@@ -1,10 +1,12 @@
-# Gas Town
+# Cursor Gas Town
 
-Multi-agent orchestration for Claude Code with persistent work tracking.
+Multi-agent orchestration for Cursor CLI with persistent work tracking.
+
+> This is a fork of [Gas Town](https://github.com/steveyegge/gastown), originally built for Claude Code. This repo converts it to work with Cursor CLI.
 
 ## Overview
 
-Gas Town coordinates multiple Claude Code agents working on different tasks. Work state persists in git-backed hooks, enabling reliable multi-agent workflows that survive crashes and restarts.
+Cursor Gas Town coordinates multiple Cursor agents working on different tasks. Work state persists in git-backed hooks, enabling reliable multi-agent workflows that survive crashes and restarts.
 
 | Challenge | Solution |
 |-----------|----------|
@@ -32,13 +34,13 @@ Gas Town coordinates multiple Claude Code agents working on different tasks. Wor
 - Git 2.25+ (for worktree support)
 - beads (bd) 0.47.0+
 - tmux 3.0+ (recommended)
-- Claude Code CLI
+- Cursor CLI
 
 ### Setup
 
 ```bash
 # Install
-go install github.com/steveyegge/gastown/cmd/gt@latest
+go install github.com/Cursor-Workshop/cursor-gastown/cmd/gt@latest
 export PATH="$PATH:$HOME/go/bin"
 
 # Create workspace
@@ -154,6 +156,10 @@ gt convoy refresh <convoy-id>
 gt mayor detach
 gt mayor attach
 ```
+
+## Origins
+
+Gas Town was created by Steve Yegge for orchestrating Claude Code agents. This fork adapts it for Cursor CLI, maintaining the same architecture while targeting the Cursor ecosystem.
 
 ## License
 
