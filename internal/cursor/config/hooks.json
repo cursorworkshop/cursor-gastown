@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeSubmitPrompt": [
+      {
+        "command": ".cursor/hooks/gastown-prompt.sh"
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/gastown-stop.sh"
+      }
+    ],
+    "afterShellExecution": [
+      {
+        "command": ".cursor/hooks/gastown-audit.sh"
+      }
+    ]
+  }
+}

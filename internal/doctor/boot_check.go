@@ -1,0 +1,120 @@
+package doctor
+
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+	"time"
+
+	"github.com/steveyegge/gastown/internal/boot"
+)
+
+// BootHealthCheck verifies Boot watchdog health.
+// "The vet checks on the dog."
+type BootHealthCheck struct {
+	BaseCheck
+}
+
+// NewBootHealthCheck creates a new Boot health check.
+func NewBootHealthCheck() *BootHealthCheck {
+	return &BootHealthCheck{
+		BaseCheck: BaseCheck{
+			CheckName:        "boot-health",
+			CheckDescription: "Check Boot watchdog health (the vet checks on the dog)",
+		},
+	}
+}
+
+// Run checks Boot health: directory, session, status, and marker freshness.
+func (c *BootHealthCheck) Run(ctx *CheckContext) *CheckResult {
+	b := boot.New(ctx.TownRoot)
+	details := []string{}
+
+	// Check 1: Boot directory exists
+	bootDir := b.Dir()
+	if _, err := os.Stat(bootDir); os.IsNotExist(err) {
+		return &CheckResult{
+			Name:    c.Name(),
+			Status:  StatusWarning,
+			Message: "Boot directory not present",
+			Details: []string{fmt.Sprintf("Expected: %s", bootDir)},
+			FixHint: "Boot directory is created on first daemon run",
+		}
+	}
+
+	// Check 2: Session alive
+	sessionAlive := b.IsSessionAlive()
+	if sessionAlive {
+		details = append(details, fmt.Sprintf("Session: %s (alive)", boot.SessionName))
+	} else {
+		details = append(details, fmt.Sprintf("Session: %s (not running)", boot.SessionName))
+	}
+
+	// Check 3: Last execution status
+	status, err := b.LoadStatus()
+	if err != nil {
+		return &CheckResult{
+			Name:    c.Name(),
+			Status:  StatusError,
+			Message: "Failed to load Boot status",
+			Details: []string{err.Error()},
+		}
+	}
+
+	if !status.CompletedAt.IsZero() {
+		age := time.Since(status.CompletedAt).Round(time.Second)
+		details = append(details, fmt.Sprintf("Last run: %s ago", age))
+		if status.LastAction != "" {
+			details = append(details, fmt.Sprintf("Last action: %s", status.LastAction))
+		}
+		if status.Target != "" {
+			details = append(details, fmt.Sprintf("Target: %s", status.Target))
+		}
+		if status.Error != "" {
+			details = append(details, fmt.Sprintf("Last error: %s", status.Error))
+			return &CheckResult{
+				Name:    c.Name(),
+				Status:  StatusWarning,
+				Message: "Boot last run had an error",
+				Details: details,
+				FixHint: "Check daemon logs for details",
+			}
+		}
+	} else if status.StartedAt.IsZero() {
+		details = append(details, "No previous run recorded")
+	}
+
+	// Check 4: Marker file freshness (stale marker indicates crash)
+	markerPath := filepath.Join(bootDir, boot.MarkerFileName)
+	if info, err := os.Stat(markerPath); err == nil {
+		age := time.Since(info.ModTime())
+		if age > boot.DefaultMarkerTTL {
+			return &CheckResult{
+				Name:    c.Name(),
+				Status:  StatusWarning,
+				Message: "Boot marker is stale (possible crash)",
+				Details: []string{
+					fmt.Sprintf("Marker age: %s", age.Round(time.Second)),
+					fmt.Sprintf("TTL: %s", boot.DefaultMarkerTTL),
+				},
+				FixHint: "Stale marker will be cleaned on next daemon tick",
+			}
+		}
+		// Marker exists and is fresh - Boot is currently running
+		details = append(details, fmt.Sprintf("Currently running (marker age: %s)", age.Round(time.Second)))
+	}
+
+	// All checks passed
+	message := "Boot watchdog healthy"
+	if b.IsDegraded() {
+		message = "Boot watchdog healthy (degraded mode)"
+		details = append(details, "Running in degraded mode (no tmux)")
+	}
+
+	return &CheckResult{
+		Name:    c.Name(),
+		Status:  StatusOK,
+		Message: message,
+		Details: details,
+	}
+}

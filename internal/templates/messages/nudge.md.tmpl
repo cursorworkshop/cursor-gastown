@@ -1,0 +1,33 @@
+# Nudge: Check-in on {{ .Issue }}
+
+Hey {{ .Polecat }},
+
+This is nudge **{{ .NudgeCount }}/{{ .MaxNudges }}** for your current work.
+
+## Reason
+
+{{ .Reason }}
+
+## Current Status
+
+Issue: {{ .Issue }}
+Status: {{ .Status }}
+
+## Action Needed
+
+Please either:
+
+1. **If making progress**: Continue working and signal when done with `gt done`
+2. **If blocked**: File a blocking issue with `bd create --title="Blocked: <reason>" --type=task`
+3. **If done**: Make sure to run:
+   - `bd close {{ .Issue }}`
+   - `bd sync`
+   - `gt done`
+
+## Important
+
+After {{ .MaxNudges }} nudges without progress, this will be escalated to the Mayor.
+
+Please respond or take action.
+
+—Witness

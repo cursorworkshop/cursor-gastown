@@ -1,0 +1,1241 @@
+package config
+
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"os"
+	"path/filepath"
+	"sort"
+	"strings"
+	"time"
+
+	"github.com/steveyegge/gastown/internal/constants"
+)
+
+var (
+	// ErrNotFound indicates the config file does not exist.
+	ErrNotFound = errors.New("config file not found")
+
+	// ErrInvalidVersion indicates an unsupported schema version.
+	ErrInvalidVersion = errors.New("unsupported config version")
+
+	// ErrInvalidType indicates an unexpected config type.
+	ErrInvalidType = errors.New("invalid config type")
+
+	// ErrMissingField indicates a required field is missing.
+	ErrMissingField = errors.New("missing required field")
+)
+
+// LoadTownConfig loads and validates a town configuration file.
+func LoadTownConfig(path string) (*TownConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is from trusted config location
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading config: %w", err)
+	}
+
+	var config TownConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("parsing config: %w", err)
+	}
+
+	if err := validateTownConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// SaveTownConfig saves a town configuration to a file.
+func SaveTownConfig(path string, config *TownConfig) error {
+	if err := validateTownConfig(config); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		return fmt.Errorf("writing config: %w", err)
+	}
+
+	return nil
+}
+
+// LoadRigsConfig loads and validates a rigs registry file.
+func LoadRigsConfig(path string) (*RigsConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally, not from user input
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading config: %w", err)
+	}
+
+	var config RigsConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("parsing config: %w", err)
+	}
+
+	if err := validateRigsConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// SaveRigsConfig saves a rigs registry to a file.
+func SaveRigsConfig(path string, config *RigsConfig) error {
+	if err := validateRigsConfig(config); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0600); err != nil {
+		return fmt.Errorf("writing config: %w", err)
+	}
+
+	return nil
+}
+
+// validateTownConfig validates a TownConfig.
+func validateTownConfig(c *TownConfig) error {
+	if c.Type != "town" && c.Type != "" {
+		return fmt.Errorf("%w: expected type 'town', got '%s'", ErrInvalidType, c.Type)
+	}
+	if c.Version > CurrentTownVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentTownVersion)
+	}
+	if c.Name == "" {
+		return fmt.Errorf("%w: name", ErrMissingField)
+	}
+	return nil
+}
+
+// validateRigsConfig validates a RigsConfig.
+func validateRigsConfig(c *RigsConfig) error {
+	if c.Version > CurrentRigsVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentRigsVersion)
+	}
+	if c.Rigs == nil {
+		c.Rigs = make(map[string]RigEntry)
+	}
+	return nil
+}
+
+// LoadRigConfig loads and validates a rig configuration file.
+func LoadRigConfig(path string) (*RigConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally, not from user input
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading config: %w", err)
+	}
+
+	var config RigConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("parsing config: %w", err)
+	}
+
+	if err := validateRigConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// SaveRigConfig saves a rig configuration to a file.
+func SaveRigConfig(path string, config *RigConfig) error {
+	if err := validateRigConfig(config); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: config files don't contain secrets
+		return fmt.Errorf("writing config: %w", err)
+	}
+
+	return nil
+}
+
+// validateRigConfig validates a RigConfig (identity only).
+func validateRigConfig(c *RigConfig) error {
+	if c.Type != "rig" && c.Type != "" {
+		return fmt.Errorf("%w: expected type 'rig', got '%s'", ErrInvalidType, c.Type)
+	}
+	if c.Version > CurrentRigConfigVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentRigConfigVersion)
+	}
+	if c.Name == "" {
+		return fmt.Errorf("%w: name", ErrMissingField)
+	}
+	return nil
+}
+
+// validateRigSettings validates a RigSettings.
+func validateRigSettings(c *RigSettings) error {
+	if c.Type != "rig-settings" && c.Type != "" {
+		return fmt.Errorf("%w: expected type 'rig-settings', got '%s'", ErrInvalidType, c.Type)
+	}
+	if c.Version > CurrentRigSettingsVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentRigSettingsVersion)
+	}
+	if c.MergeQueue != nil {
+		if err := validateMergeQueueConfig(c.MergeQueue); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// ErrInvalidOnConflict indicates an invalid on_conflict strategy.
+var ErrInvalidOnConflict = errors.New("invalid on_conflict strategy")
+
+// validateMergeQueueConfig validates a MergeQueueConfig.
+func validateMergeQueueConfig(c *MergeQueueConfig) error {
+	// Validate on_conflict strategy
+	if c.OnConflict != "" && c.OnConflict != OnConflictAssignBack && c.OnConflict != OnConflictAutoRebase {
+		return fmt.Errorf("%w: got '%s', want '%s' or '%s'",
+			ErrInvalidOnConflict, c.OnConflict, OnConflictAssignBack, OnConflictAutoRebase)
+	}
+
+	// Validate poll_interval if specified
+	if c.PollInterval != "" {
+		if _, err := time.ParseDuration(c.PollInterval); err != nil {
+			return fmt.Errorf("invalid poll_interval: %w", err)
+		}
+	}
+
+	// Validate non-negative values
+	if c.RetryFlakyTests < 0 {
+		return fmt.Errorf("%w: retry_flaky_tests must be non-negative", ErrMissingField)
+	}
+	if c.MaxConcurrent < 0 {
+		return fmt.Errorf("%w: max_concurrent must be non-negative", ErrMissingField)
+	}
+
+	return nil
+}
+
+// NewRigConfig creates a new RigConfig (identity only).
+func NewRigConfig(name, gitURL string) *RigConfig {
+	return &RigConfig{
+		Type:    "rig",
+		Version: CurrentRigConfigVersion,
+		Name:    name,
+		GitURL:  gitURL,
+	}
+}
+
+// NewRigSettings creates a new RigSettings with defaults.
+func NewRigSettings() *RigSettings {
+	return &RigSettings{
+		Type:       "rig-settings",
+		Version:    CurrentRigSettingsVersion,
+		MergeQueue: DefaultMergeQueueConfig(),
+		Namepool:   DefaultNamepoolConfig(),
+	}
+}
+
+// LoadRigSettings loads and validates a rig settings file.
+func LoadRigSettings(path string) (*RigSettings, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally, not from user input
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading settings: %w", err)
+	}
+
+	var settings RigSettings
+	if err := json.Unmarshal(data, &settings); err != nil {
+		return nil, fmt.Errorf("parsing settings: %w", err)
+	}
+
+	if err := validateRigSettings(&settings); err != nil {
+		return nil, err
+	}
+
+	return &settings, nil
+}
+
+// SaveRigSettings saves rig settings to a file.
+func SaveRigSettings(path string, settings *RigSettings) error {
+	if err := validateRigSettings(settings); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(settings, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding settings: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: settings files don't contain secrets
+		return fmt.Errorf("writing settings: %w", err)
+	}
+
+	return nil
+}
+
+// LoadMayorConfig loads and validates a mayor config file.
+func LoadMayorConfig(path string) (*MayorConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally, not from user input
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading config: %w", err)
+	}
+
+	var config MayorConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("parsing config: %w", err)
+	}
+
+	if err := validateMayorConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// SaveMayorConfig saves a mayor config to a file.
+func SaveMayorConfig(path string, config *MayorConfig) error {
+	if err := validateMayorConfig(config); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: config files don't contain secrets
+		return fmt.Errorf("writing config: %w", err)
+	}
+
+	return nil
+}
+
+// validateMayorConfig validates a MayorConfig.
+func validateMayorConfig(c *MayorConfig) error {
+	if c.Type != "mayor-config" && c.Type != "" {
+		return fmt.Errorf("%w: expected type 'mayor-config', got '%s'", ErrInvalidType, c.Type)
+	}
+	if c.Version > CurrentMayorConfigVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentMayorConfigVersion)
+	}
+	return nil
+}
+
+// NewMayorConfig creates a new MayorConfig with defaults.
+func NewMayorConfig() *MayorConfig {
+	return &MayorConfig{
+		Type:    "mayor-config",
+		Version: CurrentMayorConfigVersion,
+	}
+}
+
+// DaemonPatrolConfigPath returns the path to the daemon patrol config file.
+func DaemonPatrolConfigPath(townRoot string) string {
+	return filepath.Join(townRoot, constants.DirMayor, DaemonPatrolConfigFileName)
+}
+
+// LoadDaemonPatrolConfig loads and validates a daemon patrol config file.
+func LoadDaemonPatrolConfig(path string) (*DaemonPatrolConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading daemon patrol config: %w", err)
+	}
+
+	var config DaemonPatrolConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("parsing daemon patrol config: %w", err)
+	}
+
+	if err := validateDaemonPatrolConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// SaveDaemonPatrolConfig saves a daemon patrol config to a file.
+func SaveDaemonPatrolConfig(path string, config *DaemonPatrolConfig) error {
+	if err := validateDaemonPatrolConfig(config); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding daemon patrol config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: config files don't contain secrets
+		return fmt.Errorf("writing daemon patrol config: %w", err)
+	}
+
+	return nil
+}
+
+func validateDaemonPatrolConfig(c *DaemonPatrolConfig) error {
+	if c.Type != "daemon-patrol-config" && c.Type != "" {
+		return fmt.Errorf("%w: expected type 'daemon-patrol-config', got '%s'", ErrInvalidType, c.Type)
+	}
+	if c.Version > CurrentDaemonPatrolConfigVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentDaemonPatrolConfigVersion)
+	}
+	return nil
+}
+
+// EnsureDaemonPatrolConfig creates the daemon patrol config if it doesn't exist.
+func EnsureDaemonPatrolConfig(townRoot string) error {
+	path := DaemonPatrolConfigPath(townRoot)
+	if _, err := os.Stat(path); err != nil {
+		if !os.IsNotExist(err) {
+			return fmt.Errorf("checking daemon patrol config: %w", err)
+		}
+		return SaveDaemonPatrolConfig(path, NewDaemonPatrolConfig())
+	}
+	return nil
+}
+
+// LoadAccountsConfig loads and validates an accounts configuration file.
+func LoadAccountsConfig(path string) (*AccountsConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally, not from user input
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading accounts config: %w", err)
+	}
+
+	var config AccountsConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("parsing accounts config: %w", err)
+	}
+
+	if err := validateAccountsConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// SaveAccountsConfig saves an accounts configuration to a file.
+func SaveAccountsConfig(path string, config *AccountsConfig) error {
+	if err := validateAccountsConfig(config); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding accounts config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: accounts config doesn't contain sensitive credentials
+		return fmt.Errorf("writing accounts config: %w", err)
+	}
+
+	return nil
+}
+
+// validateAccountsConfig validates an AccountsConfig.
+func validateAccountsConfig(c *AccountsConfig) error {
+	if c.Version > CurrentAccountsVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentAccountsVersion)
+	}
+	if c.Accounts == nil {
+		c.Accounts = make(map[string]Account)
+	}
+	// Validate default refers to an existing account (if set and accounts exist)
+	if c.Default != "" && len(c.Accounts) > 0 {
+		if _, ok := c.Accounts[c.Default]; !ok {
+			return fmt.Errorf("%w: default account '%s' not found in accounts", ErrMissingField, c.Default)
+		}
+	}
+	// Validate each account has required fields
+	for handle, acct := range c.Accounts {
+		if acct.ConfigDir == "" {
+			return fmt.Errorf("%w: config_dir for account '%s'", ErrMissingField, handle)
+		}
+	}
+	return nil
+}
+
+// NewAccountsConfig creates a new AccountsConfig with defaults.
+func NewAccountsConfig() *AccountsConfig {
+	return &AccountsConfig{
+		Version:  CurrentAccountsVersion,
+		Accounts: make(map[string]Account),
+	}
+}
+
+// GetAccount returns an account by handle, or nil if not found.
+func (c *AccountsConfig) GetAccount(handle string) *Account {
+	if acct, ok := c.Accounts[handle]; ok {
+		return &acct
+	}
+	return nil
+}
+
+// GetDefaultAccount returns the default account, or nil if not set.
+func (c *AccountsConfig) GetDefaultAccount() *Account {
+	if c.Default == "" {
+		return nil
+	}
+	return c.GetAccount(c.Default)
+}
+
+// ResolveAccountConfigDir resolves the CLAUDE_CONFIG_DIR for account selection.
+// Priority order:
+//  1. GT_ACCOUNT environment variable
+//  2. accountFlag (from --account command flag)
+//  3. Default account from config
+//
+// Returns empty string if no account configured or resolved.
+// Returns the handle that was resolved as second value.
+func ResolveAccountConfigDir(accountsPath, accountFlag string) (configDir, handle string, err error) {
+	// Load accounts config
+	cfg, loadErr := LoadAccountsConfig(accountsPath)
+	if loadErr != nil {
+		// No accounts configured - that's OK, return empty
+		return "", "", nil
+	}
+
+	// Priority 1: GT_ACCOUNT env var
+	if envAccount := os.Getenv("GT_ACCOUNT"); envAccount != "" {
+		acct := cfg.GetAccount(envAccount)
+		if acct == nil {
+			return "", "", fmt.Errorf("GT_ACCOUNT '%s' not found in accounts config", envAccount)
+		}
+		return expandPath(acct.ConfigDir), envAccount, nil
+	}
+
+	// Priority 2: --account flag
+	if accountFlag != "" {
+		acct := cfg.GetAccount(accountFlag)
+		if acct == nil {
+			return "", "", fmt.Errorf("account '%s' not found in accounts config", accountFlag)
+		}
+		return expandPath(acct.ConfigDir), accountFlag, nil
+	}
+
+	// Priority 3: Default account
+	if cfg.Default != "" {
+		acct := cfg.GetDefaultAccount()
+		if acct != nil {
+			return expandPath(acct.ConfigDir), cfg.Default, nil
+		}
+	}
+
+	return "", "", nil
+}
+
+// expandPath expands ~ to home directory.
+func expandPath(path string) string {
+	if strings.HasPrefix(path, "~/") {
+		home, err := os.UserHomeDir()
+		if err == nil {
+			return filepath.Join(home, path[2:])
+		}
+	}
+	return path
+}
+
+// LoadMessagingConfig loads and validates a messaging configuration file.
+func LoadMessagingConfig(path string) (*MessagingConfig, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally, not from user input
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, fmt.Errorf("%w: %s", ErrNotFound, path)
+		}
+		return nil, fmt.Errorf("reading messaging config: %w", err)
+	}
+
+	var config MessagingConfig
+	if err := json.Unmarshal(data, &config); err != nil {
+		return nil, fmt.Errorf("parsing messaging config: %w", err)
+	}
+
+	if err := validateMessagingConfig(&config); err != nil {
+		return nil, err
+	}
+
+	return &config, nil
+}
+
+// SaveMessagingConfig saves a messaging configuration to a file.
+func SaveMessagingConfig(path string, config *MessagingConfig) error {
+	if err := validateMessagingConfig(config); err != nil {
+		return err
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding messaging config: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: messaging config doesn't contain secrets
+		return fmt.Errorf("writing messaging config: %w", err)
+	}
+
+	return nil
+}
+
+// validateMessagingConfig validates a MessagingConfig.
+func validateMessagingConfig(c *MessagingConfig) error {
+	if c.Type != "messaging" && c.Type != "" {
+		return fmt.Errorf("%w: expected type 'messaging', got '%s'", ErrInvalidType, c.Type)
+	}
+	if c.Version > CurrentMessagingVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, c.Version, CurrentMessagingVersion)
+	}
+
+	// Initialize nil maps
+	if c.Lists == nil {
+		c.Lists = make(map[string][]string)
+	}
+	if c.Queues == nil {
+		c.Queues = make(map[string]QueueConfig)
+	}
+	if c.Announces == nil {
+		c.Announces = make(map[string]AnnounceConfig)
+	}
+	if c.NudgeChannels == nil {
+		c.NudgeChannels = make(map[string][]string)
+	}
+
+	// Validate lists have at least one recipient
+	for name, recipients := range c.Lists {
+		if len(recipients) == 0 {
+			return fmt.Errorf("%w: list '%s' has no recipients", ErrMissingField, name)
+		}
+	}
+
+	// Validate queues have at least one worker
+	for name, queue := range c.Queues {
+		if len(queue.Workers) == 0 {
+			return fmt.Errorf("%w: queue '%s' workers", ErrMissingField, name)
+		}
+		if queue.MaxClaims < 0 {
+			return fmt.Errorf("%w: queue '%s' max_claims must be non-negative", ErrMissingField, name)
+		}
+	}
+
+	// Validate announces have at least one reader
+	for name, announce := range c.Announces {
+		if len(announce.Readers) == 0 {
+			return fmt.Errorf("%w: announce '%s' readers", ErrMissingField, name)
+		}
+		if announce.RetainCount < 0 {
+			return fmt.Errorf("%w: announce '%s' retain_count must be non-negative", ErrMissingField, name)
+		}
+	}
+
+	// Validate nudge channels have non-empty names and at least one recipient
+	for name, recipients := range c.NudgeChannels {
+		if name == "" {
+			return fmt.Errorf("%w: nudge channel name cannot be empty", ErrMissingField)
+		}
+		if len(recipients) == 0 {
+			return fmt.Errorf("%w: nudge channel '%s' has no recipients", ErrMissingField, name)
+		}
+	}
+
+	return nil
+}
+
+// MessagingConfigPath returns the standard path for messaging config in a town.
+func MessagingConfigPath(townRoot string) string {
+	return filepath.Join(townRoot, "config", "messaging.json")
+}
+
+// LoadOrCreateMessagingConfig loads the messaging config, creating a default if not found.
+func LoadOrCreateMessagingConfig(path string) (*MessagingConfig, error) {
+	config, err := LoadMessagingConfig(path)
+	if err != nil {
+		if errors.Is(err, ErrNotFound) {
+			return NewMessagingConfig(), nil
+		}
+		return nil, err
+	}
+	return config, nil
+}
+
+// LoadRuntimeConfig loads the RuntimeConfig from a rig's settings.
+// Falls back to defaults if settings don't exist or don't specify runtime config.
+// rigPath should be the path to the rig directory (e.g., ~/gt/gastown).
+//
+// Deprecated: Use ResolveAgentConfig for full agent resolution with town settings.
+func LoadRuntimeConfig(rigPath string) *RuntimeConfig {
+	settingsPath := filepath.Join(rigPath, "settings", "config.json")
+	settings, err := LoadRigSettings(settingsPath)
+	if err != nil {
+		return DefaultRuntimeConfig()
+	}
+	if settings.Runtime == nil {
+		return DefaultRuntimeConfig()
+	}
+	// Fill in defaults for empty fields
+	rc := settings.Runtime
+	if rc.Command == "" {
+		rc.Command = "claude"
+	}
+	if rc.Args == nil {
+		rc.Args = []string{"--dangerously-skip-permissions"}
+	}
+	return rc
+}
+
+// TownSettingsPath returns the path to town settings file.
+func TownSettingsPath(townRoot string) string {
+	return filepath.Join(townRoot, "settings", "config.json")
+}
+
+// RigSettingsPath returns the path to rig settings file.
+func RigSettingsPath(rigPath string) string {
+	return filepath.Join(rigPath, "settings", "config.json")
+}
+
+// LoadOrCreateTownSettings loads town settings or creates defaults if missing.
+func LoadOrCreateTownSettings(path string) (*TownSettings, error) {
+	data, err := os.ReadFile(path) //nolint:gosec // G304: path is constructed internally
+	if err != nil {
+		if os.IsNotExist(err) {
+			return NewTownSettings(), nil
+		}
+		return nil, err
+	}
+
+	var settings TownSettings
+	if err := json.Unmarshal(data, &settings); err != nil {
+		return nil, err
+	}
+	return &settings, nil
+}
+
+// SaveTownSettings saves town settings to a file.
+func SaveTownSettings(path string, settings *TownSettings) error {
+	if settings.Type != "town-settings" && settings.Type != "" {
+		return fmt.Errorf("%w: expected type 'town-settings', got '%s'", ErrInvalidType, settings.Type)
+	}
+	if settings.Version > CurrentTownSettingsVersion {
+		return fmt.Errorf("%w: got %d, max supported %d", ErrInvalidVersion, settings.Version, CurrentTownSettingsVersion)
+	}
+
+	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
+		return fmt.Errorf("creating directory: %w", err)
+	}
+
+	data, err := json.MarshalIndent(settings, "", "  ")
+	if err != nil {
+		return fmt.Errorf("encoding settings: %w", err)
+	}
+
+	if err := os.WriteFile(path, data, 0644); err != nil { //nolint:gosec // G306: settings files don't contain secrets
+		return fmt.Errorf("writing settings: %w", err)
+	}
+
+	return nil
+}
+
+// ResolveAgentConfig resolves the agent configuration for a rig.
+// It looks up the agent by name in town settings (custom agents) and built-in presets.
+//
+// Resolution order:
+//  1. If rig has Runtime set directly, use it (backwards compatibility)
+//  2. If rig has Agent set, look it up in:
+//     a. Town's custom agents (from TownSettings.Agents)
+//     b. Built-in presets (claude, gemini, codex)
+//  3. If rig has no Agent set, use town's default_agent
+//  4. Fall back to claude defaults
+//
+// townRoot is the path to the town directory (e.g., ~/gt).
+// rigPath is the path to the rig directory (e.g., ~/gt/gastown).
+func ResolveAgentConfig(townRoot, rigPath string) *RuntimeConfig {
+	// Load rig settings
+	rigSettings, err := LoadRigSettings(RigSettingsPath(rigPath))
+	if err != nil {
+		rigSettings = nil
+	}
+
+	// Backwards compatibility: if Runtime is set directly, use it
+	if rigSettings != nil && rigSettings.Runtime != nil {
+		rc := rigSettings.Runtime
+		return fillRuntimeDefaults(rc)
+	}
+
+	// Load town settings for agent lookup
+	townSettings, err := LoadOrCreateTownSettings(TownSettingsPath(townRoot))
+	if err != nil {
+		townSettings = NewTownSettings()
+	}
+
+	// Load custom agent registry if it exists
+	_ = LoadAgentRegistry(DefaultAgentRegistryPath(townRoot))
+
+	// Determine which agent name to use
+	agentName := ""
+	if rigSettings != nil && rigSettings.Agent != "" {
+		agentName = rigSettings.Agent
+	} else if townSettings.DefaultAgent != "" {
+		agentName = townSettings.DefaultAgent
+	} else {
+		agentName = "claude" // ultimate fallback
+	}
+
+	// Look up the agent configuration
+	return lookupAgentConfig(agentName, townSettings)
+}
+
+// ResolveAgentConfigWithOverride resolves the agent configuration for a rig, with an optional override.
+// If agentOverride is non-empty, it is used instead of rig/town defaults.
+// Returns the resolved RuntimeConfig, the selected agent name, and an error if the override name
+// does not exist in town custom agents or built-in presets.
+func ResolveAgentConfigWithOverride(townRoot, rigPath, agentOverride string) (*RuntimeConfig, string, error) {
+	// Load rig settings
+	rigSettings, err := LoadRigSettings(RigSettingsPath(rigPath))
+	if err != nil {
+		rigSettings = nil
+	}
+
+	// Backwards compatibility: if Runtime is set directly, use it (but still report agentOverride if present)
+	if rigSettings != nil && rigSettings.Runtime != nil && agentOverride == "" {
+		rc := rigSettings.Runtime
+		return fillRuntimeDefaults(rc), "", nil
+	}
+
+	// Load town settings for agent lookup
+	townSettings, err := LoadOrCreateTownSettings(TownSettingsPath(townRoot))
+	if err != nil {
+		townSettings = NewTownSettings()
+	}
+
+	// Load custom agent registry if it exists
+	_ = LoadAgentRegistry(DefaultAgentRegistryPath(townRoot))
+
+	// Determine which agent name to use
+	agentName := ""
+	if agentOverride != "" {
+		agentName = agentOverride
+	} else if rigSettings != nil && rigSettings.Agent != "" {
+		agentName = rigSettings.Agent
+	} else if townSettings.DefaultAgent != "" {
+		agentName = townSettings.DefaultAgent
+	} else {
+		agentName = "claude" // ultimate fallback
+	}
+
+	// If an override is requested, validate it exists.
+	if agentOverride != "" {
+		if townSettings.Agents != nil {
+			if custom, ok := townSettings.Agents[agentName]; ok && custom != nil {
+				return fillRuntimeDefaults(custom), agentName, nil
+			}
+		}
+		if preset := GetAgentPresetByName(agentName); preset != nil {
+			return RuntimeConfigFromPreset(AgentPreset(agentName)), agentName, nil
+		}
+		return nil, "", fmt.Errorf("agent '%s' not found", agentName)
+	}
+
+	// Normal lookup path (no override)
+	return lookupAgentConfig(agentName, townSettings), agentName, nil
+}
+
+// lookupAgentConfig looks up an agent by name.
+// First checks town's custom agents, then built-in presets from agents.go.
+func lookupAgentConfig(name string, townSettings *TownSettings) *RuntimeConfig {
+	// First check town's custom agents
+	if townSettings != nil && townSettings.Agents != nil {
+		if custom, ok := townSettings.Agents[name]; ok && custom != nil {
+			return fillRuntimeDefaults(custom)
+		}
+	}
+
+	// Check built-in presets from agents.go
+	if preset := GetAgentPresetByName(name); preset != nil {
+		return RuntimeConfigFromPreset(AgentPreset(name))
+	}
+
+	// Fallback to claude defaults
+	return DefaultRuntimeConfig()
+}
+
+// fillRuntimeDefaults fills in default values for empty RuntimeConfig fields.
+func fillRuntimeDefaults(rc *RuntimeConfig) *RuntimeConfig {
+	if rc == nil {
+		return DefaultRuntimeConfig()
+	}
+	// Create a copy to avoid modifying the original
+	result := &RuntimeConfig{
+		Command:       rc.Command,
+		Args:          rc.Args,
+		InitialPrompt: rc.InitialPrompt,
+	}
+	if result.Command == "" {
+		result.Command = "claude"
+	}
+	if result.Args == nil {
+		result.Args = []string{"--dangerously-skip-permissions"}
+	}
+	return result
+}
+
+// GetRuntimeCommand is a convenience function that returns the full command string
+// for starting an LLM session. It resolves the agent config and builds the command.
+func GetRuntimeCommand(rigPath string) string {
+	if rigPath == "" {
+		// Try to detect town root from cwd for town-level agents (mayor, deacon)
+		townRoot, err := findTownRootFromCwd()
+		if err != nil {
+			return DefaultRuntimeConfig().BuildCommand()
+		}
+		return ResolveAgentConfig(townRoot, "").BuildCommand()
+	}
+	// Derive town root from rig path (rig is typically ~/gt/<rigname>)
+	townRoot := filepath.Dir(rigPath)
+	return ResolveAgentConfig(townRoot, rigPath).BuildCommand()
+}
+
+// GetRuntimeCommandWithAgentOverride returns the full command for starting an LLM session,
+// using agentOverride if non-empty.
+func GetRuntimeCommandWithAgentOverride(rigPath, agentOverride string) (string, error) {
+	if rigPath == "" {
+		townRoot, err := findTownRootFromCwd()
+		if err != nil {
+			return DefaultRuntimeConfig().BuildCommand(), nil
+		}
+		rc, _, resolveErr := ResolveAgentConfigWithOverride(townRoot, "", agentOverride)
+		if resolveErr != nil {
+			return "", resolveErr
+		}
+		return rc.BuildCommand(), nil
+	}
+
+	townRoot := filepath.Dir(rigPath)
+	rc, _, err := ResolveAgentConfigWithOverride(townRoot, rigPath, agentOverride)
+	if err != nil {
+		return "", err
+	}
+	return rc.BuildCommand(), nil
+}
+
+// GetRuntimeCommandWithPrompt returns the full command with an initial prompt.
+func GetRuntimeCommandWithPrompt(rigPath, prompt string) string {
+	if rigPath == "" {
+		// Try to detect town root from cwd for town-level agents (mayor, deacon)
+		townRoot, err := findTownRootFromCwd()
+		if err != nil {
+			return DefaultRuntimeConfig().BuildCommandWithPrompt(prompt)
+		}
+		return ResolveAgentConfig(townRoot, "").BuildCommandWithPrompt(prompt)
+	}
+	townRoot := filepath.Dir(rigPath)
+	return ResolveAgentConfig(townRoot, rigPath).BuildCommandWithPrompt(prompt)
+}
+
+// GetRuntimeCommandWithPromptAndAgentOverride returns the full command with an initial prompt,
+// using agentOverride if non-empty.
+func GetRuntimeCommandWithPromptAndAgentOverride(rigPath, prompt, agentOverride string) (string, error) {
+	if rigPath == "" {
+		townRoot, err := findTownRootFromCwd()
+		if err != nil {
+			return DefaultRuntimeConfig().BuildCommandWithPrompt(prompt), nil
+		}
+		rc, _, resolveErr := ResolveAgentConfigWithOverride(townRoot, "", agentOverride)
+		if resolveErr != nil {
+			return "", resolveErr
+		}
+		return rc.BuildCommandWithPrompt(prompt), nil
+	}
+
+	townRoot := filepath.Dir(rigPath)
+	rc, _, err := ResolveAgentConfigWithOverride(townRoot, rigPath, agentOverride)
+	if err != nil {
+		return "", err
+	}
+	return rc.BuildCommandWithPrompt(prompt), nil
+}
+
+// findTownRootFromCwd locates the town root by walking up from cwd.
+// It looks for the mayor/town.json marker file.
+// Returns empty string and no error if not found (caller should use defaults).
+func findTownRootFromCwd() (string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "", fmt.Errorf("getting cwd: %w", err)
+	}
+
+	absDir, err := filepath.Abs(cwd)
+	if err != nil {
+		return "", fmt.Errorf("resolving path: %w", err)
+	}
+
+	const marker = "mayor/town.json"
+
+	current := absDir
+	for {
+		if _, err := os.Stat(filepath.Join(current, marker)); err == nil {
+			return current, nil
+		}
+
+		parent := filepath.Dir(current)
+		if parent == current {
+			return "", fmt.Errorf("town root not found (no %s marker)", marker)
+		}
+		current = parent
+	}
+}
+
+// BuildStartupCommand builds a full startup command with environment exports.
+// envVars is a map of environment variable names to values.
+// rigPath is optional - if empty, tries to detect town root from cwd.
+// prompt is optional - if provided, appended as the initial prompt.
+func BuildStartupCommand(envVars map[string]string, rigPath, prompt string) string {
+	var rc *RuntimeConfig
+	if rigPath != "" {
+		// Derive town root from rig path
+		townRoot := filepath.Dir(rigPath)
+		rc = ResolveAgentConfig(townRoot, rigPath)
+	} else {
+		// Try to detect town root from cwd for town-level agents (mayor, deacon)
+		townRoot, err := findTownRootFromCwd()
+		if err != nil {
+			rc = DefaultRuntimeConfig()
+		} else {
+			rc = ResolveAgentConfig(townRoot, "")
+		}
+	}
+
+	// Build environment export prefix
+	var exports []string
+	for k, v := range envVars {
+		exports = append(exports, fmt.Sprintf("%s=%s", k, v))
+	}
+
+	// Sort for deterministic output
+	sort.Strings(exports)
+
+	var cmd string
+	if len(exports) > 0 {
+		cmd = "export " + strings.Join(exports, " ") + " && "
+	}
+
+	// Add runtime command
+	if prompt != "" {
+		cmd += rc.BuildCommandWithPrompt(prompt)
+	} else {
+		cmd += rc.BuildCommand()
+	}
+
+	return cmd
+}
+
+// BuildStartupCommandWithAgentOverride builds a startup command like BuildStartupCommand,
+// but uses agentOverride if non-empty.
+func BuildStartupCommandWithAgentOverride(envVars map[string]string, rigPath, prompt, agentOverride string) (string, error) {
+	var rc *RuntimeConfig
+
+	if rigPath != "" {
+		townRoot := filepath.Dir(rigPath)
+		var err error
+		rc, _, err = ResolveAgentConfigWithOverride(townRoot, rigPath, agentOverride)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		townRoot, err := findTownRootFromCwd()
+		if err != nil {
+			rc = DefaultRuntimeConfig()
+		} else {
+			var resolveErr error
+			rc, _, resolveErr = ResolveAgentConfigWithOverride(townRoot, "", agentOverride)
+			if resolveErr != nil {
+				return "", resolveErr
+			}
+		}
+	}
+
+	// Build environment export prefix
+	var exports []string
+	for k, v := range envVars {
+		exports = append(exports, fmt.Sprintf("%s=%s", k, v))
+	}
+	sort.Strings(exports)
+
+	var cmd string
+	if len(exports) > 0 {
+		cmd = "export " + strings.Join(exports, " ") + " && "
+	}
+
+	if prompt != "" {
+		cmd += rc.BuildCommandWithPrompt(prompt)
+	} else {
+		cmd += rc.BuildCommand()
+	}
+
+	return cmd, nil
+}
+
+// BuildAgentStartupCommand is a convenience function for starting agent sessions.
+// It sets standard environment variables (GT_ROLE, BD_ACTOR, GIT_AUTHOR_NAME)
+// and builds the full startup command.
+func BuildAgentStartupCommand(role, bdActor, rigPath, prompt string) string {
+	envVars := map[string]string{
+		"GT_ROLE":         role,
+		"BD_ACTOR":        bdActor,
+		"GIT_AUTHOR_NAME": bdActor,
+	}
+	return BuildStartupCommand(envVars, rigPath, prompt)
+}
+
+// BuildAgentStartupCommandWithAgentOverride is like BuildAgentStartupCommand, but uses agentOverride if non-empty.
+func BuildAgentStartupCommandWithAgentOverride(role, bdActor, rigPath, prompt, agentOverride string) (string, error) {
+	envVars := map[string]string{
+		"GT_ROLE":         role,
+		"BD_ACTOR":        bdActor,
+		"GIT_AUTHOR_NAME": bdActor,
+	}
+	return BuildStartupCommandWithAgentOverride(envVars, rigPath, prompt, agentOverride)
+}
+
+// BuildPolecatStartupCommand builds the startup command for a polecat.
+// Sets GT_ROLE, GT_RIG, GT_POLECAT, BD_ACTOR, and GIT_AUTHOR_NAME.
+func BuildPolecatStartupCommand(rigName, polecatName, rigPath, prompt string) string {
+	bdActor := fmt.Sprintf("%s/polecats/%s", rigName, polecatName)
+	envVars := map[string]string{
+		"GT_ROLE":         "polecat",
+		"GT_RIG":          rigName,
+		"GT_POLECAT":      polecatName,
+		"BD_ACTOR":        bdActor,
+		"GIT_AUTHOR_NAME": polecatName,
+	}
+	return BuildStartupCommand(envVars, rigPath, prompt)
+}
+
+// BuildPolecatStartupCommandWithAgentOverride is like BuildPolecatStartupCommand, but uses agentOverride if non-empty.
+func BuildPolecatStartupCommandWithAgentOverride(rigName, polecatName, rigPath, prompt, agentOverride string) (string, error) {
+	bdActor := fmt.Sprintf("%s/polecats/%s", rigName, polecatName)
+	envVars := map[string]string{
+		"GT_ROLE":         "polecat",
+		"GT_RIG":          rigName,
+		"GT_POLECAT":      polecatName,
+		"BD_ACTOR":        bdActor,
+		"GIT_AUTHOR_NAME": polecatName,
+	}
+	return BuildStartupCommandWithAgentOverride(envVars, rigPath, prompt, agentOverride)
+}
+
+// BuildCrewStartupCommand builds the startup command for a crew member.
+// Sets GT_ROLE, GT_RIG, GT_CREW, BD_ACTOR, and GIT_AUTHOR_NAME.
+func BuildCrewStartupCommand(rigName, crewName, rigPath, prompt string) string {
+	bdActor := fmt.Sprintf("%s/crew/%s", rigName, crewName)
+	envVars := map[string]string{
+		"GT_ROLE":         "crew",
+		"GT_RIG":          rigName,
+		"GT_CREW":         crewName,
+		"BD_ACTOR":        bdActor,
+		"GIT_AUTHOR_NAME": crewName,
+	}
+	return BuildStartupCommand(envVars, rigPath, prompt)
+}
+
+// BuildCrewStartupCommandWithAgentOverride is like BuildCrewStartupCommand, but uses agentOverride if non-empty.
+func BuildCrewStartupCommandWithAgentOverride(rigName, crewName, rigPath, prompt, agentOverride string) (string, error) {
+	bdActor := fmt.Sprintf("%s/crew/%s", rigName, crewName)
+	envVars := map[string]string{
+		"GT_ROLE":         "crew",
+		"GT_RIG":          rigName,
+		"GT_CREW":         crewName,
+		"BD_ACTOR":        bdActor,
+		"GIT_AUTHOR_NAME": crewName,
+	}
+	return BuildStartupCommandWithAgentOverride(envVars, rigPath, prompt, agentOverride)
+}
+
+// ExpectedPaneCommands returns tmux pane command names that indicate the runtime is running.
+// For example, Claude runs as "node", while most other runtimes report their executable name.
+func ExpectedPaneCommands(rc *RuntimeConfig) []string {
+	if rc == nil || rc.Command == "" {
+		return nil
+	}
+	if filepath.Base(rc.Command) == "claude" {
+		return []string{"node"}
+	}
+	return []string{filepath.Base(rc.Command)}
+}
+
+// GetRigPrefix returns the beads prefix for a rig from rigs.json.
+// Falls back to "gt" if the rig isn't found or has no prefix configured.
+// townRoot is the path to the town directory (e.g., ~/gt).
+func GetRigPrefix(townRoot, rigName string) string {
+	rigsConfigPath := filepath.Join(townRoot, "mayor", "rigs.json")
+	rigsConfig, err := LoadRigsConfig(rigsConfigPath)
+	if err != nil {
+		return "gt" // fallback
+	}
+
+	entry, ok := rigsConfig.Rigs[rigName]
+	if !ok {
+		return "gt" // fallback
+	}
+
+	if entry.BeadsConfig == nil || entry.BeadsConfig.Prefix == "" {
+		return "gt" // fallback
+	}
+
+	// Strip trailing hyphen if present (prefix stored as "gt-" but used as "gt")
+	prefix := entry.BeadsConfig.Prefix
+	return strings.TrimSuffix(prefix, "-")
+}

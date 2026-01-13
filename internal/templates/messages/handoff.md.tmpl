@@ -1,0 +1,33 @@
+# 🤝 HANDOFF: {{ .Role }} Session
+
+## Current State
+
+**Role**: {{ .Role }}
+**Working on**: {{ .CurrentWork }}
+**Status**: {{ .Status }}
+
+{{ if .GitBranch }}
+**Git branch**: {{ .GitBranch }}
+{{ if .GitDirty }}⚠️ Working tree has uncommitted changes{{ end }}
+{{ end }}
+
+{{ if .PendingMail }}
+**Pending mail**: {{ .PendingMail }} messages in inbox
+{{ end }}
+
+## Next Steps
+
+{{ range $i, $step := .NextSteps }}
+{{ $i }}. {{ $step }}
+{{ end }}
+
+{{ if .Notes }}
+## Notes
+
+{{ .Notes }}
+{{ end }}
+
+---
+
+This handoff was generated automatically. Read the above carefully and continue
+where the previous session left off.

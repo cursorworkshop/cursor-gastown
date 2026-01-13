@@ -1,0 +1,436 @@
+package cmd
+
+import (
+	"testing"
+
+	"github.com/steveyegge/gastown/internal/beads"
+)
+
+func TestAddIntegrationBranchField(t *testing.T) {
+	tests := []struct {
+		name        string
+		description string
+		branchName  string
+		want        string
+	}{
+		{
+			name:        "empty description",
+			description: "",
+			branchName:  "integration/gt-epic",
+			want:        "integration_branch: integration/gt-epic",
+		},
+		{
+			name:        "simple description",
+			description: "Epic for authentication",
+			branchName:  "integration/gt-auth",
+			want:        "integration_branch: integration/gt-auth\nEpic for authentication",
+		},
+		{
+			name:        "existing integration_branch field",
+			description: "integration_branch: integration/old-epic\nSome description",
+			branchName:  "integration/new-epic",
+			want:        "integration_branch: integration/new-epic\nSome description",
+		},
+		{
+			name:        "multiline description",
+			description: "Line 1\nLine 2\nLine 3",
+			branchName:  "integration/gt-xyz",
+			want:        "integration_branch: integration/gt-xyz\nLine 1\nLine 2\nLine 3",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := addIntegrationBranchField(tt.description, tt.branchName)
+			if got != tt.want {
+				t.Errorf("addIntegrationBranchField() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestParseBranchName(t *testing.T) {
+	tests := []struct {
+		name       string
+		branch     string
+		wantIssue  string
+		wantWorker string
+	}{
+		{
+			name:       "polecat branch format",
+			branch:     "polecat/Nux/gt-xyz",
+			wantIssue:  "gt-xyz",
+			wantWorker: "Nux",
+		},
+		{
+			name:       "polecat branch with subtask",
+			branch:     "polecat/Worker/gt-abc.1",
+			wantIssue:  "gt-abc.1",
+			wantWorker: "Worker",
+		},
+		{
+			name:       "simple issue branch",
+			branch:     "gt-xyz",
+			wantIssue:  "gt-xyz",
+			wantWorker: "",
+		},
+		{
+			name:       "feature branch with issue",
+			branch:     "feature/gt-abc-impl",
+			wantIssue:  "gt-abc",
+			wantWorker: "",
+		},
+		{
+			name:       "no issue pattern",
+			branch:     "main",
+			wantIssue:  "",
+			wantWorker: "",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			info := parseBranchName(tt.branch)
+			if info.Issue != tt.wantIssue {
+				t.Errorf("parseBranchName() Issue = %q, want %q", info.Issue, tt.wantIssue)
+			}
+			if info.Worker != tt.wantWorker {
+				t.Errorf("parseBranchName() Worker = %q, want %q", info.Worker, tt.wantWorker)
+			}
+		})
+	}
+}
+
+func TestFormatMRAge(t *testing.T) {
+	tests := []struct {
+		name      string
+		createdAt string
+		wantOk    bool // just check it doesn't panic/error
+	}{
+		{
+			name:      "RFC3339 format",
+			createdAt: "2025-01-01T12:00:00Z",
+			wantOk:    true,
+		},
+		{
+			name:      "alternative format",
+			createdAt: "2025-01-01T12:00:00",
+			wantOk:    true,
+		},
+		{
+			name:      "invalid format",
+			createdAt: "not-a-date",
+			wantOk:    true, // returns "?" for invalid
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := formatMRAge(tt.createdAt)
+			if tt.wantOk && result == "" {
+				t.Errorf("formatMRAge() returned empty for %s", tt.createdAt)
+			}
+		})
+	}
+}
+
+func TestGetDescriptionWithoutMRFields(t *testing.T) {
+	tests := []struct {
+		name        string
+		description string
+		want        string
+	}{
+		{
+			name:        "empty description",
+			description: "",
+			want:        "",
+		},
+		{
+			name:        "only MR fields",
+			description: "branch: polecat/Nux/gt-xyz\ntarget: main\nworker: Nux",
+			want:        "",
+		},
+		{
+			name:        "mixed content",
+			description: "branch: polecat/Nux/gt-xyz\nSome custom notes\ntarget: main",
+			want:        "Some custom notes",
+		},
+		{
+			name:        "no MR fields",
+			description: "Just a regular description\nWith multiple lines",
+			want:        "Just a regular description\nWith multiple lines",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := getDescriptionWithoutMRFields(tt.description)
+			if got != tt.want {
+				t.Errorf("getDescriptionWithoutMRFields() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestTruncateString(t *testing.T) {
+	tests := []struct {
+		name   string
+		s      string
+		maxLen int
+		want   string
+	}{
+		{
+			name:   "short string",
+			s:      "hello",
+			maxLen: 10,
+			want:   "hello",
+		},
+		{
+			name:   "exact length",
+			s:      "hello",
+			maxLen: 5,
+			want:   "hello",
+		},
+		{
+			name:   "needs truncation",
+			s:      "hello world",
+			maxLen: 8,
+			want:   "hello...",
+		},
+		{
+			name:   "very short max",
+			s:      "hello",
+			maxLen: 3,
+			want:   "hel",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := truncateString(tt.s, tt.maxLen)
+			if got != tt.want {
+				t.Errorf("truncateString() = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatStatus(t *testing.T) {
+	tests := []struct {
+		name   string
+		status string
+		want   string // We check for substring since styling adds ANSI codes
+	}{
+		{
+			name:   "open status",
+			status: "open",
+			want:   "open",
+		},
+		{
+			name:   "in_progress status",
+			status: "in_progress",
+			want:   "in_progress",
+		},
+		{
+			name:   "closed status",
+			status: "closed",
+			want:   "closed",
+		},
+		{
+			name:   "unknown status",
+			status: "pending",
+			want:   "pending",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatStatus(tt.status)
+			if got == "" {
+				t.Errorf("formatStatus(%q) returned empty string", tt.status)
+			}
+			// The result contains ANSI codes, so just check the status text is present
+			if !contains(got, tt.want) {
+				t.Errorf("formatStatus(%q) = %q, should contain %q", tt.status, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetStatusIcon(t *testing.T) {
+	tests := []struct {
+		status string
+		want   string
+	}{
+		{"open", "○"},
+		{"in_progress", "▶"},
+		{"closed", "✓"},
+		{"unknown", "•"},
+		{"", "•"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.status, func(t *testing.T) {
+			got := getStatusIcon(tt.status)
+			if got != tt.want {
+				t.Errorf("getStatusIcon(%q) = %q, want %q", tt.status, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestFormatTimeAgo(t *testing.T) {
+	tests := []struct {
+		name      string
+		timestamp string
+		wantEmpty bool
+	}{
+		{
+			name:      "RFC3339 format",
+			timestamp: "2025-01-01T12:00:00Z",
+			wantEmpty: false,
+		},
+		{
+			name:      "RFC3339 with timezone",
+			timestamp: "2025-01-01T12:00:00-08:00",
+			wantEmpty: false,
+		},
+		{
+			name:      "date only format",
+			timestamp: "2025-01-01",
+			wantEmpty: false,
+		},
+		{
+			name:      "datetime without Z",
+			timestamp: "2025-01-01T12:00:00",
+			wantEmpty: false,
+		},
+		{
+			name:      "invalid format returns empty",
+			timestamp: "not-a-date",
+			wantEmpty: true,
+		},
+		{
+			name:      "empty string returns empty",
+			timestamp: "",
+			wantEmpty: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := formatTimeAgo(tt.timestamp)
+			if tt.wantEmpty && got != "" {
+				t.Errorf("formatTimeAgo(%q) = %q, want empty", tt.timestamp, got)
+			}
+			if !tt.wantEmpty && got == "" {
+				t.Errorf("formatTimeAgo(%q) returned empty, want non-empty", tt.timestamp)
+			}
+		})
+	}
+}
+
+// contains checks if s contains substr (helper for styled output)
+func contains(s, substr string) bool {
+	return len(s) >= len(substr) && (s == substr || len(substr) == 0 ||
+		(len(s) > 0 && len(substr) > 0 && stringContains(s, substr)))
+}
+
+func stringContains(s, substr string) bool {
+	for i := 0; i <= len(s)-len(substr); i++ {
+		if s[i:i+len(substr)] == substr {
+			return true
+		}
+	}
+	return false
+}
+
+func TestFilterMRsByTarget(t *testing.T) {
+	// Create test MRs with different targets
+	mrs := []*beads.Issue{
+		makeTestMR("mr-1", "polecat/Nux/gt-001", "integration/gt-epic", "Nux", "open"),
+		makeTestMR("mr-2", "polecat/Toast/gt-002", "main", "Toast", "open"),
+		makeTestMR("mr-3", "polecat/Able/gt-003", "integration/gt-epic", "Able", "open"),
+		makeTestMR("mr-4", "polecat/Baker/gt-004", "integration/gt-other", "Baker", "open"),
+	}
+
+	tests := []struct {
+		name         string
+		targetBranch string
+		wantCount    int
+		wantIDs      []string
+	}{
+		{
+			name:         "filter to integration/gt-epic",
+			targetBranch: "integration/gt-epic",
+			wantCount:    2,
+			wantIDs:      []string{"mr-1", "mr-3"},
+		},
+		{
+			name:         "filter to main",
+			targetBranch: "main",
+			wantCount:    1,
+			wantIDs:      []string{"mr-2"},
+		},
+		{
+			name:         "filter to non-existent branch",
+			targetBranch: "integration/no-such-epic",
+			wantCount:    0,
+			wantIDs:      []string{},
+		},
+		{
+			name:         "filter to other integration branch",
+			targetBranch: "integration/gt-other",
+			wantCount:    1,
+			wantIDs:      []string{"mr-4"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := filterMRsByTarget(mrs, tt.targetBranch)
+			if len(got) != tt.wantCount {
+				t.Errorf("filterMRsByTarget() returned %d MRs, want %d", len(got), tt.wantCount)
+			}
+
+			// Verify correct IDs
+			gotIDs := make(map[string]bool)
+			for _, mr := range got {
+				gotIDs[mr.ID] = true
+			}
+			for _, wantID := range tt.wantIDs {
+				if !gotIDs[wantID] {
+					t.Errorf("filterMRsByTarget() missing expected MR %s", wantID)
+				}
+			}
+		})
+	}
+}
+
+func TestFilterMRsByTarget_EmptyInput(t *testing.T) {
+	got := filterMRsByTarget(nil, "integration/gt-epic")
+	if got != nil {
+		t.Errorf("filterMRsByTarget(nil) = %v, want nil", got)
+	}
+
+	got = filterMRsByTarget([]*beads.Issue{}, "integration/gt-epic")
+	if len(got) != 0 {
+		t.Errorf("filterMRsByTarget([]) = %v, want empty slice", got)
+	}
+}
+
+func TestFilterMRsByTarget_NoMRFields(t *testing.T) {
+	// Issue without MR fields in description
+	plainIssue := &beads.Issue{
+		ID:          "issue-1",
+		Title:       "Not an MR",
+		Type:        "merge-request",
+		Status:      "open",
+		Description: "Just a plain description with no MR fields",
+	}
+
+	got := filterMRsByTarget([]*beads.Issue{plainIssue}, "main")
+	if len(got) != 0 {
+		t.Errorf("filterMRsByTarget() should filter out issues without MR fields, got %d", len(got))
+	}
+}

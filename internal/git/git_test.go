@@ -1,0 +1,389 @@
+package git
+
+import (
+	"os"
+	"os/exec"
+	"path/filepath"
+	"testing"
+)
+
+func initTestRepo(t *testing.T) string {
+	t.Helper()
+	dir := t.TempDir()
+
+	// Initialize repo
+	cmd := exec.Command("git", "init")
+	cmd.Dir = dir
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("git init: %v", err)
+	}
+
+	// Configure user for commits
+	cmd = exec.Command("git", "config", "user.email", "test@test.com")
+	cmd.Dir = dir
+	_ = cmd.Run()
+	cmd = exec.Command("git", "config", "user.name", "Test User")
+	cmd.Dir = dir
+	_ = cmd.Run()
+
+	// Create initial commit
+	testFile := filepath.Join(dir, "README.md")
+	if err := os.WriteFile(testFile, []byte("# Test\n"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+	cmd = exec.Command("git", "add", ".")
+	cmd.Dir = dir
+	_ = cmd.Run()
+	cmd = exec.Command("git", "commit", "-m", "initial")
+	cmd.Dir = dir
+	_ = cmd.Run()
+
+	return dir
+}
+
+func TestIsRepo(t *testing.T) {
+	dir := t.TempDir()
+	g := NewGit(dir)
+
+	if g.IsRepo() {
+		t.Fatal("expected IsRepo to be false for empty dir")
+	}
+
+	cmd := exec.Command("git", "init")
+	cmd.Dir = dir
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("git init: %v", err)
+	}
+
+	if !g.IsRepo() {
+		t.Fatal("expected IsRepo to be true after git init")
+	}
+}
+
+func TestCloneWithReferenceCreatesAlternates(t *testing.T) {
+	tmp := t.TempDir()
+	src := filepath.Join(tmp, "src")
+	dst := filepath.Join(tmp, "dst")
+
+	if err := exec.Command("git", "init", src).Run(); err != nil {
+		t.Fatalf("init src: %v", err)
+	}
+	_ = exec.Command("git", "-C", src, "config", "user.email", "test@test.com").Run()
+	_ = exec.Command("git", "-C", src, "config", "user.name", "Test User").Run()
+
+	if err := os.WriteFile(filepath.Join(src, "README.md"), []byte("# Test\n"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+	_ = exec.Command("git", "-C", src, "add", ".").Run()
+	_ = exec.Command("git", "-C", src, "commit", "-m", "initial").Run()
+
+	g := NewGit(tmp)
+	if err := g.CloneWithReference(src, dst, src); err != nil {
+		t.Fatalf("CloneWithReference: %v", err)
+	}
+
+	alternates := filepath.Join(dst, ".git", "objects", "info", "alternates")
+	if _, err := os.Stat(alternates); err != nil {
+		t.Fatalf("expected alternates file: %v", err)
+	}
+}
+
+func TestCurrentBranch(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+
+	branch, err := g.CurrentBranch()
+	if err != nil {
+		t.Fatalf("CurrentBranch: %v", err)
+	}
+
+	// Modern git uses "main", older uses "master"
+	if branch != "main" && branch != "master" {
+		t.Errorf("branch = %q, want main or master", branch)
+	}
+}
+
+func TestStatus(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+
+	// Should be clean initially
+	status, err := g.Status()
+	if err != nil {
+		t.Fatalf("Status: %v", err)
+	}
+	if !status.Clean {
+		t.Error("expected clean status")
+	}
+
+	// Add an untracked file
+	testFile := filepath.Join(dir, "new.txt")
+	if err := os.WriteFile(testFile, []byte("new"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+
+	status, err = g.Status()
+	if err != nil {
+		t.Fatalf("Status: %v", err)
+	}
+	if status.Clean {
+		t.Error("expected dirty status")
+	}
+	if len(status.Untracked) != 1 {
+		t.Errorf("untracked = %d, want 1", len(status.Untracked))
+	}
+}
+
+func TestAddAndCommit(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+
+	// Create a new file
+	testFile := filepath.Join(dir, "new.txt")
+	if err := os.WriteFile(testFile, []byte("new content"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+
+	// Add and commit
+	if err := g.Add("new.txt"); err != nil {
+		t.Fatalf("Add: %v", err)
+	}
+	if err := g.Commit("add new file"); err != nil {
+		t.Fatalf("Commit: %v", err)
+	}
+
+	// Should be clean
+	status, err := g.Status()
+	if err != nil {
+		t.Fatalf("Status: %v", err)
+	}
+	if !status.Clean {
+		t.Error("expected clean after commit")
+	}
+}
+
+func TestHasUncommittedChanges(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+
+	has, err := g.HasUncommittedChanges()
+	if err != nil {
+		t.Fatalf("HasUncommittedChanges: %v", err)
+	}
+	if has {
+		t.Error("expected no changes initially")
+	}
+
+	// Modify a file
+	testFile := filepath.Join(dir, "README.md")
+	if err := os.WriteFile(testFile, []byte("modified"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+
+	has, err = g.HasUncommittedChanges()
+	if err != nil {
+		t.Fatalf("HasUncommittedChanges: %v", err)
+	}
+	if !has {
+		t.Error("expected changes after modify")
+	}
+}
+
+func TestCheckout(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+
+	// Create a new branch
+	if err := g.CreateBranch("feature"); err != nil {
+		t.Fatalf("CreateBranch: %v", err)
+	}
+
+	// Checkout the new branch
+	if err := g.Checkout("feature"); err != nil {
+		t.Fatalf("Checkout: %v", err)
+	}
+
+	branch, _ := g.CurrentBranch()
+	if branch != "feature" {
+		t.Errorf("branch = %q, want feature", branch)
+	}
+}
+
+func TestNotARepo(t *testing.T) {
+	dir := t.TempDir() // Empty dir, not a git repo
+	g := NewGit(dir)
+
+	_, err := g.CurrentBranch()
+	if err != ErrNotARepo {
+		t.Errorf("expected ErrNotARepo, got %v", err)
+	}
+}
+
+func TestRev(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+
+	hash, err := g.Rev("HEAD")
+	if err != nil {
+		t.Fatalf("Rev: %v", err)
+	}
+
+	// Should be a 40-char hex string
+	if len(hash) != 40 {
+		t.Errorf("hash length = %d, want 40", len(hash))
+	}
+}
+
+func TestFetchBranch(t *testing.T) {
+	// Create a "remote" repo
+	remoteDir := t.TempDir()
+	cmd := exec.Command("git", "init", "--bare")
+	cmd.Dir = remoteDir
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("git init --bare: %v", err)
+	}
+
+	// Create a local repo and push to remote
+	localDir := initTestRepo(t)
+	g := NewGit(localDir)
+
+	// Add remote
+	cmd = exec.Command("git", "remote", "add", "origin", remoteDir)
+	cmd.Dir = localDir
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("git remote add: %v", err)
+	}
+
+	// Push main branch
+	mainBranch, _ := g.CurrentBranch()
+	cmd = exec.Command("git", "push", "-u", "origin", mainBranch)
+	cmd.Dir = localDir
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("git push: %v", err)
+	}
+
+	// Fetch should succeed
+	if err := g.FetchBranch("origin", mainBranch); err != nil {
+		t.Errorf("FetchBranch: %v", err)
+	}
+}
+
+func TestCheckConflicts_NoConflict(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+	mainBranch, _ := g.CurrentBranch()
+
+	// Create feature branch with non-conflicting change
+	if err := g.CreateBranch("feature"); err != nil {
+		t.Fatalf("CreateBranch: %v", err)
+	}
+	if err := g.Checkout("feature"); err != nil {
+		t.Fatalf("Checkout feature: %v", err)
+	}
+
+	// Add a new file (won't conflict with main)
+	newFile := filepath.Join(dir, "feature.txt")
+	if err := os.WriteFile(newFile, []byte("feature content"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+	if err := g.Add("feature.txt"); err != nil {
+		t.Fatalf("Add: %v", err)
+	}
+	if err := g.Commit("add feature file"); err != nil {
+		t.Fatalf("Commit: %v", err)
+	}
+
+	// Go back to main
+	if err := g.Checkout(mainBranch); err != nil {
+		t.Fatalf("Checkout main: %v", err)
+	}
+
+	// Check for conflicts - should be none
+	conflicts, err := g.CheckConflicts("feature", mainBranch)
+	if err != nil {
+		t.Fatalf("CheckConflicts: %v", err)
+	}
+	if len(conflicts) > 0 {
+		t.Errorf("expected no conflicts, got %v", conflicts)
+	}
+
+	// Verify we're still on main and clean
+	branch, _ := g.CurrentBranch()
+	if branch != mainBranch {
+		t.Errorf("branch = %q, want %q", branch, mainBranch)
+	}
+	status, _ := g.Status()
+	if !status.Clean {
+		t.Error("expected clean working directory after CheckConflicts")
+	}
+}
+
+func TestCheckConflicts_WithConflict(t *testing.T) {
+	dir := initTestRepo(t)
+	g := NewGit(dir)
+	mainBranch, _ := g.CurrentBranch()
+
+	// Create feature branch
+	if err := g.CreateBranch("feature"); err != nil {
+		t.Fatalf("CreateBranch: %v", err)
+	}
+	if err := g.Checkout("feature"); err != nil {
+		t.Fatalf("Checkout feature: %v", err)
+	}
+
+	// Modify README.md on feature branch
+	readmeFile := filepath.Join(dir, "README.md")
+	if err := os.WriteFile(readmeFile, []byte("# Feature changes\n"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+	if err := g.Add("README.md"); err != nil {
+		t.Fatalf("Add: %v", err)
+	}
+	if err := g.Commit("modify readme on feature"); err != nil {
+		t.Fatalf("Commit: %v", err)
+	}
+
+	// Go back to main and make conflicting change
+	if err := g.Checkout(mainBranch); err != nil {
+		t.Fatalf("Checkout main: %v", err)
+	}
+	if err := os.WriteFile(readmeFile, []byte("# Main changes\n"), 0644); err != nil {
+		t.Fatalf("write file: %v", err)
+	}
+	if err := g.Add("README.md"); err != nil {
+		t.Fatalf("Add: %v", err)
+	}
+	if err := g.Commit("modify readme on main"); err != nil {
+		t.Fatalf("Commit: %v", err)
+	}
+
+	// Check for conflicts - should find README.md
+	conflicts, err := g.CheckConflicts("feature", mainBranch)
+	if err != nil {
+		t.Fatalf("CheckConflicts: %v", err)
+	}
+	if len(conflicts) == 0 {
+		t.Error("expected conflicts, got none")
+	}
+
+	foundReadme := false
+	for _, f := range conflicts {
+		if f == "README.md" {
+			foundReadme = true
+			break
+		}
+	}
+	if !foundReadme {
+		t.Errorf("expected README.md in conflicts, got %v", conflicts)
+	}
+
+	// Verify we're still on main and clean
+	branch, _ := g.CurrentBranch()
+	if branch != mainBranch {
+		t.Errorf("branch = %q, want %q", branch, mainBranch)
+	}
+	status, _ := g.Status()
+	if !status.Clean {
+		t.Error("expected clean working directory after CheckConflicts")
+	}
+}

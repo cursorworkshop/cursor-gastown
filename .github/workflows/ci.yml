@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # Fast check to catch accidental .beads/issues.jsonl changes from contributors
+  check-no-beads-changes:
+    name: Check for .beads changes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Check for .beads/issues.jsonl changes
+        run: |
+          if git diff --name-only origin/${{ github.base_ref }}...HEAD | grep -q "^\.beads/issues\.jsonl$"; then
+            echo "This PR includes changes to .beads/issues.jsonl"
+            echo ""
+            echo "This file is the project's issue database and should not be modified in PRs."
+            echo ""
+            echo "To fix, run:"
+            echo "  git checkout origin/main -- .beads/issues.jsonl"
+            echo "  git commit --amend"
+            echo "  git push --force"
+            echo ""
+            exit 1
+          fi
+          echo "No .beads/issues.jsonl changes detected"
+
+  # Verify committed formulas allow build without go:generate
+  # This catches issues where go install @latest would fail
+  check-embedded-formulas:
+    name: Check embedded formulas
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Build without go:generate
+        run: |
+          # This must succeed with committed formulas only
+          # If this fails, run: go generate ./... && git add -A && git commit
+          go build -v ./cmd/gt
+
+      - name: Verify formulas are in sync
+        run: |
+          # Regenerate and check for differences
+          go generate ./internal/formula/...
+          if ! git diff --exit-code internal/formula/formulas/; then
+            echo ""
+            echo "ERROR: Committed formulas are out of sync with .beads/formulas/"
+            echo "Run: go generate ./... && git add -A && git commit"
+            exit 1
+          fi
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "CI Bot"
+          git config --global user.email "ci@gastown.test"
+
+      - name: Build
+        run: go build -v ./cmd/gt
+
+      - name: Test
+        run: go test -v -race -short ./...
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: latest
+          args: --timeout=5m
+
+  integration:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "CI Bot"
+          git config --global user.email "ci@gastown.test"
+
+      - name: Install beads (bd)
+        run: go install github.com/steveyegge/beads/cmd/bd@latest
+
+      - name: Build gt
+        run: go build -v -o gt ./cmd/gt
+
+      - name: Add to PATH
+        run: echo "$(go env GOPATH)/bin" >> $GITHUB_PATH
+
+      - name: Integration Tests
+        run: go test -tags=integration -timeout=5m -v ./internal/cmd/...
