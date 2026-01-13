@@ -50,7 +50,7 @@ func runCrewRename(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Renamed crew workspace: %s/%s → %s/%s\n",
-		style.Bold.Render("✓"), r.Name, oldName, r.Name, newName)
+		style.Bold.Render("OK"), r.Name, oldName, r.Name, newName)
 	fmt.Printf("New session will be: %s\n", style.Dim.Render(crewSessionName(r.Name, newName)))
 
 	return nil
@@ -113,17 +113,17 @@ func runCrewPristine(cmd *cobra.Command, args []string) error {
 		fmt.Printf("%s %s/%s\n", style.Bold.Render("→"), r.Name, result.Name)
 
 		if result.HadChanges {
-			fmt.Printf("  %s\n", style.Bold.Render("⚠ Has uncommitted changes"))
+			fmt.Printf("  %s\n", style.Bold.Render("WARN Has uncommitted changes"))
 		}
 
 		if result.Pulled {
-			fmt.Printf("  %s git pull\n", style.Dim.Render("✓"))
+			fmt.Printf("  %s git pull\n", style.Dim.Render("OK"))
 		} else if result.PullError != "" {
 			fmt.Printf("  %s git pull: %s\n", style.Bold.Render("✗"), result.PullError)
 		}
 
 		if result.Synced {
-			fmt.Printf("  %s bd sync\n", style.Dim.Render("✓"))
+			fmt.Printf("  %s bd sync\n", style.Dim.Render("OK"))
 		} else if result.SyncError != "" {
 			fmt.Printf("  %s bd sync: %s\n", style.Bold.Render("✗"), result.SyncError)
 		}

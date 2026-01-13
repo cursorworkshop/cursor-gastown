@@ -224,7 +224,7 @@ func runSynthesisStart(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("creating synthesis bead: %w", err)
 	}
-	fmt.Printf("%s Created synthesis bead: %s\n", style.Bold.Render("✓"), synthesisID)
+	fmt.Printf("%s Created synthesis bead: %s\n", style.Bold.Render("OK"), synthesisID)
 
 	// Sling to target rig
 	fmt.Printf("  Slinging to %s...\n", targetRig)
@@ -232,7 +232,7 @@ func runSynthesisStart(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("slinging synthesis: %w", err)
 	}
 
-	fmt.Printf("%s Synthesis started\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Synthesis started\n", style.Bold.Render("OK"))
 	fmt.Printf("  Monitor: gt convoy status %s\n", convoyID)
 
 	return nil
@@ -333,7 +333,7 @@ func runSynthesisClose(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("closing convoy: %w", err)
 	}
 
-	fmt.Printf("%s Convoy closed: %s\n", style.Bold.Render("✓"), convoyID)
+	fmt.Printf("%s Convoy closed: %s\n", style.Bold.Render("OK"), convoyID)
 
 	// TODO: Trigger notification if configured
 	// Parse description for "Notify: <address>" and send mail

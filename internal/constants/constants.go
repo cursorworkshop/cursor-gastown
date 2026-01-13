@@ -121,45 +121,45 @@ const (
 	RoleDeacon = "deacon"
 )
 
-// Role emojis - centralized for easy customization.
+// Role icons - centralized for easy customization.
 // These match the Gas Town visual identity (see ~/Desktop/Gas Town/ prompts).
 const (
-	// EmojiMayor is the mayor emoji (fox conductor).
-	EmojiMayor = "🎩"
+	// IconMayor is the mayor icon (fox conductor).
+	IconMayor = "[mayor]"
 
-	// EmojiDeacon is the deacon emoji (wolf in the engine room).
-	EmojiDeacon = "🐺"
+	// IconDeacon is the deacon icon (wolf in the engine room).
+	IconDeacon = "[deacon]"
 
-	// EmojiWitness is the witness emoji (watchful owl).
-	EmojiWitness = "🦉"
+	// IconWitness is the witness icon (watchful owl).
+	IconWitness = "[witness]"
 
-	// EmojiRefinery is the refinery emoji (industrial).
-	EmojiRefinery = "🏭"
+	// IconRefinery is the refinery icon (industrial).
+	IconRefinery = "[refinery]"
 
-	// EmojiCrew is the crew emoji (established worker).
-	EmojiCrew = "👷"
+	// IconCrew is the crew icon (established worker).
+	IconCrew = "[crew]"
 
-	// EmojiPolecat is the polecat emoji (transient worker).
-	EmojiPolecat = "😺"
+	// IconPolecat is the polecat icon (transient worker).
+	IconPolecat = "[polecat]"
 )
 
-// RoleEmoji returns the emoji for a given role name.
-func RoleEmoji(role string) string {
+// RoleIcon returns the icon for a given role name.
+func RoleIcon(role string) string {
 	switch role {
 	case RoleMayor:
-		return EmojiMayor
+		return IconMayor
 	case RoleDeacon:
-		return EmojiDeacon
+		return IconDeacon
 	case RoleWitness:
-		return EmojiWitness
+		return IconWitness
 	case RoleRefinery:
-		return EmojiRefinery
+		return IconRefinery
 	case RoleCrew:
-		return EmojiCrew
+		return IconCrew
 	case RolePolecat:
-		return EmojiPolecat
+		return IconPolecat
 	default:
-		return "❓"
+		return "[?]"
 	}
 }
 

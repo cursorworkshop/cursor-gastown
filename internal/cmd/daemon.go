@@ -138,7 +138,7 @@ func runDaemonStart(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Printf("%s Daemon started (PID %d)\n", style.Bold.Render("✓"), pid)
+	fmt.Printf("%s Daemon started (PID %d)\n", style.Bold.Render("OK"), pid)
 	return nil
 }
 
@@ -160,7 +160,7 @@ func runDaemonStop(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("stopping daemon: %w", err)
 	}
 
-	fmt.Printf("%s Daemon stopped (was PID %d)\n", style.Bold.Render("✓"), pid)
+	fmt.Printf("%s Daemon stopped (was PID %d)\n", style.Bold.Render("OK"), pid)
 	return nil
 }
 
@@ -196,7 +196,7 @@ func runDaemonStatus(cmd *cobra.Command, args []string) error {
 				fmt.Printf("  Binary: %s\n", binaryModTime.Format("2006-01-02 15:04:05"))
 				if binaryModTime.After(state.StartedAt) {
 					fmt.Printf("  %s Binary is newer than process - consider '%s'\n",
-						style.Bold.Render("⚠"),
+						style.Bold.Render("WARN"),
 						style.Dim.Render("gt daemon stop && gt daemon start"))
 				}
 			}

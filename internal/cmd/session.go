@@ -271,7 +271,7 @@ func runSessionStart(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Session started. Attach with: %s\n",
-		style.Bold.Render("✓"),
+		style.Bold.Render("OK"),
 		style.Dim.Render(fmt.Sprintf("gt session at %s/%s", rigName, polecatName)))
 
 	// Log wake event
@@ -304,7 +304,7 @@ func runSessionStop(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("stopping session: %w", err)
 	}
 
-	fmt.Printf("%s Session stopped.\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Session stopped.\n", style.Bold.Render("OK"))
 
 	// Log kill event
 	if townRoot, err := workspace.FindFromCwd(); err == nil && townRoot != "" {
@@ -485,7 +485,7 @@ func runSessionInject(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Message sent to %s/%s\n",
-		style.Bold.Render("✓"), rigName, polecatName)
+		style.Bold.Render("OK"), rigName, polecatName)
 	return nil
 }
 
@@ -526,7 +526,7 @@ func runSessionRestart(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Session restarted. Attach with: %s\n",
-		style.Bold.Render("✓"),
+		style.Bold.Render("OK"),
 		style.Dim.Render(fmt.Sprintf("gt session at %s/%s", rigName, polecatName)))
 	return nil
 }
@@ -656,12 +656,12 @@ func runSessionCheck(cmd *cobra.Command, args []string) error {
 			// Check if session exists
 			running, err := t.HasSession(sessionName)
 			if err != nil {
-				fmt.Printf("  %s %s/%s: %s\n", style.Bold.Render("⚠"), r.Name, polecatName, style.Dim.Render("error checking session"))
+				fmt.Printf("  %s %s/%s: %s\n", style.Bold.Render("WARN"), r.Name, polecatName, style.Dim.Render("error checking session"))
 				continue
 			}
 
 			if running {
-				fmt.Printf("  %s %s/%s: %s\n", style.Bold.Render("✓"), r.Name, polecatName, style.Dim.Render("session alive"))
+				fmt.Printf("  %s %s/%s: %s\n", style.Bold.Render("OK"), r.Name, polecatName, style.Dim.Render("session alive"))
 				totalHealthy++
 			} else {
 				// Check if polecat has work on hook (would need restart)

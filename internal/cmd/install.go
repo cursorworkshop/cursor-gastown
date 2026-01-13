@@ -129,7 +129,7 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	if err := os.MkdirAll(mayorDir, 0755); err != nil {
 		return fmt.Errorf("creating mayor directory: %w", err)
 	}
-	fmt.Printf("   ✓ Created mayor/\n")
+	fmt.Printf("   OK Created mayor/\n")
 
 	// Determine owner (defaults to git user.email)
 	owner := installOwner
@@ -159,7 +159,7 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	if err := config.SaveTownConfig(townPath, townConfig); err != nil {
 		return fmt.Errorf("writing town.json: %w", err)
 	}
-	fmt.Printf("   ✓ Created mayor/town.json\n")
+	fmt.Printf("   OK Created mayor/town.json\n")
 
 	// Create rigs.json in mayor/
 	rigsConfig := &config.RigsConfig{
@@ -170,16 +170,16 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	if err := config.SaveRigsConfig(rigsPath, rigsConfig); err != nil {
 		return fmt.Errorf("writing rigs.json: %w", err)
 	}
-	fmt.Printf("   ✓ Created mayor/rigs.json\n")
+	fmt.Printf("   OK Created mayor/rigs.json\n")
 
 	// Create Mayor CLAUDE.md at mayor/ (Mayor's canonical home)
 	// IMPORTANT: CLAUDE.md must be in ~/gt/mayor/, NOT ~/gt/
 	// CLAUDE.md at town root would be inherited by ALL agents via directory traversal,
 	// causing crew/polecat/etc to receive Mayor-specific instructions.
 	if err := createMayorCLAUDEmd(mayorDir, absPath); err != nil {
-		fmt.Printf("   %s Could not create CLAUDE.md: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not create CLAUDE.md: %v\n", style.Dim.Render("WARN"), err)
 	} else {
-		fmt.Printf("   ✓ Created mayor/CLAUDE.md\n")
+		fmt.Printf("   OK Created mayor/CLAUDE.md\n")
 	}
 
 	// Create mayor settings (mayor runs from ~/gt/mayor/)
@@ -188,21 +188,21 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	// causing crew/polecat/etc to cd to town root before running commands.
 	// mayorDir already defined above
 	if err := os.MkdirAll(mayorDir, 0755); err != nil {
-		fmt.Printf("   %s Could not create mayor directory: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not create mayor directory: %v\n", style.Dim.Render("WARN"), err)
 	} else if err := claude.EnsureSettingsForRole(mayorDir, "mayor"); err != nil {
-		fmt.Printf("   %s Could not create mayor settings: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not create mayor settings: %v\n", style.Dim.Render("WARN"), err)
 	} else {
-		fmt.Printf("   ✓ Created mayor/.claude/settings.json\n")
+		fmt.Printf("   OK Created mayor/.claude/settings.json\n")
 	}
 
 	// Create deacon directory and settings (deacon runs from ~/gt/deacon/)
 	deaconDir := filepath.Join(absPath, "deacon")
 	if err := os.MkdirAll(deaconDir, 0755); err != nil {
-		fmt.Printf("   %s Could not create deacon directory: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not create deacon directory: %v\n", style.Dim.Render("WARN"), err)
 	} else if err := claude.EnsureSettingsForRole(deaconDir, "deacon"); err != nil {
-		fmt.Printf("   %s Could not create deacon settings: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not create deacon settings: %v\n", style.Dim.Render("WARN"), err)
 	} else {
-		fmt.Printf("   ✓ Created deacon/.claude/settings.json\n")
+		fmt.Printf("   OK Created deacon/.claude/settings.json\n")
 	}
 
 	// Initialize git BEFORE beads so that bd can compute repository fingerprint.
@@ -219,48 +219,48 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	// Rig beads are separate and have their own prefixes.
 	if !installNoBeads {
 		if err := initTownBeads(absPath); err != nil {
-			fmt.Printf("   %s Could not initialize town beads: %v\n", style.Dim.Render("⚠"), err)
+			fmt.Printf("   %s Could not initialize town beads: %v\n", style.Dim.Render("WARN"), err)
 		} else {
-			fmt.Printf("   ✓ Initialized .beads/ (town-level beads with hq- prefix)\n")
+			fmt.Printf("   OK Initialized .beads/ (town-level beads with hq- prefix)\n")
 
 			// Provision embedded formulas to .beads/formulas/
 			if count, err := formula.ProvisionFormulas(absPath); err != nil {
 				// Non-fatal: formulas are optional, just convenience
-				fmt.Printf("   %s Could not provision formulas: %v\n", style.Dim.Render("⚠"), err)
+				fmt.Printf("   %s Could not provision formulas: %v\n", style.Dim.Render("WARN"), err)
 			} else if count > 0 {
-				fmt.Printf("   ✓ Provisioned %d formulas\n", count)
+				fmt.Printf("   OK Provisioned %d formulas\n", count)
 			}
 		}
 
 		// Create town-level agent beads (Mayor, Deacon) and role beads.
 		// These use hq- prefix and are stored in town beads for cross-rig coordination.
 		if err := initTownAgentBeads(absPath); err != nil {
-			fmt.Printf("   %s Could not create town-level agent beads: %v\n", style.Dim.Render("⚠"), err)
+			fmt.Printf("   %s Could not create town-level agent beads: %v\n", style.Dim.Render("WARN"), err)
 		}
 	}
 
 	// Detect and save overseer identity
 	overseer, err := config.DetectOverseer(absPath)
 	if err != nil {
-		fmt.Printf("   %s Could not detect overseer identity: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not detect overseer identity: %v\n", style.Dim.Render("WARN"), err)
 	} else {
 		overseerPath := config.OverseerConfigPath(absPath)
 		if err := config.SaveOverseerConfig(overseerPath, overseer); err != nil {
-			fmt.Printf("   %s Could not save overseer config: %v\n", style.Dim.Render("⚠"), err)
+			fmt.Printf("   %s Could not save overseer config: %v\n", style.Dim.Render("WARN"), err)
 		} else {
-			fmt.Printf("   ✓ Detected overseer: %s (via %s)\n", overseer.FormatOverseerIdentity(), overseer.Source)
+			fmt.Printf("   OK Detected overseer: %s (via %s)\n", overseer.FormatOverseerIdentity(), overseer.Source)
 		}
 	}
 
 	// Provision town-level slash commands (.claude/commands/)
 	// All agents inherit these via Claude's directory traversal - no per-workspace copies needed.
 	if err := templates.ProvisionCommands(absPath); err != nil {
-		fmt.Printf("   %s Could not provision slash commands: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not provision slash commands: %v\n", style.Dim.Render("WARN"), err)
 	} else {
-		fmt.Printf("   ✓ Created .claude/commands/ (slash commands for all agents)\n")
+		fmt.Printf("   OK Created .claude/commands/ (slash commands for all agents)\n")
 	}
 
-	fmt.Printf("\n%s HQ created successfully!\n", style.Bold.Render("✓"))
+	fmt.Printf("\n%s HQ created successfully!\n", style.Bold.Render("OK"))
 	fmt.Println()
 	fmt.Println("Next steps:")
 	step := 1
@@ -320,7 +320,7 @@ func initTownBeads(townPath string) error {
 	configCmd.Dir = townPath
 	if configOutput, configErr := configCmd.CombinedOutput(); configErr != nil {
 		// Non-fatal: older beads versions don't need this, newer ones do
-		fmt.Printf("   %s Could not set custom types: %s\n", style.Dim.Render("⚠"), strings.TrimSpace(string(configOutput)))
+		fmt.Printf("   %s Could not set custom types: %s\n", style.Dim.Render("WARN"), strings.TrimSpace(string(configOutput)))
 	}
 
 	// Ensure database has repository fingerprint (GH #25).
@@ -328,7 +328,7 @@ func initTownBeads(townPath string) error {
 	// Without fingerprint, the bd daemon fails to start silently.
 	if err := ensureRepoFingerprint(townPath); err != nil {
 		// Non-fatal: fingerprint is optional for functionality, just daemon optimization
-		fmt.Printf("   %s Could not verify repo fingerprint: %v\n", style.Dim.Render("⚠"), err)
+		fmt.Printf("   %s Could not verify repo fingerprint: %v\n", style.Dim.Render("WARN"), err)
 	}
 
 	return nil
@@ -428,10 +428,10 @@ func initTownAgentBeads(townPath string) error {
 		if output, err := cmd.CombinedOutput(); err != nil {
 			// Log but continue - role beads are optional
 			fmt.Printf("   %s Could not create role bead %s: %s\n",
-				style.Dim.Render("⚠"), role.id, strings.TrimSpace(string(output)))
+				style.Dim.Render("WARN"), role.id, strings.TrimSpace(string(output)))
 			continue
 		}
-		fmt.Printf("   ✓ Created role bead: %s\n", role.id)
+		fmt.Printf("   OK Created role bead: %s\n", role.id)
 	}
 
 	// Town-level agent beads
@@ -481,7 +481,7 @@ func initTownAgentBeads(townPath string) error {
 		if _, err := bd.CreateAgentBead(agent.id, agent.title, fields); err != nil {
 			return fmt.Errorf("creating %s: %w", agent.id, err)
 		}
-		fmt.Printf("   ✓ Created agent bead: %s\n", agent.id)
+		fmt.Printf("   OK Created agent bead: %s\n", agent.id)
 	}
 
 	return nil

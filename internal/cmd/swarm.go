@@ -264,7 +264,7 @@ func runSwarmCreate(cmd *cobra.Command, args []string) error {
 	integration := fmt.Sprintf("swarm/%s", swarmEpic)
 
 	// Output
-	fmt.Printf("%s Created swarm %s\n\n", style.Bold.Render("✓"), swarmEpic)
+	fmt.Printf("%s Created swarm %s\n\n", style.Bold.Render("OK"), swarmEpic)
 	fmt.Printf("  Epic:        %s\n", swarmEpic)
 	fmt.Printf("  Rig:         %s\n", rigName)
 	fmt.Printf("  Base commit: %s\n", truncate(baseCommit, 8))
@@ -369,7 +369,7 @@ func runSwarmStart(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Printf("%s Swarm %s starting with %d ready tasks\n", style.Bold.Render("✓"), swarmID, len(status.Ready))
+	fmt.Printf("%s Swarm %s starting with %d ready tasks\n", style.Bold.Render("OK"), swarmID, len(status.Ready))
 
 	// If workers were specified in create, use them; otherwise prompt user
 	if len(swarmWorkers) > 0 {
@@ -508,7 +508,7 @@ func runSwarmDispatch(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("slinging task: %w", err)
 	}
 
-	fmt.Printf("%s Dispatched %s: %s → %s\n", style.Bold.Render("✓"), task.ID, task.Title, target)
+	fmt.Printf("%s Dispatched %s: %s → %s\n", style.Bold.Render("OK"), task.ID, task.Title, target)
 
 	// Show remaining tasks and workers
 	if len(unassigned) > 1 {
@@ -817,7 +817,7 @@ func runSwarmLand(cmd *cobra.Command, args []string) error {
 		style.PrintWarning("couldn't close swarm epic in beads: %v", err)
 	}
 
-	fmt.Printf("%s Swarm %s landed to main\n", style.Bold.Render("✓"), sw.ID)
+	fmt.Printf("%s Swarm %s landed to main\n", style.Bold.Render("OK"), sw.ID)
 	fmt.Printf("  Sessions stopped: %d\n", result.SessionsStopped)
 	fmt.Printf("  Branches cleaned: %d\n", result.BranchesCleaned)
 	return nil
@@ -876,7 +876,7 @@ func runSwarmCancel(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("closing swarm: %w", err)
 	}
 
-	fmt.Printf("%s Swarm %s canceled\n", style.Bold.Render("✓"), swarmID)
+	fmt.Printf("%s Swarm %s canceled\n", style.Bold.Render("OK"), swarmID)
 	return nil
 }
 

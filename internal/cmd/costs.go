@@ -493,7 +493,7 @@ func outputLedgerHuman(output CostsOutput, entries []CostEntry) error {
 	if output.ByRole != nil && len(output.ByRole) > 0 {
 		fmt.Printf("\n%s\n", style.Bold.Render("By Role:"))
 		for role, cost := range output.ByRole {
-			icon := constants.RoleEmoji(role)
+			icon := constants.RoleIcon(role)
 			fmt.Printf("  %s %-12s $%.2f\n", icon, role, cost)
 		}
 	}

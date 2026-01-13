@@ -112,7 +112,7 @@ func runMayorStart(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Mayor session started. Attach with: %s\n",
-		style.Bold.Render("✓"),
+		style.Bold.Render("OK"),
 		style.Dim.Render("gt mayor attach"))
 
 	return nil
@@ -132,7 +132,7 @@ func runMayorStop(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Printf("%s Mayor session stopped.\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Mayor session stopped.\n", style.Bold.Render("OK"))
 	return nil
 }
 

@@ -45,7 +45,7 @@ func runMoleculeAttach(cmd *cobra.Command, args []string) error {
 	}
 
 	attachment := beads.ParseAttachmentFields(issue)
-	fmt.Printf("%s Attached %s to %s\n", style.Bold.Render("✓"), moleculeID, pinnedBeadID)
+	fmt.Printf("%s Attached %s to %s\n", style.Bold.Render("OK"), moleculeID, pinnedBeadID)
 	if attachment != nil && attachment.AttachedAt != "" {
 		fmt.Printf("  attached_at: %s\n", attachment.AttachedAt)
 	}
@@ -127,7 +127,7 @@ func runMoleculeDetach(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("detaching molecule: %w", err)
 	}
 
-	fmt.Printf("%s Detached %s from %s\n", style.Bold.Render("✓"), previousMolecule, pinnedBeadID)
+	fmt.Printf("%s Detached %s from %s\n", style.Bold.Render("OK"), previousMolecule, pinnedBeadID)
 
 	return nil
 }

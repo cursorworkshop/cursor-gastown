@@ -157,7 +157,7 @@ func runHook(_ *cobra.Command, args []string) error {
 
 		// Skip if it's the same bead we're trying to pin
 		if existing.ID == beadID {
-			fmt.Printf("%s Already hooked: %s\n", style.Bold.Render("✓"), beadID)
+			fmt.Printf("%s Already hooked: %s\n", style.Bold.Render("OK"), beadID)
 			return nil
 		}
 
@@ -190,7 +190,7 @@ func runHook(_ *cobra.Command, args []string) error {
 			}
 		} else if hookForce {
 			// Force replace incomplete bead
-			fmt.Printf("%s Force-replacing incomplete bead %s...\n", style.Dim.Render("⚠"), existing.ID)
+			fmt.Printf("%s Force-replacing incomplete bead %s...\n", style.Dim.Render("WARN"), existing.ID)
 			if !hookDryRun {
 				// Unpin by setting status back to open
 				status := "open"
@@ -225,7 +225,7 @@ func runHook(_ *cobra.Command, args []string) error {
 		return fmt.Errorf("hooking bead: %w", err)
 	}
 
-	fmt.Printf("%s Work attached to hook (hooked bead)\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Work attached to hook (hooked bead)\n", style.Bold.Render("OK"))
 	fmt.Printf("  Use 'gt handoff' to restart with this work\n")
 	fmt.Printf("  Use 'gt hook' to see hook status\n")
 

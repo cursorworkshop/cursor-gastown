@@ -111,7 +111,7 @@ func runDown(cmd *cobra.Command, args []string) error {
 
 	fmt.Println()
 	if allOK {
-		fmt.Printf("%s All services stopped\n", style.Bold.Render("✓"))
+		fmt.Printf("%s All services stopped\n", style.Bold.Render("OK"))
 		// Log halt event with stopped services
 		stoppedServices := []string{"daemon", "deacon", "boot", "mayor"}
 		for _, rigName := range rigs {

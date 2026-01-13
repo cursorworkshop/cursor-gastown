@@ -48,14 +48,14 @@ var AgentTypeColors = map[AgentType]string{
 }
 
 // AgentTypeIcons maps agent types to display icons.
-// Uses centralized emojis from constants package.
+// Uses centralized icons from constants package.
 var AgentTypeIcons = map[AgentType]string{
-	AgentMayor:    constants.EmojiMayor,
-	AgentDeacon:   constants.EmojiDeacon,
-	AgentWitness:  constants.EmojiWitness,
-	AgentRefinery: constants.EmojiRefinery,
-	AgentCrew:     constants.EmojiCrew,
-	AgentPolecat:  constants.EmojiPolecat,
+	AgentMayor:    constants.IconMayor,
+	AgentDeacon:   constants.IconDeacon,
+	AgentWitness:  constants.IconWitness,
+	AgentRefinery: constants.IconRefinery,
+	AgentCrew:     constants.IconCrew,
+	AgentPolecat:  constants.IconPolecat,
 }
 
 var agentsCmd = &cobra.Command{
@@ -423,12 +423,12 @@ func runAgentsCheck(cmd *cobra.Command, args []string) error {
 
 	// Text output
 	if len(report.Issues) == 0 {
-		fmt.Printf("%s All agents healthy\n", style.Bold.Render("✓"))
+		fmt.Printf("%s All agents healthy\n", style.Bold.Render("OK"))
 		fmt.Printf("  Sessions: %d, Locks: %d\n", report.TotalSessions, report.TotalLocks)
 		return nil
 	}
 
-	fmt.Printf("%s\n\n", style.Bold.Render("⚠️  Issues Detected"))
+	fmt.Printf("%s\n\n", style.Bold.Render("WARN: Issues Detected"))
 	fmt.Printf("Collisions: %d, Stale locks: %d\n\n", report.Collisions, report.StaleLocks)
 
 	for _, issue := range report.Issues {
@@ -458,7 +458,7 @@ func runAgentsFix(cmd *cobra.Command, args []string) error {
 	}
 
 	if cleaned > 0 {
-		fmt.Printf("%s Cleaned %d stale lock(s)\n", style.Bold.Render("✓"), cleaned)
+		fmt.Printf("%s Cleaned %d stale lock(s)\n", style.Bold.Render("OK"), cleaned)
 	} else {
 		fmt.Printf("%s No stale locks found\n", style.Dim.Render("○"))
 	}
@@ -472,7 +472,7 @@ func runAgentsFix(cmd *cobra.Command, args []string) error {
 	if report.Collisions > 0 {
 		fmt.Println()
 		fmt.Printf("%s %d collision(s) require manual intervention:\n\n",
-			style.Bold.Render("⚠"), report.Collisions)
+			style.Bold.Render("WARN"), report.Collisions)
 
 		for _, issue := range report.Issues {
 			if issue.Type == "collision" {

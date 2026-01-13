@@ -110,7 +110,7 @@ func runMoleculeAwaitSignal(cmd *cobra.Command, args []string) error {
 			// Agent bead might not exist yet - that's OK, start at 0
 			if !awaitSignalQuiet {
 				fmt.Printf("%s Could not read agent bead (starting at idle=0): %v\n",
-					style.Dim.Render("⚠"), err)
+					style.Dim.Render("WARN"), err)
 			}
 		} else if idleStr, ok := labels["idle"]; ok {
 			if n, err := parseIntSimple(idleStr); err == nil {
@@ -154,7 +154,7 @@ func runMoleculeAwaitSignal(cmd *cobra.Command, args []string) error {
 		if err := setAgentIdleCycles(awaitSignalAgentBead, beadsDir, newIdleCycles); err != nil {
 			if !awaitSignalQuiet {
 				fmt.Printf("%s Failed to update agent bead idle count: %v\n",
-					style.Dim.Render("⚠"), err)
+					style.Dim.Render("WARN"), err)
 			}
 		} else {
 			result.IdleCycles = newIdleCycles
@@ -175,7 +175,7 @@ func runMoleculeAwaitSignal(cmd *cobra.Command, args []string) error {
 		switch result.Reason {
 		case "signal":
 			fmt.Printf("%s Signal received after %v\n",
-				style.Bold.Render("✓"), result.Elapsed.Round(time.Millisecond))
+				style.Bold.Render("OK"), result.Elapsed.Round(time.Millisecond))
 			if result.Signal != "" {
 				// Truncate long signals
 				sig := result.Signal

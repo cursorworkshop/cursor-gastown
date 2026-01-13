@@ -18,7 +18,7 @@ type PatrolConfig struct {
 	PatrolMolName string   // "mol-deacon-patrol", etc.
 	BeadsDir      string   // where to look for beads
 	Assignee      string   // agent identity for pinning
-	HeaderEmoji   string   // display emoji
+	HeaderIcon    string   // display icon
 	HeaderTitle   string   // "Patrol Status", etc.
 	WorkLoopSteps []string // role-specific instructions
 	CheckInProgress bool   // whether to check in_progress status first (witness/refinery do, deacon doesn't)
@@ -179,7 +179,7 @@ func autoSpawnPatrol(cfg PatrolConfig) (string, error) {
 // It finds or creates a patrol and outputs the status and work loop.
 func outputPatrolContext(cfg PatrolConfig) {
 	fmt.Println()
-	fmt.Printf("%s\n\n", style.Bold.Render(fmt.Sprintf("## %s %s", cfg.HeaderEmoji, cfg.HeaderTitle)))
+	fmt.Printf("%s\n\n", style.Bold.Render(fmt.Sprintf("## %s %s", cfg.HeaderIcon, cfg.HeaderTitle)))
 
 	// Try to find an active patrol
 	patrolID, patrolLine, hasPatrol := findActivePatrol(cfg)

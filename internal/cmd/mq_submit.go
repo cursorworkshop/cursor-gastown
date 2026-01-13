@@ -158,7 +158,7 @@ func runMqSubmit(cmd *cobra.Command, args []string) error {
 	}
 
 	// Success output
-	fmt.Printf("%s Submitted to merge queue\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Submitted to merge queue\n", style.Bold.Render("OK"))
 	fmt.Printf("  MR ID: %s\n", style.Bold.Render(mrIssue.ID))
 	fmt.Printf("  Source: %s\n", branch)
 	fmt.Printf("  Target: %s\n", target)
@@ -172,7 +172,7 @@ func runMqSubmit(cmd *cobra.Command, args []string) error {
 	// send lifecycle request and wait for termination
 	if worker != "" && !mqSubmitNoCleanup {
 		fmt.Println()
-		fmt.Printf("%s Auto-cleanup: polecat work submitted\n", style.Bold.Render("✓"))
+		fmt.Printf("%s Auto-cleanup: polecat work submitted\n", style.Bold.Render("OK"))
 		if err := polecatCleanup(rigName, worker, townRoot); err != nil {
 			// Non-fatal: warn but return success (MR was created)
 			style.PrintWarning("Could not auto-cleanup: %v", err)
@@ -260,7 +260,7 @@ Please verify state and execute lifecycle action.
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return fmt.Errorf("sending lifecycle request: %w: %s", err, string(out))
 	}
-	fmt.Printf("%s Sent shutdown request to %s\n", style.Bold.Render("✓"), manager)
+	fmt.Printf("%s Sent shutdown request to %s\n", style.Bold.Render("OK"), manager)
 
 	// Wait for retirement with periodic status
 	fmt.Println()

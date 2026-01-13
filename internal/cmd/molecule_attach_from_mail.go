@@ -116,7 +116,7 @@ func runMoleculeAttachFromMail(cmd *cobra.Command, args []string) error {
 
 	// Output success
 	attachment := beads.ParseAttachmentFields(issue)
-	fmt.Printf("%s Attached molecule from mail\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Attached molecule from mail\n", style.Bold.Render("OK"))
 	fmt.Printf("  Mail: %s\n", mailID)
 	fmt.Printf("  Hook: %s\n", hookBead.ID)
 	fmt.Printf("  Molecule: %s\n", moleculeID)

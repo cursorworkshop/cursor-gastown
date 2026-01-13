@@ -159,7 +159,7 @@ func runCrewAt(cmd *cobra.Command, args []string) error {
 		}
 
 		fmt.Printf("%s Created session for %s/%s\n",
-			style.Bold.Render("✓"), r.Name, name)
+			style.Bold.Render("OK"), r.Name, name)
 	} else {
 		// Session exists - check if Claude is still running
 		// Uses both pane command check and UI marker detection to avoid

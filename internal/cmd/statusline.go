@@ -121,9 +121,9 @@ func runWorkerStatusLine(t *tmux.Tmux, session, rigName, polecat, crew, issue st
 	// Show hooked work (takes precedence)
 	if hookedWork != "" {
 		if icon != "" {
-			parts = append(parts, fmt.Sprintf("%s 🪝 %s", icon, hookedWork))
+			parts = append(parts, fmt.Sprintf("%s [hook] %s", icon, hookedWork))
 		} else {
-			parts = append(parts, fmt.Sprintf("🪝 %s", hookedWork))
+			parts = append(parts, fmt.Sprintf("[hook] %s", hookedWork))
 		}
 	} else if currentWork != "" {
 		// Fall back to current work (in_progress)
@@ -141,9 +141,9 @@ func runWorkerStatusLine(t *tmux.Tmux, session, rigName, polecat, crew, issue st
 		unread, subject := getMailPreviewWithRoot(identity, 45, townRoot)
 		if unread > 0 {
 			if subject != "" {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %s", subject))
+				parts = append(parts, fmt.Sprintf("[mail] %s", subject))
 			} else {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %d", unread))
+				parts = append(parts, fmt.Sprintf("[mail] %d", unread))
 			}
 		}
 	}
@@ -218,12 +218,12 @@ func runMayorStatusLine(t *tmux.Tmux) error {
 
 	// Build status
 	var parts []string
-	parts = append(parts, fmt.Sprintf("%d 😺", polecatCount))
+	parts = append(parts, fmt.Sprintf("%d polecats", polecatCount))
 
 	// Build rig status display with LED indicators
-	// 🟢 = both witness and refinery running (fully active)
-	// 🟡 = one of witness/refinery running (partially active)
-	// ⚫ = neither running (inactive)
+	// [*] = both witness and refinery running (fully active)
+	// [~] = one of witness/refinery running (partially active)
+	// [-] = neither running (inactive)
 	var rigParts []string
 	var rigNames []string
 	for rigName := range rigStatuses {
@@ -238,13 +238,13 @@ func runMayorStatusLine(t *tmux.Tmux) error {
 		// Check if rig is parked or docked
 		opState, _ := getRigOperationalState(townRoot, rigName)
 		if opState == "PARKED" || opState == "DOCKED" {
-			led = "⏸️" // Parked/docked - intentionally offline
+			led = "[=]" // Parked/docked - intentionally offline
 		} else if status.hasWitness && status.hasRefinery {
-			led = "🟢" // Both running - fully active
+			led = "[*]" // Both running - fully active
 		} else if status.hasWitness || status.hasRefinery {
-			led = "🟡" // One running - partially active
+			led = "[~]" // One running - partially active
 		} else {
-			led = "⚫" // Neither running - inactive
+			led = "[-]" // Neither running - inactive
 		}
 		rigParts = append(rigParts, led+rigName)
 	}
@@ -259,15 +259,15 @@ func runMayorStatusLine(t *tmux.Tmux) error {
 		hookedWork = getHookedWork("mayor", 40, townRoot)
 	}
 	if hookedWork != "" {
-		parts = append(parts, fmt.Sprintf("🪝 %s", hookedWork))
+		parts = append(parts, fmt.Sprintf("[hook] %s", hookedWork))
 	} else if townRoot != "" {
 		// Priority 2: Fall back to mail preview
 		unread, subject := getMailPreviewWithRoot("mayor/", 45, townRoot)
 		if unread > 0 {
 			if subject != "" {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %s", subject))
+				parts = append(parts, fmt.Sprintf("[mail] %s", subject))
 			} else {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %d", unread))
+				parts = append(parts, fmt.Sprintf("[mail] %d", unread))
 			}
 		}
 	}
@@ -324,7 +324,7 @@ func runDeaconStatusLine(t *tmux.Tmux) error {
 	// Build status
 	var parts []string
 	parts = append(parts, fmt.Sprintf("%d rigs", rigCount))
-	parts = append(parts, fmt.Sprintf("%d 😺", polecatCount))
+	parts = append(parts, fmt.Sprintf("%d polecats", polecatCount))
 
 	// Priority 1: Check for hooked work (town beads for deacon)
 	hookedWork := ""
@@ -332,15 +332,15 @@ func runDeaconStatusLine(t *tmux.Tmux) error {
 		hookedWork = getHookedWork("deacon", 35, townRoot)
 	}
 	if hookedWork != "" {
-		parts = append(parts, fmt.Sprintf("🪝 %s", hookedWork))
+		parts = append(parts, fmt.Sprintf("[hook] %s", hookedWork))
 	} else if townRoot != "" {
 		// Priority 2: Fall back to mail preview
 		unread, subject := getMailPreviewWithRoot("deacon/", 40, townRoot)
 		if unread > 0 {
 			if subject != "" {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %s", subject))
+				parts = append(parts, fmt.Sprintf("[mail] %s", subject))
 			} else {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %d", unread))
+				parts = append(parts, fmt.Sprintf("[mail] %d", unread))
 			}
 		}
 	}
@@ -393,7 +393,7 @@ func runWitnessStatusLine(t *tmux.Tmux, rigName string) error {
 
 	// Build status
 	var parts []string
-	parts = append(parts, fmt.Sprintf("%d 😺", polecatCount))
+	parts = append(parts, fmt.Sprintf("%d polecats", polecatCount))
 	if crewCount > 0 {
 		parts = append(parts, fmt.Sprintf("%d crew", crewCount))
 	}
@@ -405,15 +405,15 @@ func runWitnessStatusLine(t *tmux.Tmux, rigName string) error {
 		hookedWork = getHookedWork(identity, 30, rigBeadsDir)
 	}
 	if hookedWork != "" {
-		parts = append(parts, fmt.Sprintf("🪝 %s", hookedWork))
+		parts = append(parts, fmt.Sprintf("[hook] %s", hookedWork))
 	} else if townRoot != "" {
 		// Priority 2: Fall back to mail preview
 		unread, subject := getMailPreviewWithRoot(identity, 35, townRoot)
 		if unread > 0 {
 			if subject != "" {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %s", subject))
+				parts = append(parts, fmt.Sprintf("[mail] %s", subject))
 			} else {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %d", unread))
+				parts = append(parts, fmt.Sprintf("[mail] %d", unread))
 			}
 		}
 	}
@@ -496,15 +496,15 @@ func runRefineryStatusLine(t *tmux.Tmux, rigName string) error {
 		hookedWork = getHookedWork(identity, 25, rigBeadsDir)
 	}
 	if hookedWork != "" {
-		parts = append(parts, fmt.Sprintf("🪝 %s", hookedWork))
+		parts = append(parts, fmt.Sprintf("[hook] %s", hookedWork))
 	} else if townRoot != "" {
 		// Priority 2: Fall back to mail preview
 		unread, subject := getMailPreviewWithRoot(identity, 30, townRoot)
 		if unread > 0 {
 			if subject != "" {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %s", subject))
+				parts = append(parts, fmt.Sprintf("[mail] %s", subject))
 			} else {
-				parts = append(parts, fmt.Sprintf("\U0001F4EC %d", unread))
+				parts = append(parts, fmt.Sprintf("[mail] %d", unread))
 			}
 		}
 	}

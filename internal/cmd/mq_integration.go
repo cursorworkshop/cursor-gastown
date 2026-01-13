@@ -122,7 +122,7 @@ func runMqIntegrationCreate(cmd *cobra.Command, args []string) error {
 	}
 
 	// Success output
-	fmt.Printf("\n%s Created integration branch\n", style.Bold.Render("✓"))
+	fmt.Printf("\n%s Created integration branch\n", style.Bold.Render("OK"))
 	fmt.Printf("  Epic:   %s\n", epicID)
 	fmt.Printf("  Branch: %s\n", branchName)
 	fmt.Printf("  From:   main\n")
@@ -231,7 +231,7 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("fetching branch: %w", err)
 		}
 	}
-	fmt.Printf("  %s Branch exists\n", style.Bold.Render("✓"))
+	fmt.Printf("  %s Branch exists\n", style.Bold.Render("OK"))
 
 	// 3. Verify all MRs targeting this integration branch are merged
 	fmt.Printf("Checking open merge requests...\n")
@@ -241,7 +241,7 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(openMRs) > 0 {
-		fmt.Printf("\n  %s Open merge requests targeting %s:\n", style.Bold.Render("⚠"), branchName)
+		fmt.Printf("\n  %s Open merge requests targeting %s:\n", style.Bold.Render("WARN"), branchName)
 		for _, mr := range openMRs {
 			fmt.Printf("    - %s: %s\n", mr.ID, mr.Title)
 		}
@@ -250,9 +250,9 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 		if !mqIntegrationLandForce {
 			return fmt.Errorf("cannot land: %d open MRs (use --force to override)", len(openMRs))
 		}
-		fmt.Printf("  %s Proceeding anyway (--force)\n", style.Dim.Render("⚠"))
+		fmt.Printf("  %s Proceeding anyway (--force)\n", style.Dim.Render("WARN"))
 	} else {
-		fmt.Printf("  %s No open MRs targeting integration branch\n", style.Bold.Render("✓"))
+		fmt.Printf("  %s No open MRs targeting integration branch\n", style.Bold.Render("OK"))
 	}
 
 	// Dry run stops here
@@ -303,7 +303,7 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 		_ = g.AbortMerge()
 		return fmt.Errorf("merge failed: %w", err)
 	}
-	fmt.Printf("  %s Merged successfully\n", style.Bold.Render("✓"))
+	fmt.Printf("  %s Merged successfully\n", style.Bold.Render("OK"))
 
 	// 5. Run tests (if configured and not skipped)
 	if !mqIntegrationLandSkipTests {
@@ -320,7 +320,7 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 				}
 				return fmt.Errorf("tests failed: %w", err)
 			}
-			fmt.Printf("  %s Tests passed\n", style.Bold.Render("✓"))
+			fmt.Printf("  %s Tests passed\n", style.Bold.Render("OK"))
 		} else {
 			fmt.Printf("  %s\n", style.Dim.Render("(no test command configured)"))
 		}
@@ -338,7 +338,7 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 		}
 		return fmt.Errorf("push failed: %w", err)
 	}
-	fmt.Printf("  %s Pushed to origin\n", style.Bold.Render("✓"))
+	fmt.Printf("  %s Pushed to origin\n", style.Bold.Render("OK"))
 
 	// 7. Delete integration branch
 	fmt.Printf("Deleting integration branch...\n")
@@ -346,13 +346,13 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 	if err := g.DeleteRemoteBranch("origin", branchName); err != nil {
 		fmt.Printf("  %s\n", style.Dim.Render(fmt.Sprintf("(could not delete remote branch: %v)", err)))
 	} else {
-		fmt.Printf("  %s Deleted from origin\n", style.Bold.Render("✓"))
+		fmt.Printf("  %s Deleted from origin\n", style.Bold.Render("OK"))
 	}
 	// Delete local
 	if err := g.DeleteBranch(branchName, true); err != nil {
 		fmt.Printf("  %s\n", style.Dim.Render(fmt.Sprintf("(could not delete local branch: %v)", err)))
 	} else {
-		fmt.Printf("  %s Deleted locally\n", style.Bold.Render("✓"))
+		fmt.Printf("  %s Deleted locally\n", style.Bold.Render("OK"))
 	}
 
 	// 8. Update epic status
@@ -360,11 +360,11 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 	if err := bd.Close(epicID); err != nil {
 		fmt.Printf("  %s\n", style.Dim.Render(fmt.Sprintf("(could not close epic: %v)", err)))
 	} else {
-		fmt.Printf("  %s Epic closed\n", style.Bold.Render("✓"))
+		fmt.Printf("  %s Epic closed\n", style.Bold.Render("OK"))
 	}
 
 	// Success output
-	fmt.Printf("\n%s Successfully landed integration branch\n", style.Bold.Render("✓"))
+	fmt.Printf("\n%s Successfully landed integration branch\n", style.Bold.Render("OK"))
 	fmt.Printf("  Epic:   %s\n", epicID)
 	fmt.Printf("  Branch: %s → main\n", branchName)
 

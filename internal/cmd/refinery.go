@@ -279,7 +279,7 @@ func runRefineryStart(cmd *cobra.Command, args []string) error {
 
 	if err := mgr.Start(refineryForeground); err != nil {
 		if err == refinery.ErrAlreadyRunning {
-			fmt.Printf("%s Refinery is already running\n", style.Dim.Render("⚠"))
+			fmt.Printf("%s Refinery is already running\n", style.Dim.Render("WARN"))
 			return nil
 		}
 		return fmt.Errorf("starting refinery: %w", err)
@@ -290,7 +290,7 @@ func runRefineryStart(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Printf("%s Refinery started for %s\n", style.Bold.Render("✓"), rigName)
+	fmt.Printf("%s Refinery started for %s\n", style.Bold.Render("OK"), rigName)
 	fmt.Printf("  %s\n", style.Dim.Render("Use 'gt refinery status' to check progress"))
 	return nil
 }
@@ -308,13 +308,13 @@ func runRefineryStop(cmd *cobra.Command, args []string) error {
 
 	if err := mgr.Stop(); err != nil {
 		if err == refinery.ErrNotRunning {
-			fmt.Printf("%s Refinery is not running\n", style.Dim.Render("⚠"))
+			fmt.Printf("%s Refinery is not running\n", style.Dim.Render("WARN"))
 			return nil
 		}
 		return fmt.Errorf("stopping refinery: %w", err)
 	}
 
-	fmt.Printf("%s Refinery stopped for %s\n", style.Bold.Render("✓"), rigName)
+	fmt.Printf("%s Refinery stopped for %s\n", style.Bold.Render("OK"), rigName)
 	return nil
 }
 
@@ -342,7 +342,7 @@ func runRefineryStatus(cmd *cobra.Command, args []string) error {
 	}
 
 	// Human-readable output
-	fmt.Printf("%s Refinery: %s\n\n", style.Bold.Render("⚙"), rigName)
+	fmt.Printf("%s Refinery: %s\n\n", style.Bold.Render("[status]"), rigName)
 
 	stateStr := string(ref.State)
 	switch ref.State {
@@ -409,7 +409,7 @@ func runRefineryQueue(cmd *cobra.Command, args []string) error {
 	}
 
 	// Human-readable output
-	fmt.Printf("%s Merge queue for '%s':\n\n", style.Bold.Render("📋"), rigName)
+	fmt.Printf("%s Merge queue for '%s':\n\n", style.Bold.Render("[list]"), rigName)
 
 	if len(queue) == 0 {
 		fmt.Printf("  %s\n", style.Dim.Render("(empty)"))
@@ -493,7 +493,7 @@ func runRefineryAttach(cmd *cobra.Command, args []string) error {
 		if err := mgr.Start(false); err != nil {
 			return fmt.Errorf("starting refinery: %w", err)
 		}
-		fmt.Printf("%s Refinery started\n", style.Bold.Render("✓"))
+		fmt.Printf("%s Refinery started\n", style.Bold.Render("OK"))
 	}
 
 	// Attach to session using exec to properly forward TTY
@@ -523,7 +523,7 @@ func runRefineryRestart(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("starting refinery: %w", err)
 	}
 
-	fmt.Printf("%s Refinery restarted for %s\n", style.Bold.Render("✓"), rigName)
+	fmt.Printf("%s Refinery restarted for %s\n", style.Bold.Render("OK"), rigName)
 	fmt.Printf("  %s\n", style.Dim.Render("Use 'gt refinery attach' to connect"))
 	return nil
 }
@@ -556,7 +556,7 @@ func runRefineryClaim(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("claiming MR: %w", err)
 	}
 
-	fmt.Printf("%s Claimed %s for %s\n", style.Bold.Render("✓"), mrID, workerID)
+	fmt.Printf("%s Claimed %s for %s\n", style.Bold.Render("OK"), mrID, workerID)
 	return nil
 }
 
@@ -572,7 +572,7 @@ func runRefineryRelease(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("releasing MR: %w", err)
 	}
 
-	fmt.Printf("%s Released %s back to queue\n", style.Bold.Render("✓"), mrID)
+	fmt.Printf("%s Released %s back to queue\n", style.Bold.Render("OK"), mrID)
 	return nil
 }
 
@@ -601,7 +601,7 @@ func runRefineryUnclaimed(cmd *cobra.Command, args []string) error {
 	}
 
 	// Human-readable output
-	fmt.Printf("%s Unclaimed MRs for '%s':\n\n", style.Bold.Render("📋"), rigName)
+	fmt.Printf("%s Unclaimed MRs for '%s':\n\n", style.Bold.Render("[list]"), rigName)
 
 	if len(unclaimed) == 0 {
 		fmt.Printf("  %s\n", style.Dim.Render("(none available)"))
@@ -645,7 +645,7 @@ func runRefineryReady(cmd *cobra.Command, args []string) error {
 	}
 
 	// Human-readable output
-	fmt.Printf("%s Ready MRs for '%s':\n\n", style.Bold.Render("🚀"), rigName)
+	fmt.Printf("%s Ready MRs for '%s':\n\n", style.Bold.Render("[ready]"), rigName)
 
 	if len(ready) == 0 {
 		fmt.Printf("  %s\n", style.Dim.Render("(none ready)"))
@@ -689,7 +689,7 @@ func runRefineryBlocked(cmd *cobra.Command, args []string) error {
 	}
 
 	// Human-readable output
-	fmt.Printf("%s Blocked MRs for '%s':\n\n", style.Bold.Render("🚧"), rigName)
+	fmt.Printf("%s Blocked MRs for '%s':\n\n", style.Bold.Render("[blocked]"), rigName)
 
 	if len(blocked) == 0 {
 		fmt.Printf("  %s\n", style.Dim.Render("(none blocked)"))

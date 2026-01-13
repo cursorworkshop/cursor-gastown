@@ -155,7 +155,7 @@ func runCallbacksProcess(cmd *cobra.Command, args []string) error {
 				result.Error)
 		} else if result.Handled {
 			fmt.Printf("  %s [%s] %s\n",
-				style.Bold.Render("✓"),
+				style.Bold.Render("OK"),
 				result.CallbackType,
 				result.Action)
 		} else {
@@ -189,7 +189,7 @@ func runCallbacksProcess(cmd *cobra.Command, args []string) error {
 			style.Dim.Render("○"), handled, len(results))
 	} else {
 		fmt.Printf("%s Processed %d/%d callbacks",
-			style.Bold.Render("✓"), handled, len(results))
+			style.Bold.Render("OK"), handled, len(results))
 		if errors > 0 {
 			fmt.Printf(" (%d errors)", errors)
 		}

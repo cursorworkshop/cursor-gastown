@@ -697,19 +697,19 @@ func (t *Tmux) ApplyTheme(session string, theme Theme) error {
 }
 
 // roleIcons maps role names to display icons for the status bar.
-// Uses centralized emojis from constants package.
+// Uses centralized icons from constants package.
 // Includes legacy keys ("coordinator", "health-check") for backwards compatibility.
 var roleIcons = map[string]string{
 	// Standard role names (from constants)
-	constants.RoleMayor:    constants.EmojiMayor,
-	constants.RoleDeacon:   constants.EmojiDeacon,
-	constants.RoleWitness:  constants.EmojiWitness,
-	constants.RoleRefinery: constants.EmojiRefinery,
-	constants.RoleCrew:     constants.EmojiCrew,
-	constants.RolePolecat:  constants.EmojiPolecat,
+	constants.RoleMayor:    constants.IconMayor,
+	constants.RoleDeacon:   constants.IconDeacon,
+	constants.RoleWitness:  constants.IconWitness,
+	constants.RoleRefinery: constants.IconRefinery,
+	constants.RoleCrew:     constants.IconCrew,
+	constants.RolePolecat:  constants.IconPolecat,
 	// Legacy names (for backwards compatibility)
-	"coordinator":  constants.EmojiMayor,
-	"health-check": constants.EmojiDeacon,
+	"coordinator":  constants.IconMayor,
+	"health-check": constants.IconDeacon,
 }
 
 // SetStatusFormat configures the left side of the status bar.
@@ -719,9 +719,9 @@ func (t *Tmux) SetStatusFormat(session, rig, worker, role string) error {
 	icon := roleIcons[role]
 
 	// Compact format - icon already identifies role
-	// Mayor: 🎩 Mayor
-	// Crew:  👷 gastown/crew/max (full path)
-	// Polecat: 😺 gastown/Toast
+	// Mayor: [mayor] Mayor
+	// Crew:  [crew] gastown/crew/max (full path)
+	// Polecat: [polecat] gastown/Toast
 	var left string
 	if rig == "" {
 		// Town-level agent (Mayor, Deacon)

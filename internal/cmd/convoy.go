@@ -311,7 +311,7 @@ func runConvoyCreate(cmd *cobra.Command, args []string) error {
 	}
 
 	// Output
-	fmt.Printf("%s Created convoy 🚚 %s\n\n", style.Bold.Render("✓"), convoyID)
+	fmt.Printf("%s Created convoy 🚚 %s\n\n", style.Bold.Render("OK"), convoyID)
 	fmt.Printf("  Name:     %s\n", name)
 	fmt.Printf("  Tracking: %d issues\n", trackedCount)
 	if len(trackedIssues) > 0 {
@@ -401,7 +401,7 @@ func runConvoyAdd(cmd *cobra.Command, args []string) error {
 	if reopened {
 		fmt.Println()
 	}
-	fmt.Printf("%s Added %d issue(s) to convoy 🚚 %s\n", style.Bold.Render("✓"), addedCount, convoyID)
+	fmt.Printf("%s Added %d issue(s) to convoy 🚚 %s\n", style.Bold.Render("OK"), addedCount, convoyID)
 	if addedCount > 0 {
 		fmt.Printf("  Issues: %s\n", strings.Join(issuesToAdd[:addedCount], ", "))
 	}
@@ -423,7 +423,7 @@ func runConvoyCheck(cmd *cobra.Command, args []string) error {
 	if len(closed) == 0 {
 		fmt.Println("No convoys ready to close.")
 	} else {
-		fmt.Printf("%s Auto-closed %d convoy(s):\n", style.Bold.Render("✓"), len(closed))
+		fmt.Printf("%s Auto-closed %d convoy(s):\n", style.Bold.Render("OK"), len(closed))
 		for _, c := range closed {
 			fmt.Printf("  🚚 %s: %s\n", c.ID, c.Title)
 		}

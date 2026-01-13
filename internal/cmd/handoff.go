@@ -646,7 +646,7 @@ func hookBeadForHandoff(beadID string) error {
 		return fmt.Errorf("pinning bead: %w", err)
 	}
 
-	fmt.Printf("%s Work attached to hook (pinned bead)\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Work attached to hook (pinned bead)\n", style.Bold.Render("OK"))
 	return nil
 }
 

@@ -171,7 +171,7 @@ func runPark(cmd *cobra.Command, args []string) error {
 	waitCmd := exec.Command("bd", "gate", "wait", gateID, "--notify", agentID)
 	if err := waitCmd.Run(); err != nil {
 		// Not fatal - might already be a waiter
-		fmt.Printf("%s Note: could not add as waiter (may already be registered)\n", style.Dim.Render("⚠"))
+		fmt.Printf("%s Note: could not add as waiter (may already be registered)\n", style.Dim.Render("WARN"))
 	}
 
 	// Store parked work in a file (alongside hook files)

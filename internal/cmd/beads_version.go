@@ -11,7 +11,7 @@ import (
 
 // MinBeadsVersion is the minimum required beads version for Gas Town.
 // This version must include custom type support (bd-i54l).
-const MinBeadsVersion = "0.44.0"
+const MinBeadsVersion = "0.47.0"
 
 // beadsVersion represents a parsed semantic version.
 type beadsVersion struct {

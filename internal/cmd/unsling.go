@@ -170,7 +170,7 @@ func runUnsling(cmd *cobra.Command, args []string) error {
 	// Log unhook event
 	_ = events.LogFeed(events.TypeUnhook, agentID, events.UnhookPayload(hookedBeadID))
 
-	fmt.Printf("%s Work removed from hook\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Work removed from hook\n", style.Bold.Render("OK"))
 	fmt.Printf("  Agent %s hook cleared (was: %s)\n", agentID, hookedBeadID)
 
 	return nil

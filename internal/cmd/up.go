@@ -180,7 +180,7 @@ func runUp(cmd *cobra.Command, args []string) error {
 
 	fmt.Println()
 	if allOK {
-		fmt.Printf("%s All services running\n", style.Bold.Render("✓"))
+		fmt.Printf("%s All services running\n", style.Bold.Render("OK"))
 		// Log boot event with started services
 		startedServices := []string{"daemon", "deacon", "mayor"}
 		for _, rigName := range rigs {

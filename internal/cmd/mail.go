@@ -582,7 +582,7 @@ func runMailSend(cmd *cobra.Command, args []string) error {
 	// Log mail event to activity feed
 	_ = events.LogFeed(events.TypeMail, from, events.MailPayload(to, mailSubject))
 
-	fmt.Printf("%s Message sent to %s\n", style.Bold.Render("✓"), to)
+	fmt.Printf("%s Message sent to %s\n", style.Bold.Render("OK"), to)
 	fmt.Printf("  Subject: %s\n", mailSubject)
 
 	// Show fan-out recipients for list addresses
@@ -831,7 +831,7 @@ func runMailDelete(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("deleting message: %w", err)
 	}
 
-	fmt.Printf("%s Message deleted\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Message deleted\n", style.Bold.Render("OK"))
 	return nil
 }
 
@@ -866,7 +866,7 @@ func runMailArchive(cmd *cobra.Command, args []string) error {
 	// Report results
 	if len(errors) > 0 {
 		fmt.Printf("%s Archived %d/%d messages\n",
-			style.Bold.Render("⚠"), archived, len(args))
+			style.Bold.Render("WARN"), archived, len(args))
 		for _, e := range errors {
 			fmt.Printf("  Error: %s\n", e)
 		}
@@ -874,9 +874,9 @@ func runMailArchive(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(args) == 1 {
-		fmt.Printf("%s Message archived\n", style.Bold.Render("✓"))
+		fmt.Printf("%s Message archived\n", style.Bold.Render("OK"))
 	} else {
-		fmt.Printf("%s Archived %d messages\n", style.Bold.Render("✓"), archived)
+		fmt.Printf("%s Archived %d messages\n", style.Bold.Render("OK"), archived)
 	}
 	return nil
 }
@@ -928,7 +928,7 @@ func runMailClear(cmd *cobra.Command, args []string) error {
 	// Report results
 	if len(errors) > 0 {
 		fmt.Printf("%s Cleared %d/%d messages from %s\n",
-			style.Bold.Render("⚠"), deleted, len(messages), address)
+			style.Bold.Render("WARN"), deleted, len(messages), address)
 		for _, e := range errors {
 			fmt.Printf("  Error: %s\n", e)
 		}
@@ -936,7 +936,7 @@ func runMailClear(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Cleared %d messages from %s\n",
-		style.Bold.Render("✓"), deleted, address)
+		style.Bold.Render("OK"), deleted, address)
 	return nil
 }
 
@@ -1322,7 +1322,7 @@ func runMailReply(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("sending reply: %w", err)
 	}
 
-	fmt.Printf("%s Reply sent to %s\n", style.Bold.Render("✓"), original.From)
+	fmt.Printf("%s Reply sent to %s\n", style.Bold.Render("OK"), original.From)
 	fmt.Printf("  Subject: %s\n", subject)
 	if original.ThreadID != "" {
 		fmt.Printf("  Thread: %s\n", style.Dim.Render(original.ThreadID))
@@ -1391,7 +1391,7 @@ func runMailClaim(cmd *cobra.Command, args []string) error {
 	}
 
 	// Print claimed message details
-	fmt.Printf("%s Claimed message from queue %s\n", style.Bold.Render("✓"), queueName)
+	fmt.Printf("%s Claimed message from queue %s\n", style.Bold.Render("OK"), queueName)
 	fmt.Printf("  ID: %s\n", oldest.ID)
 	fmt.Printf("  Subject: %s\n", oldest.Title)
 	if oldest.Description != "" {
@@ -1604,7 +1604,7 @@ func runMailRelease(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("releasing message: %w", err)
 	}
 
-	fmt.Printf("%s Released message back to queue %s\n", style.Bold.Render("✓"), msgInfo.QueueName)
+	fmt.Printf("%s Released message back to queue %s\n", style.Bold.Render("OK"), msgInfo.QueueName)
 	fmt.Printf("  ID: %s\n", messageID)
 	fmt.Printf("  Subject: %s\n", msgInfo.Title)
 

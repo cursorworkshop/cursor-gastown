@@ -140,7 +140,7 @@ func runStop(cmd *cobra.Command, args []string) error {
 				result.Success = true
 				stopped++
 				fmt.Printf("  %s [%s] %s: stopped\n",
-					style.Bold.Render("✓"),
+					style.Bold.Render("OK"),
 					r.Name, info.Polecat)
 
 				// Log kill event
@@ -170,7 +170,7 @@ func runStop(cmd *cobra.Command, args []string) error {
 		fmt.Println("No active sessions to stop.")
 	} else {
 		fmt.Printf("%s %d session(s) stopped.\n",
-			style.Bold.Render("✓"), stopped)
+			style.Bold.Render("OK"), stopped)
 	}
 
 	// Report failures
@@ -182,7 +182,7 @@ func runStop(cmd *cobra.Command, args []string) error {
 	}
 	if failures > 0 {
 		fmt.Printf("%s %d session(s) failed to stop.\n",
-			style.Dim.Render("⚠"), failures)
+			style.Dim.Render("WARN"), failures)
 	}
 
 	return nil

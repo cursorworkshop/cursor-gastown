@@ -126,7 +126,7 @@ func runWorktree(cmd *cobra.Command, args []string) error {
 		if worktreeNoCD {
 			fmt.Println(worktreePath)
 		} else {
-			fmt.Printf("%s Worktree already exists at %s\n", style.Success.Render("✓"), worktreePath)
+			fmt.Printf("%s Worktree already exists at %s\n", style.Success.Render("OK"), worktreePath)
 			fmt.Printf("cd %s\n", worktreePath)
 		}
 		return nil
@@ -147,7 +147,7 @@ func runWorktree(cmd *cobra.Command, args []string) error {
 	// Fetch latest from remote before creating worktree
 	if err := g.Fetch("origin"); err != nil {
 		// Non-fatal - continue with local state
-		fmt.Printf("%s Warning: could not fetch from origin: %v\n", style.Warning.Render("⚠"), err)
+		fmt.Printf("%s Warning: could not fetch from origin: %v\n", style.Warning.Render("WARN"), err)
 	}
 
 	// Create the worktree on main branch
@@ -163,10 +163,10 @@ func runWorktree(cmd *cobra.Command, args []string) error {
 
 	// Set local git config for this worktree
 	if err := setGitConfig(worktreePath, "user.name", bdActor); err != nil {
-		fmt.Printf("%s Warning: could not set git author name: %v\n", style.Warning.Render("⚠"), err)
+		fmt.Printf("%s Warning: could not set git author name: %v\n", style.Warning.Render("WARN"), err)
 	}
 
-	fmt.Printf("%s Created worktree for cross-rig work\n", style.Success.Render("✓"))
+	fmt.Printf("%s Created worktree for cross-rig work\n", style.Success.Render("OK"))
 	fmt.Printf("  Source: %s/crew/%s\n", sourceRig, crewName)
 	fmt.Printf("  Target: %s\n", worktreePath)
 	fmt.Printf("  Branch: main\n")
@@ -174,7 +174,7 @@ func runWorktree(cmd *cobra.Command, args []string) error {
 
 	// Pull latest main in the new worktree
 	if err := worktreeGit.Pull("origin", "main"); err != nil {
-		fmt.Printf("%s Warning: could not pull latest: %v\n", style.Warning.Render("⚠"), err)
+		fmt.Printf("%s Warning: could not pull latest: %v\n", style.Warning.Render("WARN"), err)
 	}
 
 	if worktreeNoCD {
@@ -334,7 +334,7 @@ func runWorktreeRemove(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("removing worktree: %w", err)
 	}
 
-	fmt.Printf("%s Removed worktree at %s\n", style.Success.Render("✓"), worktreePath)
+	fmt.Printf("%s Removed worktree at %s\n", style.Success.Render("OK"), worktreePath)
 
 	return nil
 }

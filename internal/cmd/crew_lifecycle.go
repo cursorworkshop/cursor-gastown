@@ -94,7 +94,7 @@ func runCrewRemove(cmd *cobra.Command, args []string) error {
 				continue
 			}
 			fmt.Printf("%s Removed crew worktree: %s/%s\n",
-				style.Bold.Render("✓"), r.Name, name)
+				style.Bold.Render("OK"), r.Name, name)
 		} else {
 			// For regular clones, use the crew manager
 			if err := crewMgr.Remove(name, forceRemove); err != nil {
@@ -109,7 +109,7 @@ func runCrewRemove(cmd *cobra.Command, args []string) error {
 				continue
 			}
 			fmt.Printf("%s Removed crew workspace: %s/%s\n",
-				style.Bold.Render("✓"), r.Name, name)
+				style.Bold.Render("OK"), r.Name, name)
 		}
 
 		// Handle agent bead
@@ -245,7 +245,7 @@ func runCrewRefresh(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Refreshed crew workspace: %s/%s\n",
-		style.Bold.Render("✓"), r.Name, name)
+		style.Bold.Render("OK"), r.Name, name)
 	fmt.Printf("Attach with: %s\n", style.Dim.Render(fmt.Sprintf("gt crew at %s", name)))
 
 	return nil
@@ -310,7 +310,7 @@ func runCrewStart(cmd *cobra.Command, args []string) error {
 
 	if startedCount > 0 {
 		fmt.Printf("\n%s Started %d crew member(s) in %s\n",
-			style.Bold.Render("✓"), startedCount, r.Name)
+			style.Bold.Render("OK"), startedCount, r.Name)
 	}
 
 	return lastErr
@@ -356,7 +356,7 @@ func runCrewRestart(cmd *cobra.Command, args []string) error {
 		}
 
 		fmt.Printf("%s Restarted crew workspace: %s/%s\n",
-			style.Bold.Render("✓"), r.Name, name)
+			style.Bold.Render("OK"), r.Name, name)
 		fmt.Printf("Attach with: %s\n", style.Dim.Render(fmt.Sprintf("gt crew at %s", name)))
 	}
 

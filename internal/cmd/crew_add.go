@@ -95,7 +95,7 @@ func runCrewAdd(cmd *cobra.Command, args []string) error {
 		}
 
 		fmt.Printf("%s Created crew workspace: %s/%s\n",
-			style.Bold.Render("✓"), rigName, name)
+			style.Bold.Render("OK"), rigName, name)
 		fmt.Printf("  Path: %s\n", worker.ClonePath)
 		fmt.Printf("  Branch: %s\n", worker.Branch)
 
@@ -126,7 +126,7 @@ func runCrewAdd(cmd *cobra.Command, args []string) error {
 	// Summary
 	if len(created) > 0 {
 		fmt.Printf("%s Created %d crew workspace(s): %v\n",
-			style.Bold.Render("✓"), len(created), created)
+			style.Bold.Render("OK"), len(created), created)
 		if lastWorker != nil && len(created) == 1 {
 			fmt.Printf("\n%s\n", style.Dim.Render("Start working with: cd "+lastWorker.ClonePath))
 		}

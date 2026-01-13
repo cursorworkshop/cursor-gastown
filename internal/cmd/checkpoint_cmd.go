@@ -145,7 +145,7 @@ func runCheckpointWrite(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("writing checkpoint: %w", err)
 	}
 
-	fmt.Printf("%s Checkpoint written\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Checkpoint written\n", style.Bold.Render("OK"))
 	fmt.Printf("  %s\n", cp.Summary())
 
 	return nil
@@ -214,7 +214,7 @@ func runCheckpointClear(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("removing checkpoint: %w", err)
 	}
 
-	fmt.Printf("%s Checkpoint cleared\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Checkpoint cleared\n", style.Bold.Render("OK"))
 	return nil
 }
 

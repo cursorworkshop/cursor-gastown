@@ -409,7 +409,7 @@ func runSling(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return fmt.Errorf("parsing wisp output: %w", err)
 		}
-		fmt.Printf("%s Formula wisp created: %s\n", style.Bold.Render("✓"), wispRootID)
+		fmt.Printf("%s Formula wisp created: %s\n", style.Bold.Render("OK"), wispRootID)
 
 		// Step 3: Bond wisp to original bead (creates compound)
 		// Use --no-daemon for mol bond (requires direct database access)
@@ -433,7 +433,7 @@ func runSling(cmd *cobra.Command, args []string) error {
 			wispRootID = bondResult.RootID
 		}
 
-		fmt.Printf("%s Formula bonded to %s\n", style.Bold.Render("✓"), beadID)
+		fmt.Printf("%s Formula bonded to %s\n", style.Bold.Render("OK"), beadID)
 
 		// Update beadID to hook the compound root instead of bare bead
 		beadID = wispRootID
@@ -448,7 +448,7 @@ func runSling(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("hooking bead: %w", err)
 	}
 
-	fmt.Printf("%s Work attached to hook (status=hooked)\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Work attached to hook (status=hooked)\n", style.Bold.Render("OK"))
 
 	// Log sling event to activity feed
 	actor := detectActor()
@@ -469,7 +469,7 @@ func runSling(cmd *cobra.Command, args []string) error {
 			// Warn but don't fail - args will still be in the nudge prompt
 			fmt.Printf("%s Could not store args in bead: %v\n", style.Dim.Render("Warning:"), err)
 		} else {
-			fmt.Printf("%s Args stored in bead (durable)\n", style.Bold.Render("✓"))
+			fmt.Printf("%s Args stored in bead (durable)\n", style.Bold.Render("OK"))
 		}
 	}
 
@@ -966,7 +966,7 @@ func runSlingFormula(args []string) error {
 		return fmt.Errorf("parsing wisp output: %w", err)
 	}
 
-	fmt.Printf("%s Wisp created: %s\n", style.Bold.Render("✓"), wispRootID)
+	fmt.Printf("%s Wisp created: %s\n", style.Bold.Render("OK"), wispRootID)
 
 	// Step 3: Hook the wisp bead using bd update.
 	// See: https://github.com/steveyegge/gastown/issues/148
@@ -976,7 +976,7 @@ func runSlingFormula(args []string) error {
 	if err := hookCmd.Run(); err != nil {
 		return fmt.Errorf("hooking wisp bead: %w", err)
 	}
-	fmt.Printf("%s Attached to hook (status=hooked)\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Attached to hook (status=hooked)\n", style.Bold.Render("OK"))
 
 	// Log sling event to activity feed (formula slinging)
 	actor := detectActor()
@@ -999,7 +999,7 @@ func runSlingFormula(args []string) error {
 		if err := storeArgsInBead(wispRootID, slingArgs); err != nil {
 			fmt.Printf("%s Could not store args in bead: %v\n", style.Dim.Render("Warning:"), err)
 		} else {
-			fmt.Printf("%s Args stored in bead (durable)\n", style.Bold.Render("✓"))
+			fmt.Printf("%s Args stored in bead (durable)\n", style.Bold.Render("OK"))
 		}
 	}
 
@@ -1202,7 +1202,7 @@ func DispatchToDog(dogName string, create bool) (*DogDispatchInfo, error) {
 				if err != nil {
 					return nil, fmt.Errorf("creating dog %s: %w", dogName, err)
 				}
-				fmt.Printf("✓ Created dog %s\n", dogName)
+				fmt.Printf("OK Created dog %s\n", dogName)
 				spawned = true
 			} else {
 				return nil, fmt.Errorf("dog %s not found (use --create to add)", dogName)
@@ -1223,7 +1223,7 @@ func DispatchToDog(dogName string, create bool) (*DogDispatchInfo, error) {
 				if err != nil {
 					return nil, fmt.Errorf("creating dog %s: %w", newName, err)
 				}
-				fmt.Printf("✓ Created dog %s (pool was empty)\n", newName)
+				fmt.Printf("OK Created dog %s (pool was empty)\n", newName)
 				spawned = true
 			} else {
 				return nil, fmt.Errorf("no idle dogs available (use --create to add)")
@@ -1471,7 +1471,7 @@ func runBatchSling(beadIDs []string, rigName string, townBeadsDir string) error 
 			continue
 		}
 
-		fmt.Printf("  %s Work attached to %s\n", style.Bold.Render("✓"), spawnInfo.PolecatName)
+		fmt.Printf("  %s Work attached to %s\n", style.Bold.Render("OK"), spawnInfo.PolecatName)
 
 		// Log sling event
 		actor := detectActor()

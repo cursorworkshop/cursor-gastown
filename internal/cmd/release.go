@@ -60,7 +60,7 @@ func runRelease(cmd *cobra.Command, args []string) error {
 			fmt.Printf("%s Failed to release %s: %v\n", style.Dim.Render("✗"), id, err)
 			failed++
 		} else {
-			fmt.Printf("%s Released %s → open\n", style.Bold.Render("✓"), id)
+			fmt.Printf("%s Released %s → open\n", style.Bold.Render("OK"), id)
 			released++
 		}
 	}

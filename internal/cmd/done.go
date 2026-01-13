@@ -209,7 +209,7 @@ func runDone(cmd *cobra.Command, args []string) error {
 		if existingMR != nil {
 			// MR already exists - use it instead of creating a new one
 			mrID = existingMR.ID
-			fmt.Printf("%s MR already exists (idempotent)\n", style.Bold.Render("✓"))
+			fmt.Printf("%s MR already exists (idempotent)\n", style.Bold.Render("OK"))
 			fmt.Printf("  MR ID: %s\n", style.Bold.Render(mrID))
 		} else {
 			// Build MR bead title and description
@@ -248,7 +248,7 @@ func runDone(cmd *cobra.Command, args []string) error {
 			}
 
 			// Success output
-			fmt.Printf("%s Work submitted to merge queue\n", style.Bold.Render("✓"))
+			fmt.Printf("%s Work submitted to merge queue\n", style.Bold.Render("OK"))
 			fmt.Printf("  MR ID: %s\n", style.Bold.Render(mrID))
 		}
 		fmt.Printf("  Source: %s\n", branch)
@@ -276,7 +276,7 @@ func runDone(cmd *cobra.Command, args []string) error {
 		if err := bd.AddGateWaiter(doneGate, sender); err != nil {
 			style.PrintWarning("could not register as gate waiter: %v", err)
 		} else {
-			fmt.Printf("%s Registered as waiter on gate %s\n", style.Bold.Render("✓"), doneGate)
+			fmt.Printf("%s Registered as waiter on gate %s\n", style.Bold.Render("OK"), doneGate)
 		}
 	} else {
 		// For ESCALATED or DEFERRED, just print status
@@ -317,7 +317,7 @@ func runDone(cmd *cobra.Command, args []string) error {
 	if err := townRouter.Send(doneNotification); err != nil {
 		style.PrintWarning("could not notify witness: %v", err)
 	} else {
-		fmt.Printf("%s Witness notified of %s\n", style.Bold.Render("✓"), exitType)
+		fmt.Printf("%s Witness notified of %s\n", style.Bold.Render("OK"), exitType)
 	}
 
 	// Notify dispatcher if work was dispatched by another agent
@@ -332,7 +332,7 @@ func runDone(cmd *cobra.Command, args []string) error {
 			if err := townRouter.Send(dispatcherNotification); err != nil {
 				style.PrintWarning("could not notify dispatcher %s: %v", dispatcher, err)
 			} else {
-				fmt.Printf("%s Dispatcher %s notified of %s\n", style.Bold.Render("✓"), dispatcher, exitType)
+				fmt.Printf("%s Dispatcher %s notified of %s\n", style.Bold.Render("OK"), dispatcher, exitType)
 			}
 		}
 	}

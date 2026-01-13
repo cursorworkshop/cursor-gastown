@@ -138,7 +138,7 @@ func runWitnessStart(cmd *cobra.Command, args []string) error {
 
 	if err := mgr.Start(witnessForeground); err != nil {
 		if err == witness.ErrAlreadyRunning {
-			fmt.Printf("%s Witness is already running\n", style.Dim.Render("⚠"))
+			fmt.Printf("%s Witness is already running\n", style.Dim.Render("WARN"))
 			fmt.Printf("  %s\n", style.Dim.Render("Use 'gt witness attach' to connect"))
 			return nil
 		}
@@ -146,12 +146,12 @@ func runWitnessStart(cmd *cobra.Command, args []string) error {
 	}
 
 	if witnessForeground {
-		fmt.Printf("%s Note: Foreground mode no longer runs patrol loop\n", style.Dim.Render("⚠"))
+		fmt.Printf("%s Note: Foreground mode no longer runs patrol loop\n", style.Dim.Render("WARN"))
 		fmt.Printf("  %s\n", style.Dim.Render("Patrol logic is now handled by mol-witness-patrol molecule"))
 		return nil
 	}
 
-	fmt.Printf("%s Witness started for %s\n", style.Bold.Render("✓"), rigName)
+	fmt.Printf("%s Witness started for %s\n", style.Bold.Render("OK"), rigName)
 	fmt.Printf("  %s\n", style.Dim.Render("Use 'gt witness attach' to connect"))
 	fmt.Printf("  %s\n", style.Dim.Render("Use 'gt witness status' to check progress"))
 	return nil
@@ -178,7 +178,7 @@ func runWitnessStop(cmd *cobra.Command, args []string) error {
 	// Update state file
 	if err := mgr.Stop(); err != nil {
 		if err == witness.ErrNotRunning && !running {
-			fmt.Printf("%s Witness is not running\n", style.Dim.Render("⚠"))
+			fmt.Printf("%s Witness is not running\n", style.Dim.Render("WARN"))
 			return nil
 		}
 		// Even if manager.Stop fails, if we killed the session it's stopped
@@ -187,7 +187,7 @@ func runWitnessStop(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	fmt.Printf("%s Witness stopped for %s\n", style.Bold.Render("✓"), rigName)
+	fmt.Printf("%s Witness stopped for %s\n", style.Bold.Render("OK"), rigName)
 	return nil
 }
 
@@ -326,7 +326,7 @@ func runWitnessRestart(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("starting witness: %w", err)
 	}
 
-	fmt.Printf("%s Witness restarted for %s\n", style.Bold.Render("✓"), rigName)
+	fmt.Printf("%s Witness restarted for %s\n", style.Bold.Render("OK"), rigName)
 	fmt.Printf("  %s\n", style.Dim.Render("Use 'gt witness attach' to connect"))
 	return nil
 }

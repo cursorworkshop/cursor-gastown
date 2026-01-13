@@ -285,7 +285,7 @@ func runDeaconStart(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Deacon session started. Attach with: %s\n",
-		style.Bold.Render("✓"),
+		style.Bold.Render("OK"),
 		style.Dim.Render("gt deacon attach"))
 
 	return nil
@@ -386,7 +386,7 @@ func runDeaconStop(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("killing session: %w", err)
 	}
 
-	fmt.Printf("%s Deacon session stopped.\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Deacon session stopped.\n", style.Bold.Render("OK"))
 	return nil
 }
 
@@ -476,7 +476,7 @@ func runDeaconRestart(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	fmt.Printf("%s Deacon restarted\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Deacon restarted\n", style.Bold.Render("OK"))
 	fmt.Printf("  %s\n", style.Dim.Render("Use 'gt deacon attach' to connect"))
 	return nil
 }
@@ -496,12 +496,12 @@ func runDeaconHeartbeat(cmd *cobra.Command, args []string) error {
 		if err := deacon.TouchWithAction(townRoot, action, 0, 0); err != nil {
 			return fmt.Errorf("updating heartbeat: %w", err)
 		}
-		fmt.Printf("%s Heartbeat updated: %s\n", style.Bold.Render("✓"), action)
+		fmt.Printf("%s Heartbeat updated: %s\n", style.Bold.Render("OK"), action)
 	} else {
 		if err := deacon.Touch(townRoot); err != nil {
 			return fmt.Errorf("updating heartbeat: %w", err)
 		}
-		fmt.Printf("%s Heartbeat updated\n", style.Bold.Render("✓"))
+		fmt.Printf("%s Heartbeat updated\n", style.Bold.Render("OK"))
 	}
 
 	return nil
@@ -538,11 +538,11 @@ func runDeaconTriggerPending(cmd *cobra.Command, args []string) error {
 		if r.Triggered {
 			triggered++
 			fmt.Printf("  %s Triggered %s/%s\n",
-				style.Bold.Render("✓"),
+				style.Bold.Render("OK"),
 				r.Spawn.Rig, r.Spawn.Polecat)
 		} else if r.Error != nil {
 			fmt.Printf("  %s %s/%s: %v\n",
-				style.Dim.Render("⚠"),
+				style.Dim.Render("WARN"),
 				r.Spawn.Rig, r.Spawn.Polecat, r.Error)
 		}
 	}
@@ -650,7 +650,7 @@ func runDeaconHealthCheck(cmd *cobra.Command, args []string) error {
 			style.PrintWarning("failed to save health check state: %v", err)
 		}
 		fmt.Printf("%s Agent %s responded (failures reset to 0)\n",
-			style.Bold.Render("✓"), agent)
+			style.Bold.Render("OK"), agent)
 		return nil
 	}
 
@@ -661,7 +661,7 @@ func runDeaconHealthCheck(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Agent %s did not respond (consecutive failures: %d/%d)\n",
-		style.Dim.Render("⚠"), agent, agentState.ConsecutiveFailures, healthCheckFailures)
+		style.Dim.Render("WARN"), agent, agentState.ConsecutiveFailures, healthCheckFailures)
 
 	// Check if force-kill threshold reached
 	if agentState.ShouldForceKill(healthCheckFailures) {
@@ -750,7 +750,7 @@ func runDeaconForceKill(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Force-killed agent %s (total kills: %d)\n",
-		style.Bold.Render("✓"), agent, agentState.ForceKillCount)
+		style.Bold.Render("OK"), agent, agentState.ForceKillCount)
 	fmt.Printf("  %s\n", style.Dim.Render("Agent is now 'asleep'. Use 'gt rig boot' to restart."))
 
 	return nil
@@ -928,7 +928,7 @@ func runDeaconStaleHooks(cmd *cobra.Command, args []string) error {
 				status = style.Bold.Render("?")
 				action = "would unhook (agent dead)"
 			} else if r.Unhooked {
-				status = style.Bold.Render("✓")
+				status = style.Bold.Render("OK")
 				action = "unhooked (agent dead)"
 			} else if r.Error != "" {
 				status = style.Dim.Render("✗")
@@ -946,7 +946,7 @@ func runDeaconStaleHooks(cmd *cobra.Command, args []string) error {
 			style.Dim.Render("ℹ"))
 	} else if result.Unhooked > 0 {
 		fmt.Printf("\n%s Unhooked %d stale bead(s)\n",
-			style.Bold.Render("✓"), result.Unhooked)
+			style.Bold.Render("OK"), result.Unhooked)
 	}
 
 	return nil

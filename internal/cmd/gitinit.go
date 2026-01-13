@@ -145,7 +145,7 @@ func runGitInit(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	fmt.Printf("\n%s Git initialization complete!\n", style.Bold.Render("✓"))
+	fmt.Printf("\n%s Git initialization complete!\n", style.Bold.Render("OK"))
 
 	// Show next steps if no GitHub was created
 	if gitInitGitHub == "" {

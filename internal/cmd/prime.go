@@ -916,7 +916,7 @@ func outputDeaconPatrolContext(ctx RoleContext) {
 		PatrolMolName:   "mol-deacon-patrol",
 		BeadsDir:        ctx.TownRoot, // Town-level role uses town root beads
 		Assignee:        "deacon",
-		HeaderEmoji:     "🔄",
+		HeaderIcon:      "[patrol]",
 		HeaderTitle:     "Patrol Status (Wisp-based)",
 		CheckInProgress: false,
 		WorkLoopSteps: []string{
@@ -938,7 +938,7 @@ func outputWitnessPatrolContext(ctx RoleContext) {
 		PatrolMolName:   "mol-witness-patrol",
 		BeadsDir:        ctx.WorkDir,
 		Assignee:        ctx.Rig + "/witness",
-		HeaderEmoji:     constants.EmojiWitness,
+		HeaderIcon:      constants.IconWitness,
 		HeaderTitle:     "Witness Patrol Status",
 		CheckInProgress: true,
 		WorkLoopSteps: []string{
@@ -961,7 +961,7 @@ func outputRefineryPatrolContext(ctx RoleContext) {
 		PatrolMolName:   "mol-refinery-patrol",
 		BeadsDir:        ctx.WorkDir,
 		Assignee:        ctx.Rig + "/refinery",
-		HeaderEmoji:     "🔧",
+		HeaderIcon:      "[refinery]",
 		HeaderTitle:     "Refinery Patrol Status",
 		CheckInProgress: true,
 		WorkLoopSteps: []string{

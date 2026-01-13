@@ -179,7 +179,7 @@ func runStart(cmd *cobra.Command, args []string) error {
 	startConfiguredCrew(t, townRoot)
 
 	fmt.Println()
-	fmt.Printf("%s Gas Town is running\n", style.Bold.Render("✓"))
+	fmt.Printf("%s Gas Town is running\n", style.Bold.Render("OK"))
 	fmt.Println()
 	fmt.Printf("  Attach to Mayor:  %s\n", style.Dim.Render("gt mayor attach"))
 	fmt.Printf("  Attach to Deacon: %s\n", style.Dim.Render("gt deacon attach"))
@@ -199,7 +199,7 @@ func startCoreAgents(townRoot string, agentOverride string) error {
 			return fmt.Errorf("starting Mayor: %w", err)
 		}
 	} else {
-		fmt.Printf("  %s Mayor started\n", style.Bold.Render("✓"))
+		fmt.Printf("  %s Mayor started\n", style.Bold.Render("OK"))
 	}
 
 	// Start Deacon (health monitor)
@@ -211,7 +211,7 @@ func startCoreAgents(townRoot string, agentOverride string) error {
 			return fmt.Errorf("starting Deacon: %w", err)
 		}
 	} else {
-		fmt.Printf("  %s Deacon started\n", style.Bold.Render("✓"))
+		fmt.Printf("  %s Deacon started\n", style.Bold.Render("OK"))
 	}
 
 	return nil
@@ -241,7 +241,7 @@ func startRigAgents(t *tmux.Tmux, townRoot string) {
 					fmt.Printf("  %s %s witness failed: %v\n", style.Dim.Render("○"), r.Name, err)
 				}
 			} else {
-				fmt.Printf("  %s %s witness started\n", style.Bold.Render("✓"), r.Name)
+				fmt.Printf("  %s %s witness started\n", style.Bold.Render("OK"), r.Name)
 			}
 		}
 
@@ -255,7 +255,7 @@ func startRigAgents(t *tmux.Tmux, townRoot string) {
 			if err != nil {
 				fmt.Printf("  %s %s refinery failed: %v\n", style.Dim.Render("○"), r.Name, err)
 			} else if created {
-				fmt.Printf("  %s %s refinery started\n", style.Bold.Render("✓"), r.Name)
+				fmt.Printf("  %s %s refinery started\n", style.Bold.Render("OK"), r.Name)
 			}
 		}
 	}
@@ -284,7 +284,7 @@ func startConfiguredCrew(t *tmux.Tmux, townRoot string) {
 					if err := t.SendKeys(sessionID, claudeCmd); err != nil {
 						fmt.Printf("  %s %s/%s restart failed: %v\n", style.Dim.Render("○"), r.Name, crewName, err)
 					} else {
-						fmt.Printf("  %s %s/%s Claude restarted\n", style.Bold.Render("✓"), r.Name, crewName)
+						fmt.Printf("  %s %s/%s Claude restarted\n", style.Bold.Render("OK"), r.Name, crewName)
 						startedAny = true
 					}
 				} else {
@@ -294,7 +294,7 @@ func startConfiguredCrew(t *tmux.Tmux, townRoot string) {
 				if err := startCrewMember(r.Name, crewName, townRoot); err != nil {
 					fmt.Printf("  %s %s/%s failed: %v\n", style.Dim.Render("○"), r.Name, crewName, err)
 				} else {
-					fmt.Printf("  %s %s/%s started\n", style.Bold.Render("✓"), r.Name, crewName)
+					fmt.Printf("  %s %s/%s started\n", style.Bold.Render("OK"), r.Name, crewName)
 					startedAny = true
 				}
 			}
@@ -549,7 +549,7 @@ func runGracefulShutdown(t *tmux.Tmux, gtSessions []string, townRoot string) err
 	}
 
 	fmt.Println()
-	fmt.Printf("%s Graceful shutdown complete (%d sessions stopped)\n", style.Bold.Render("✓"), stopped)
+	fmt.Printf("%s Graceful shutdown complete (%d sessions stopped)\n", style.Bold.Render("OK"), stopped)
 	return nil
 }
 
@@ -568,7 +568,7 @@ func runImmediateShutdown(t *tmux.Tmux, gtSessions []string, townRoot string) er
 	}
 
 	fmt.Println()
-	fmt.Printf("%s Gas Town shutdown complete (%d sessions stopped)\n", style.Bold.Render("✓"), stopped)
+	fmt.Printf("%s Gas Town shutdown complete (%d sessions stopped)\n", style.Bold.Render("OK"), stopped)
 
 	return nil
 }
@@ -594,7 +594,7 @@ func killSessionsInOrder(t *tmux.Tmux, sessions []string, mayorSession, deaconSe
 	// 1. Stop Deacon first
 	if inList(deaconSession) {
 		if err := t.KillSession(deaconSession); err == nil {
-			fmt.Printf("  %s %s stopped\n", style.Bold.Render("✓"), deaconSession)
+			fmt.Printf("  %s %s stopped\n", style.Bold.Render("OK"), deaconSession)
 			stopped++
 		}
 	}
@@ -605,7 +605,7 @@ func killSessionsInOrder(t *tmux.Tmux, sessions []string, mayorSession, deaconSe
 			continue
 		}
 		if err := t.KillSession(sess); err == nil {
-			fmt.Printf("  %s %s stopped\n", style.Bold.Render("✓"), sess)
+			fmt.Printf("  %s %s stopped\n", style.Bold.Render("OK"), sess)
 			stopped++
 		}
 	}
@@ -613,7 +613,7 @@ func killSessionsInOrder(t *tmux.Tmux, sessions []string, mayorSession, deaconSe
 	// 3. Stop Mayor last
 	if inList(mayorSession) {
 		if err := t.KillSession(mayorSession); err == nil {
-			fmt.Printf("  %s %s stopped\n", style.Bold.Render("✓"), mayorSession)
+			fmt.Printf("  %s %s stopped\n", style.Bold.Render("OK"), mayorSession)
 			stopped++
 		}
 	}
@@ -677,7 +677,7 @@ func cleanupPolecats(townRoot string) {
 				}
 				// Nuclear mode: warn but proceed
 				fmt.Printf("  %s %s/%s: NUCLEAR - removing despite %s\n",
-					style.Bold.Render("⚠"), r.Name, p.Name, status.String())
+					style.Bold.Render("WARN"), r.Name, p.Name, status.String())
 			}
 
 			// Clean: remove worktree and branch
@@ -694,7 +694,7 @@ func cleanupPolecats(townRoot string) {
 			mayorGit := git.NewGit(mayorPath)
 			_ = mayorGit.DeleteBranch(branchName, true) // Ignore errors
 
-			fmt.Printf("  %s %s/%s: cleaned up\n", style.Bold.Render("✓"), r.Name, p.Name)
+			fmt.Printf("  %s %s/%s: cleaned up\n", style.Bold.Render("OK"), r.Name, p.Name)
 			totalCleaned++
 		}
 	}
@@ -703,7 +703,7 @@ func cleanupPolecats(townRoot string) {
 	if len(uncommittedPolecats) > 0 {
 		fmt.Println()
 		fmt.Printf("  %s Polecats with uncommitted work (use --nuclear to force):\n",
-			style.Bold.Render("⚠"))
+			style.Bold.Render("WARN"))
 		for _, pc := range uncommittedPolecats {
 			fmt.Printf("    • %s\n", pc)
 		}
@@ -786,7 +786,7 @@ func runStartCrew(cmd *cobra.Command, args []string) error {
 		}
 	} else {
 		fmt.Printf("%s Started crew workspace: %s/%s\n",
-			style.Bold.Render("✓"), rigName, name)
+			style.Bold.Render("OK"), rigName, name)
 	}
 
 	fmt.Printf("Attach with: %s\n", style.Dim.Render(fmt.Sprintf("gt crew at %s", name)))

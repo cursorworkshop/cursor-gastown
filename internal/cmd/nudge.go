@@ -159,7 +159,7 @@ func runNudge(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("nudging deacon: %w", err)
 		}
 
-		fmt.Printf("%s Nudged deacon\n", style.Bold.Render("✓"))
+		fmt.Printf("%s Nudged deacon\n", style.Bold.Render("OK"))
 
 		// Log nudge event
 		if townRoot, err := workspace.FindFromCwd(); err == nil && townRoot != "" {
@@ -198,7 +198,7 @@ func runNudge(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("nudging session: %w", err)
 		}
 
-		fmt.Printf("%s Nudged %s/%s\n", style.Bold.Render("✓"), rigName, polecatName)
+		fmt.Printf("%s Nudged %s/%s\n", style.Bold.Render("OK"), rigName, polecatName)
 
 		// Log nudge event
 		if townRoot, err := workspace.FindFromCwd(); err == nil && townRoot != "" {
@@ -219,7 +219,7 @@ func runNudge(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("nudging session: %w", err)
 		}
 
-		fmt.Printf("✓ Nudged %s\n", target)
+		fmt.Printf("OK Nudged %s\n", target)
 
 		// Log nudge event
 		if townRoot, err := workspace.FindFromCwd(); err == nil && townRoot != "" {

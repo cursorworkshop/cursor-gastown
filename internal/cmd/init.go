@@ -68,20 +68,20 @@ func runInit(cmd *cobra.Command, args []string) error {
 			_ = os.WriteFile(gitkeep, []byte(""), 0644)
 		}
 
-		fmt.Printf("   ✓ Created %s/\n", dir)
+		fmt.Printf("   OKCreated %s/\n", dir)
 		created++
 	}
 
 	// Update .git/info/exclude
 	if err := updateGitExclude(cwd); err != nil {
 		fmt.Printf("   %s Could not update .git/info/exclude: %v\n",
-			style.Dim.Render("⚠"), err)
+			style.Dim.Render("WARN"), err)
 	} else {
-		fmt.Printf("   ✓ Updated .git/info/exclude\n")
+		fmt.Printf("   OKUpdated .git/info/exclude\n")
 	}
 
 	fmt.Printf("\n%s Rig initialized with %d directories.\n",
-		style.Bold.Render("✓"), created)
+		style.Bold.Render("OK"), created)
 	fmt.Println()
 	fmt.Println("Next steps:")
 	fmt.Printf("  1. Add this rig to a town: %s\n",

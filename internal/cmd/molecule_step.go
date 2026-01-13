@@ -113,7 +113,7 @@ func runMoleculeStepDone(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("closing step: %w", err)
 		}
 		result.StepClosed = true
-		fmt.Printf("%s Closed step %s: %s\n", style.Bold.Render("✓"), stepID, step.Title)
+		fmt.Printf("%s Closed step %s: %s\n", style.Bold.Render("OK"), stepID, step.Title)
 	}
 
 	// Step 4: Find the next ready step
@@ -379,7 +379,7 @@ func handleMoleculeComplete(cwd, townRoot, moleculeID string, dryRun bool) error
 			if err := unpinCmd.Run(); err != nil {
 				style.PrintWarning("could not unpin bead: %v", err)
 			} else {
-				fmt.Printf("%s Work unpinned\n", style.Bold.Render("✓"))
+				fmt.Printf("%s Work unpinned\n", style.Bold.Render("OK"))
 			}
 		}
 	}

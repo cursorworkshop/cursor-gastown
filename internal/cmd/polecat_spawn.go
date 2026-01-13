@@ -179,7 +179,7 @@ func SpawnPolecatForSling(rigName string, opts SlingSpawnOptions) (*SpawnedPolec
 		return nil, fmt.Errorf("getting pane for %s: %w", sessionName, err)
 	}
 
-	fmt.Printf("%s Polecat %s spawned\n", style.Bold.Render("✓"), polecatName)
+	fmt.Printf("%s Polecat %s spawned\n", style.Bold.Render("OK"), polecatName)
 
 	// Log spawn event to activity feed
 	_ = events.LogFeed(events.TypeSpawn, "gt", events.SpawnPayload(rigName, polecatName))

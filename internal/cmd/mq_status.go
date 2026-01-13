@@ -233,7 +233,7 @@ func formatStatus(status string) string {
 	case "in_progress":
 		return style.Bold.Render("▶ in_progress")
 	case "closed":
-		return style.Dim.Render("✓ closed")
+		return style.Dim.Render("OK closed")
 	default:
 		return status
 	}
@@ -247,7 +247,7 @@ func getStatusIcon(status string) string {
 	case "in_progress":
 		return "▶"
 	case "closed":
-		return "✓"
+		return "OK"
 	default:
 		return "•"
 	}

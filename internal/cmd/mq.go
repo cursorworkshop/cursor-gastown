@@ -378,9 +378,9 @@ func runMQRetry(cmd *cobra.Command, args []string) error {
 	}
 
 	if mqRetryNow {
-		fmt.Printf("%s Merge request processed\n", style.Bold.Render("✓"))
+		fmt.Printf("%s Merge request processed\n", style.Bold.Render("OK"))
 	} else {
-		fmt.Printf("%s Merge request queued for retry\n", style.Bold.Render("✓"))
+		fmt.Printf("%s Merge request queued for retry\n", style.Bold.Render("OK"))
 		fmt.Printf("  %s\n", style.Dim.Render("Will be processed on next refinery cycle"))
 	}
 

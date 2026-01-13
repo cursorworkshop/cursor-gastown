@@ -138,35 +138,9 @@ func RemoveMCPServer(workDir, name string) error {
 }
 
 // EnsureGasTownMCPServers ensures Gas Town MCP servers are configured.
-// This is a no-op if the servers are already configured.
+// Currently a no-op as Gas Town does not yet have an MCP server.
 func EnsureGasTownMCPServers(workDir string) error {
-	path := MCPConfigPath(workDir)
-
-	config, err := LoadMCPConfig(path)
-	if err != nil {
-		return err
-	}
-
-	// Check if we need to add any servers
-	modified := false
-
-	// Add Gas Town MCP server if not present
-	// Note: This is a placeholder - Gas Town doesn't have an MCP server yet,
-	// but this is where we'd configure it when available.
-	if _, exists := config.McpServers["gastown"]; !exists {
-		// Uncomment when Gas Town has an MCP server:
-		// config.McpServers["gastown"] = MCPServer{
-		// 	Command: "gt",
-		// 	Args:    []string{"mcp", "serve"},
-		// }
-		// modified = true
-		_ = exists // silence unused warning
-	}
-
-	if modified {
-		return SaveMCPConfig(path, config)
-	}
-
+	// Future: Add Gas Town MCP server configuration here when available.
 	return nil
 }
 

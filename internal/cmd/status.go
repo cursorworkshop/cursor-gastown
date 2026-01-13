@@ -406,7 +406,7 @@ func runStatusOnce(_ *cobra.Command, _ []string) error {
 
 	// Show bd daemon warning at the end if there were issues
 	if bdWarning != "" {
-		fmt.Printf("%s %s\n", style.Warning.Render("⚠"), bdWarning)
+		fmt.Printf("%s %s\n", style.Warning.Render("WARN"), bdWarning)
 		fmt.Printf("  Run 'bd daemon killall && bd daemon --start' to restart daemons\n")
 	}
 
@@ -439,17 +439,17 @@ func outputStatusText(status TownStatus) error {
 		fmt.Println()
 	}
 
-	// Role icons - uses centralized emojis from constants package
+	// Role icons - uses centralized icons from constants package
 	roleIcons := map[string]string{
-		constants.RoleMayor:    constants.EmojiMayor,
-		constants.RoleDeacon:   constants.EmojiDeacon,
-		constants.RoleWitness:  constants.EmojiWitness,
-		constants.RoleRefinery: constants.EmojiRefinery,
-		constants.RoleCrew:     constants.EmojiCrew,
-		constants.RolePolecat:  constants.EmojiPolecat,
+		constants.RoleMayor:    constants.IconMayor,
+		constants.RoleDeacon:   constants.IconDeacon,
+		constants.RoleWitness:  constants.IconWitness,
+		constants.RoleRefinery: constants.IconRefinery,
+		constants.RoleCrew:     constants.IconCrew,
+		constants.RolePolecat:  constants.IconPolecat,
 		// Legacy names for backwards compatibility
-		"coordinator":  constants.EmojiMayor,
-		"health-check": constants.EmojiDeacon,
+		"coordinator":  constants.IconMayor,
+		"health-check": constants.IconDeacon,
 	}
 
 	// Global Agents (Mayor, Deacon)

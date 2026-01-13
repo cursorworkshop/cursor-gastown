@@ -231,7 +231,7 @@ func modifyAgentState(agentBead, beadsDir string, hasIncr bool) error {
 		return fmt.Errorf("updating agent state: %w", err)
 	}
 
-	fmt.Printf("%s Updated agent state for %s\n", style.Bold.Render("✓"), agentBead)
+	fmt.Printf("%s Updated agent state for %s\n", style.Bold.Render("OK"), agentBead)
 
 	return nil
 }

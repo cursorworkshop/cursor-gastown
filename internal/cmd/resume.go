@@ -180,7 +180,7 @@ func runResume(cmd *cobra.Command, args []string) error {
 		style.PrintWarning("could not clear parked state: %v", err)
 	}
 
-	fmt.Printf("\n%s Ready to continue!\n", style.Bold.Render("✓"))
+	fmt.Printf("\n%s Ready to continue!\n", style.Bold.Render("OK"))
 	return nil
 }
 

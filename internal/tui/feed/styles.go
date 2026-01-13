@@ -99,14 +99,14 @@ var (
 				BorderForeground(colorPrimary).
 				Padding(0, 1)
 
-	// Role icons - uses centralized emojis from constants package
+	// Role icons - uses centralized icons from constants package
 	RoleIcons = map[string]string{
-		constants.RoleMayor:    constants.EmojiMayor,
-		constants.RoleWitness:  constants.EmojiWitness,
-		constants.RoleRefinery: constants.EmojiRefinery,
-		constants.RoleCrew:     constants.EmojiCrew,
-		constants.RolePolecat:  constants.EmojiPolecat,
-		constants.RoleDeacon:   constants.EmojiDeacon,
+		constants.RoleMayor:    constants.IconMayor,
+		constants.RoleWitness:  constants.IconWitness,
+		constants.RoleRefinery: constants.IconRefinery,
+		constants.RoleCrew:     constants.IconCrew,
+		constants.RolePolecat:  constants.IconPolecat,
+		constants.RoleDeacon:   constants.IconDeacon,
 	}
 
 	// MQ event styles
@@ -127,33 +127,33 @@ var (
 	// Event symbols
 	EventSymbols = map[string]string{
 		"create":   "+",
-		"update":   "→",
-		"complete": "✓",
-		"fail":     "✗",
-		"delete":   "⊘",
-		"pin":      "📌",
+		"update":   ">",
+		"complete": "*",
+		"fail":     "x",
+		"delete":   "-",
+		"pin":      "^",
 		// Witness patrol events
-		"patrol_started":  constants.EmojiWitness,
-		"patrol_complete": "✓",
-		"polecat_checked": "·",
-		"polecat_nudged":  "⚡",
-		"escalation_sent": "⬆",
+		"patrol_started":  constants.IconWitness,
+		"patrol_complete": "*",
+		"polecat_checked": ".",
+		"polecat_nudged":  "!",
+		"escalation_sent": "^",
 		// Merge events
-		"merge_started": "⚙",
-		"merged":        "✓",
-		"merge_failed":  "✗",
-		"merge_skipped": "⊘",
+		"merge_started": "#",
+		"merged":        "*",
+		"merge_failed":  "x",
+		"merge_skipped": "-",
 		// General gt events
-		"sling":   "🎯",
-		"hook":    "🪝",
-		"unhook":  "↩",
-		"handoff": "🤝",
-		"done":    "✓",
-		"mail":    "✉",
-		"spawn":   "🚀",
-		"kill":    "💀",
-		"nudge":   "⚡",
-		"boot":    "🔌",
-		"halt":    "⏹",
+		"sling":   ">",
+		"hook":    "[hook]",
+		"unhook":  "[unhook]",
+		"handoff": "[handoff]",
+		"done":    "*",
+		"mail":    "@",
+		"spawn":   "[spawn]",
+		"kill":    "[kill]",
+		"nudge":   "!",
+		"boot":    "[boot]",
+		"halt":    "[halt]",
 	}
 )

@@ -80,7 +80,7 @@ func runOrphans(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(orphans) == 0 {
-		fmt.Printf("%s No orphaned commits found\n", style.Bold.Render("✓"))
+		fmt.Printf("%s No orphaned commits found\n", style.Bold.Render("OK"))
 		return nil
 	}
 
@@ -95,7 +95,7 @@ func runOrphans(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(filtered) == 0 {
-		fmt.Printf("%s No orphaned commits in the last %d days\n", style.Bold.Render("✓"), orphansDays)
+		fmt.Printf("%s No orphaned commits in the last %d days\n", style.Bold.Render("OK"), orphansDays)
 		fmt.Printf("%s Use --days=N or --all to see older orphans\n", style.Dim.Render("Hint:"))
 		return nil
 	}

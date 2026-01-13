@@ -310,7 +310,7 @@ func executeConvoyFormula(f *formulaData, formulaName, targetRig string) error {
 		return fmt.Errorf("creating convoy bead: %w", err)
 	}
 
-	fmt.Printf("%s Created convoy: %s\n", style.Bold.Render("✓"), convoyID)
+	fmt.Printf("%s Created convoy: %s\n", style.Bold.Render("OK"), convoyID)
 
 	// Step 2: Create leg beads and track them
 	legBeads := make(map[string]string) // leg.ID -> bead ID
@@ -438,7 +438,7 @@ func executeConvoyFormula(f *formulaData, formulaName, targetRig string) error {
 	}
 
 	// Summary
-	fmt.Printf("\n%s Convoy dispatched!\n", style.Bold.Render("✓"))
+	fmt.Printf("\n%s Convoy dispatched!\n", style.Bold.Render("OK"))
 	fmt.Printf("  Convoy:  %s\n", convoyID)
 	fmt.Printf("  Legs:    %d dispatched\n", slingCount)
 	if synthesisBeadID != "" {
@@ -735,7 +735,7 @@ func runFormulaCreate(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("writing formula file: %w", err)
 	}
 
-	fmt.Printf("%s Created formula: %s\n", style.Bold.Render("✓"), filename)
+	fmt.Printf("%s Created formula: %s\n", style.Bold.Render("OK"), filename)
 	fmt.Printf("\nNext steps:\n")
 	fmt.Printf("  1. Edit the formula: %s\n", filename)
 	fmt.Printf("  2. View it:          gt formula show %s\n", formulaName)
