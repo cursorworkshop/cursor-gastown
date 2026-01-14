@@ -4,17 +4,19 @@ This document outlines issues discovered while integrating [Gas Town](https://gi
 
 ## Context
 
-Gas Town is a multi-agent workspace manager that orchestrates AI coding agents. We've successfully integrated Cursor CLI as an agent backend alongside Claude Code, but encountered several issues specific to Cursor.
+Gas Town is a multi-agent workspace manager that orchestrates AI coding agents. This fork uses Cursor CLI (`cursor-agent`) as the **default** agent backend.
 
-**Repository**: [https://github.com/okc0mputex/gastown-cursor-cli](https://github.com/okc0mputex/gastown-cursor-cli) (fork with Cursor integration)
+**Repository**: [https://github.com/cursorworkshop/cursor-gastown](https://github.com/cursorworkshop/cursor-gastown)
 
 ---
 
-## Issue 1: Nudge Message Flooding in UI
+## Issue 1: Nudge Message Flooding in UI - NEEDS VERIFICATION
 
 ### Description
 
 When sending a single startup message to a Cursor agent session via tmux, the message appears duplicated 15-20+ times in the Cursor UI as separate conversation bubbles.
+
+**Update (2026-01-14):** In recent testing with cursor-agent v2026.01.09, this issue was NOT observed. Messages sent via `tmux send-keys` appeared once as expected. May have been fixed in newer versions.
 
 ### Expected Behavior
 
@@ -64,11 +66,13 @@ The same message is displayed multiple times:
 
 ---
 
-## Issue 2: Workspace Trust Blocks Automation
+## Issue 2: Workspace Trust Blocks Automation - RESOLVED
 
 ### Description
 
 When cursor-agent starts in a new workspace, it displays a trust dialog that requires manual user interaction. This blocks autonomous agent spawning in multi-agent workflows.
+
+**Resolution (2026-01-14):** The `-f` (force) flag bypasses workspace trust prompts. Gas Town now uses `cursor-agent -f` as the default startup command, which enables fully autonomous agent spawning without trust dialogs.
 
 ### Expected Behavior
 
@@ -275,25 +279,28 @@ grok                    - Grok
 
 For questions about this integration or to discuss solutions:
 
-- Gas Town Repository: [https://github.com/steveyegge/gastown](https://github.com/steveyegge/gastown)
-- Integration Fork: [https://github.com/okc0mputex/gastown-cursor-cli](https://github.com/okc0mputex/gastown-cursor-cli)
-- Related PR: [https://github.com/steveyegge/gastown/pull/247](https://github.com/steveyegge/gastown/pull/247)
+- Original Gas Town: [https://github.com/steveyegge/gastown](https://github.com/steveyegge/gastown)
+- Cursor Fork: [https://github.com/cursorworkshop/cursor-gastown](https://github.com/cursorworkshop/cursor-gastown)
 
 ---
 
 ## Appendix: Gas Town + Cursor Integration Status
 
-### Working Features
+**As of 2026-01-14:** Cursor CLI (`cursor-agent`) is now the **default** agent for this fork. All agent sessions spawn `cursor-agent -f` instead of Claude Code.
 
+### Working Features
 
 | Feature                        | Status |
 | ------------------------------ | ------ |
-| Agent preset configuration     | ✅      |
-| Hooks via `.cursor/hooks.json` | ✅      |
-| Rules via `.cursor/rules/`     | ✅      |
-| Session start/stop             | ✅      |
-| Force mode (`-f`)              | ✅      |
-| Tmux session management        | ✅      |
+| Default agent = cursor-agent   | YES    |
+| Agent preset configuration     | YES    |
+| Hooks via `.cursor/hooks.json` | YES    |
+| Rules via `.cursor/rules/`     | YES    |
+| Session start/stop             | YES    |
+| Force mode (`-f`)              | YES    |
+| Tmux session management        | YES    |
+| Task execution via tmux        | YES    |
+| Multi-file task completion     | YES    |
 
 
 ### Hooks Implementation
