@@ -153,7 +153,7 @@ func runRigDock(cmd *cobra.Command, args []string) error {
 	}
 
 	// Output
-	fmt.Printf("%s Rig %s docked (global)\n", style.Success.Render("✓"), rigName)
+	fmt.Printf("%s Rig %s docked (global)\n", style.Success.Render("[OK]"), rigName)
 	fmt.Printf("  Label added: %s\n", RigDockedLabel)
 	for _, msg := range stoppedAgents {
 		fmt.Printf("  %s\n", msg)
@@ -218,7 +218,7 @@ func runRigUndock(cmd *cobra.Command, args []string) error {
 		fmt.Printf("  %s bd sync warning: %v\n%s", style.Warning.Render("!"), err, string(output))
 	}
 
-	fmt.Printf("%s Rig %s undocked\n", style.Success.Render("✓"), rigName)
+	fmt.Printf("%s Rig %s undocked\n", style.Success.Render("[OK]"), rigName)
 	fmt.Printf("  Label removed: %s\n", RigDockedLabel)
 	fmt.Printf("  Daemon can now auto-restart agents\n")
 	fmt.Printf("  Use '%s' to start agents immediately\n", style.Dim.Render("gt rig start "+rigName))

@@ -122,8 +122,8 @@ Example output:
   Created:   2025-12-30T10:15:00-08:00
 
   Tracked Issues:
-    ✓ gt-xyz: Update API endpoint [task]
-    ✓ bd-abc: Fix validation [bug]
+    [OK] gt-xyz: Update API endpoint [task]
+    [OK] bd-abc: Fix validation [bug]
     ○ bd-ghi: Update docs [task]
     ○ gt-jkl: Deploy to prod [task]
 ```
@@ -171,9 +171,9 @@ Notification content:
 🚚 Convoy Landed: Deploy v2.0 (hq-cv-abc)
 
 Issues (3):
-  ✓ gt-xyz: Update API endpoint
-  ✓ gt-def: Add validation
-  ✓ bd-abc: Update docs
+  [OK] gt-xyz: Update API endpoint
+  [OK] gt-def: Add validation
+  [OK] bd-abc: Update docs
 
 Duration: 2h 15m
 ```

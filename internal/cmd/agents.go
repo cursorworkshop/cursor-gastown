@@ -301,7 +301,7 @@ func runAgents(cmd *cobra.Command, args []string) error {
 	// Build display-menu arguments
 	menuArgs := []string{
 		"display-menu",
-		"-T", "#[fg=cyan,bold]⚙️  Gas Town Agents",
+		"-T", "#[fg=cyan,bold][CFG]  Gas Town Agents",
 		"-x", "C", // Center horizontally
 		"-y", "C", // Center vertically
 	}

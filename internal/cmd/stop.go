@@ -133,7 +133,7 @@ func runStop(cmd *cobra.Command, args []string) error {
 				result.Success = false
 				result.Error = err.Error()
 				fmt.Printf("  %s [%s] %s: %s\n",
-					style.Dim.Render("✗"),
+					style.Dim.Render("[X]"),
 					r.Name, info.Polecat,
 					style.Dim.Render(err.Error()))
 			} else {

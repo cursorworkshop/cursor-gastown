@@ -169,7 +169,7 @@ func runRigConfigSet(cmd *cobra.Command, args []string) error {
 		if err := wispCfg.Block(key); err != nil {
 			return fmt.Errorf("blocking %s: %w", key, err)
 		}
-		fmt.Printf("%s Blocked %s for rig %s\n", style.Success.Render("✓"), key, rigName)
+		fmt.Printf("%s Blocked %s for rig %s\n", style.Success.Render("[OK]"), key, rigName)
 		return nil
 	}
 
@@ -180,7 +180,7 @@ func runRigConfigSet(cmd *cobra.Command, args []string) error {
 		if err := setBeadLabel(townRoot, r, key, value); err != nil {
 			return fmt.Errorf("setting bead label: %w", err)
 		}
-		fmt.Printf("%s Set %s=%s in bead layer for rig %s\n", style.Success.Render("✓"), key, value, rigName)
+		fmt.Printf("%s Set %s=%s in bead layer for rig %s\n", style.Success.Render("[OK]"), key, value, rigName)
 	} else {
 		// Set in wisp layer
 		wispCfg := wisp.NewConfig(townRoot, r.Name)
@@ -194,7 +194,7 @@ func runRigConfigSet(cmd *cobra.Command, args []string) error {
 		if err := wispCfg.Set(key, typedValue); err != nil {
 			return fmt.Errorf("setting %s: %w", key, err)
 		}
-		fmt.Printf("%s Set %s=%s in wisp layer for rig %s\n", style.Success.Render("✓"), key, value, rigName)
+		fmt.Printf("%s Set %s=%s in wisp layer for rig %s\n", style.Success.Render("[OK]"), key, value, rigName)
 	}
 
 	return nil
@@ -214,7 +214,7 @@ func runRigConfigUnset(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("unsetting %s: %w", key, err)
 	}
 
-	fmt.Printf("%s Unset %s from wisp layer for rig %s\n", style.Success.Render("✓"), key, rigName)
+	fmt.Printf("%s Unset %s from wisp layer for rig %s\n", style.Success.Render("[OK]"), key, rigName)
 	return nil
 }
 

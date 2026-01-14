@@ -168,7 +168,7 @@ func runEscalate(cmd *cobra.Command, args []string) error {
 	case SeverityCritical:
 		emoji = "🚨"
 	case SeverityHigh:
-		emoji = "⚠️"
+		emoji = "[!]"
 	default:
 		emoji = "📢"
 	}

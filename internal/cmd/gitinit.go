@@ -120,7 +120,7 @@ func runGitInit(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Initializing git for HQ at %s\n\n",
-		style.Bold.Render("🔧"), style.Dim.Render(hqRoot))
+		style.Bold.Render("[FIX]"), style.Dim.Render(hqRoot))
 
 	// Create .gitignore
 	gitignorePath := filepath.Join(hqRoot, ".gitignore")
@@ -135,7 +135,7 @@ func runGitInit(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	} else {
-		fmt.Printf("   ✓ Git repository already exists\n")
+		fmt.Printf("   [OK] Git repository already exists\n")
 	}
 
 	// Create GitHub repo if requested
@@ -171,7 +171,7 @@ func createGitignore(path string) error {
 
 		// Check if it already has Gas Town section
 		if strings.Contains(string(content), "Gas Town HQ") {
-			fmt.Printf("   ✓ .gitignore already configured for Gas Town\n")
+			fmt.Printf("   [OK] .gitignore already configured for Gas Town\n")
 			return nil
 		}
 
@@ -180,7 +180,7 @@ func createGitignore(path string) error {
 		if err := os.WriteFile(path, []byte(combined), 0644); err != nil {
 			return fmt.Errorf("updating .gitignore: %w", err)
 		}
-		fmt.Printf("   ✓ Updated .gitignore with Gas Town patterns\n")
+		fmt.Printf("   [OK] Updated .gitignore with Gas Town patterns\n")
 		return nil
 	}
 
@@ -188,7 +188,7 @@ func createGitignore(path string) error {
 	if err := os.WriteFile(path, []byte(HQGitignore), 0644); err != nil {
 		return fmt.Errorf("creating .gitignore: %w", err)
 	}
-	fmt.Printf("   ✓ Created .gitignore\n")
+	fmt.Printf("   [OK] Created .gitignore\n")
 	return nil
 }
 
@@ -201,7 +201,7 @@ func initGitRepo(path string) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("git init failed: %w", err)
 	}
-	fmt.Printf("   ✓ Initialized git repository\n")
+	fmt.Printf("   [OK] Initialized git repository\n")
 	return nil
 }
 
@@ -240,7 +240,7 @@ func createGitHubRepo(hqRoot, repo string, private bool) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("gh repo create failed: %w", err)
 	}
-	fmt.Printf("   ✓ Created and pushed to GitHub: %s (%s)\n", repo, visibility)
+	fmt.Printf("   [OK] Created and pushed to GitHub: %s (%s)\n", repo, visibility)
 	if private {
 		fmt.Printf("   ℹ To make this repo public: %s\n", style.Dim.Render("gh repo edit "+repo+" --visibility public"))
 	}
@@ -264,7 +264,7 @@ func InitGitForHarness(hqRoot string, github string, private bool) error {
 			return err
 		}
 	} else {
-		fmt.Printf("   ✓ Git repository already exists\n")
+		fmt.Printf("   [OK] Git repository already exists\n")
 	}
 
 	// Create GitHub repo if requested

@@ -25,7 +25,7 @@ NC='\033[0m' # No Color
 log() { echo -e "${GREEN}[+]${NC} $1"; }
 warn() { echo -e "${YELLOW}[!]${NC} $1"; }
 fail() { echo -e "${RED}[X]${NC} $1"; exit 1; }
-check() { echo -e "${GREEN}[✓]${NC} $1"; }
+check() { echo -e "${GREEN}[[OK]]${NC} $1"; }
 
 echo "================================================"
 echo "  Gas Town GCE Installation Test"

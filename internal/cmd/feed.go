@@ -67,8 +67,8 @@ Tmux Integration:
 Event symbols:
   +  created/bonded    - New issue or molecule created
   →  in_progress       - Work started on an issue
-  ✓  completed         - Issue closed or step completed
-  ✗  failed            - Step or issue failed
+  [OK]  completed         - Issue closed or step completed
+  [X]  failed            - Step or issue failed
   ⊘  deleted           - Issue removed
   🦉  patrol_started   - Witness began patrol cycle
   ⚡  polecat_nudged   - Worker was nudged
@@ -77,8 +77,8 @@ Event symbols:
 
 MQ (Merge Queue) event symbols:
   ⚙  merge_started   - Refinery began processing an MR
-  ✓  merged          - MR successfully merged (green)
-  ✗  merge_failed    - Merge failed (conflict, tests, etc.) (red)
+  [OK]  merged          - MR successfully merged (green)
+  [X]  merge_failed    - Merge failed (conflict, tests, etc.) (red)
   ⊘  merge_skipped   - MR skipped (already merged, etc.)
 
 Examples:

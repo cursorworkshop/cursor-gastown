@@ -265,7 +265,7 @@ squashed_at: %s
 	}
 
 	fmt.Printf("%s Squashed molecule %s → digest %s\n",
-		style.Bold.Render("📦"), moleculeID, digestIssue.ID)
+		style.Bold.Render("[PKG]"), moleculeID, digestIssue.ID)
 	if childrenClosed > 0 {
 		fmt.Printf("  Closed %d step issues\n", childrenClosed)
 	}

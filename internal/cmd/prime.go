@@ -119,7 +119,7 @@ func runPrime(cmd *cobra.Command, args []string) error {
 
 	// Warn prominently if there's a role/cwd mismatch
 	if roleInfo.Mismatch {
-		fmt.Printf("\n%s\n", style.Bold.Render("⚠️  ROLE/LOCATION MISMATCH"))
+		fmt.Printf("\n%s\n", style.Bold.Render("[!]  ROLE/LOCATION MISMATCH"))
 		fmt.Printf("You are %s (from $GT_ROLE) but your cwd suggests %s.\n",
 			style.Bold.Render(string(roleInfo.Role)),
 			style.Bold.Render(string(roleInfo.CwdRole)))
@@ -768,7 +768,7 @@ func showMoleculeExecutionPrompt(workDir, moleculeID string) {
 		fmt.Println("  3. Continue until molecule complete")
 	} else {
 		// No next step - molecule may be complete
-		fmt.Println(style.Bold.Render("✓ MOLECULE COMPLETE"))
+		fmt.Println(style.Bold.Render("[OK] MOLECULE COMPLETE"))
 		fmt.Println()
 		fmt.Println("All steps are done. You may:")
 		fmt.Println("  - Report completion to supervisor")
@@ -1164,7 +1164,7 @@ func acquireIdentityLock(ctx RoleContext) error {
 	if err := l.Acquire(sessionID); err != nil {
 		if errors.Is(err, lock.ErrLocked) {
 			// Another agent owns this identity
-			fmt.Printf("\n%s\n\n", style.Bold.Render("⚠️  IDENTITY COLLISION DETECTED"))
+			fmt.Printf("\n%s\n\n", style.Bold.Render("[!]  IDENTITY COLLISION DETECTED"))
 			fmt.Printf("Another agent already claims this worker identity.\n\n")
 
 			// Show lock details

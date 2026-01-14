@@ -92,7 +92,7 @@ func runCrewAt(cmd *cobra.Command, args []string) error {
 			// Found an existing session with an agent running in this directory
 			existingSession := existingSessions[0]
 			fmt.Printf("%s Found existing agent session '%s' in crew directory\n",
-				style.Warning.Render("⚠"),
+				style.Warning.Render("[!]"),
 				existingSession)
 			fmt.Printf("  Attaching to existing session instead of creating a new one\n")
 

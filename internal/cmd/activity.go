@@ -188,7 +188,7 @@ func runActivityEmit(cmd *cobra.Command, args []string) error {
 
 	// Print confirmation
 	payloadJSON, _ := json.Marshal(payload)
-	fmt.Printf("%s Emitted %s event\n", style.Success.Render("✓"), style.Bold.Render(eventType))
+	fmt.Printf("%s Emitted %s event\n", style.Success.Render("[OK]"), style.Bold.Render(eventType))
 	fmt.Printf("  Actor:   %s\n", actor)
 	fmt.Printf("  Payload: %s\n", string(payloadJSON))
 

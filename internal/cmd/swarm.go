@@ -574,7 +574,7 @@ func spawnSwarmWorkersFromBeads(r *rig.Rig, townRoot string, swarmID string, wor
 		if err := polecatSessMgr.Inject(worker, context); err != nil {
 			style.PrintWarning("  couldn't inject to %s: %v", worker, err)
 		} else {
-			fmt.Printf("  %s → %s ✓\n", worker, task.ID)
+			fmt.Printf("  %s → %s [OK]\n", worker, task.ID)
 		}
 	}
 

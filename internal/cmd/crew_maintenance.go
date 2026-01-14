@@ -119,13 +119,13 @@ func runCrewPristine(cmd *cobra.Command, args []string) error {
 		if result.Pulled {
 			fmt.Printf("  %s git pull\n", style.Dim.Render("OK"))
 		} else if result.PullError != "" {
-			fmt.Printf("  %s git pull: %s\n", style.Bold.Render("✗"), result.PullError)
+			fmt.Printf("  %s git pull: %s\n", style.Bold.Render("[X]"), result.PullError)
 		}
 
 		if result.Synced {
 			fmt.Printf("  %s bd sync\n", style.Dim.Render("OK"))
 		} else if result.SyncError != "" {
-			fmt.Printf("  %s bd sync: %s\n", style.Bold.Render("✗"), result.SyncError)
+			fmt.Printf("  %s bd sync: %s\n", style.Bold.Render("[X]"), result.SyncError)
 		}
 	}
 

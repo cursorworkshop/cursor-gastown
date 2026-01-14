@@ -543,7 +543,7 @@ func runPolecatRemove(cmd *cobra.Command, args []string) error {
 			continue
 		}
 
-		fmt.Printf("  %s removed\n", style.Success.Render("✓"))
+		fmt.Printf("  %s removed\n", style.Success.Render("[OK]"))
 		removed++
 	}
 
@@ -631,7 +631,7 @@ func runPolecatSync(cmd *cobra.Command, args []string) error {
 				fmt.Printf("  %s\n", style.Dim.Render(string(output)))
 			}
 		} else {
-			fmt.Printf("  %s\n", style.Success.Render("✓ synced"))
+			fmt.Printf("  %s\n", style.Success.Render("[OK] synced"))
 		}
 	}
 
@@ -1069,12 +1069,12 @@ func runPolecatCheckRecovery(cmd *cobra.Command, args []string) error {
 	if status.NeedsRecovery {
 		fmt.Printf("  Verdict:         %s\n", style.Error.Render("NEEDS_RECOVERY"))
 		fmt.Println()
-		fmt.Printf("  %s This polecat has unpushed/uncommitted work.\n", style.Warning.Render("⚠"))
+		fmt.Printf("  %s This polecat has unpushed/uncommitted work.\n", style.Warning.Render("[!]"))
 		fmt.Println("  Escalate to Mayor for recovery before cleanup.")
 	} else {
 		fmt.Printf("  Verdict:         %s\n", style.Success.Render("SAFE_TO_NUKE"))
 		fmt.Println()
-		fmt.Printf("  %s Safe to nuke - no work at risk.\n", style.Success.Render("✓"))
+		fmt.Printf("  %s Safe to nuke - no work at risk.\n", style.Success.Render("[OK]"))
 	}
 
 	return nil
@@ -1427,7 +1427,7 @@ func runPolecatNuke(cmd *cobra.Command, args []string) error {
 		}
 
 		if polecatNukeForce {
-			fmt.Printf("%s Nuking %s/%s (--force)...\n", style.Warning.Render("⚠"), p.rigName, p.polecatName)
+			fmt.Printf("%s Nuking %s/%s (--force)...\n", style.Warning.Render("[!]"), p.rigName, p.polecatName)
 		} else {
 			fmt.Printf("Nuking %s/%s...\n", p.rigName, p.polecatName)
 		}
@@ -1437,10 +1437,10 @@ func runPolecatNuke(cmd *cobra.Command, args []string) error {
 		running, _ := polecatMgr.IsRunning(p.polecatName)
 		if running {
 			if err := polecatMgr.Stop(p.polecatName, true); err != nil {
-				fmt.Printf("  %s session kill failed: %v\n", style.Warning.Render("⚠"), err)
+				fmt.Printf("  %s session kill failed: %v\n", style.Warning.Render("[!]"), err)
 				// Continue anyway - worktree removal will still work
 			} else {
-				fmt.Printf("  %s killed session\n", style.Success.Render("✓"))
+				fmt.Printf("  %s killed session\n", style.Success.Render("[OK]"))
 			}
 		}
 
@@ -1460,7 +1460,7 @@ func runPolecatNuke(cmd *cobra.Command, args []string) error {
 				continue
 			}
 		} else {
-			fmt.Printf("  %s deleted worktree\n", style.Success.Render("✓"))
+			fmt.Printf("  %s deleted worktree\n", style.Success.Render("[OK]"))
 		}
 
 		// Step 4: Delete branch (if we know it)
@@ -1470,7 +1470,7 @@ func runPolecatNuke(cmd *cobra.Command, args []string) error {
 				// Non-fatal - branch might already be gone
 				fmt.Printf("  %s branch delete: %v\n", style.Dim.Render("○"), err)
 			} else {
-				fmt.Printf("  %s deleted branch %s\n", style.Success.Render("✓"), branchToDelete)
+				fmt.Printf("  %s deleted branch %s\n", style.Success.Render("[OK]"), branchToDelete)
 			}
 		}
 
@@ -1486,7 +1486,7 @@ func runPolecatNuke(cmd *cobra.Command, args []string) error {
 			// Non-fatal - agent bead might not exist
 			fmt.Printf("  %s agent bead not found or already closed\n", style.Dim.Render("○"))
 		} else {
-			fmt.Printf("  %s closed agent bead %s\n", style.Success.Render("✓"), agentBeadID)
+			fmt.Printf("  %s closed agent bead %s\n", style.Success.Render("[OK]"), agentBeadID)
 		}
 
 		nuked++

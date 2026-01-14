@@ -49,7 +49,7 @@ Convoy: hq-abc (Deploy v2.0)
 Progress: 2/3 complete
 
 Issues
-  ✓ gt-xyz: Update API              closed
+  [OK] gt-xyz: Update API              closed
   → bd-ghi: Update docs             in_progress  @beads/amber
   ○ gt-jkl: Final review            open
 

@@ -133,7 +133,7 @@ func TestIsCompleteNotFound(t *testing.T) {
 //	bd swarm status gt-xxxxx
 //	Expected: Progress 4/4 complete (100%)
 //
-// 8. SWARM AUTO-CLOSE ⚠️
+// 8. SWARM AUTO-CLOSE [!]
 //
 //	The swarm and epic remain open after all tasks complete.
 //	This is by design - the Witness coordinator is responsible for

@@ -145,7 +145,7 @@ func (m *Manager) Start(foreground bool) error {
 			return ErrAlreadyRunning
 		}
 		// Zombie - tmux alive but Claude dead. Kill and recreate.
-		_, _ = fmt.Fprintln(m.output, "⚠ Detected zombie session (tmux alive, Claude dead). Recreating...")
+		_, _ = fmt.Fprintln(m.output, "[!] Detected zombie session (tmux alive, Claude dead). Recreating...")
 		if err := t.KillSession(sessionID); err != nil {
 			return fmt.Errorf("killing zombie session: %w", err)
 		}

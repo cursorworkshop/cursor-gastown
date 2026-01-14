@@ -193,14 +193,14 @@ func outputPatrolContext(cfg PatrolConfig) {
 		patrolID, err = autoSpawnPatrol(cfg)
 		if err != nil {
 			if patrolID != "" {
-				fmt.Printf("⚠ %s\n", err.Error())
+				fmt.Printf("[!] %s\n", err.Error())
 			} else {
 				fmt.Println(style.Dim.Render(err.Error()))
 				fmt.Println(style.Dim.Render(fmt.Sprintf("Run `bd mol catalog` to troubleshoot.")))
 				return
 			}
 		} else {
-			fmt.Printf("✓ Created and hooked patrol wisp: %s\n", patrolID)
+			fmt.Printf("[OK] Created and hooked patrol wisp: %s\n", patrolID)
 		}
 	} else {
 		// Has active patrol - show status

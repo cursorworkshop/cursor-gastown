@@ -289,9 +289,9 @@ func ListAgentPresets() []string {
 	return names
 }
 
-// DefaultAgentPreset returns the default agent preset (Claude).
+// DefaultAgentPreset returns the default agent preset (Cursor).
 func DefaultAgentPreset() AgentPreset {
-	return AgentClaude
+	return AgentCursor
 }
 
 // RuntimeConfigFromPreset creates a RuntimeConfig from an agent preset.

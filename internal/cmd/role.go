@@ -323,7 +323,7 @@ func runRoleShow(cmd *cobra.Command, args []string) error {
 	// Show mismatch warning
 	if info.Mismatch {
 		fmt.Println()
-		fmt.Printf("%s\n", style.Bold.Render("⚠️  ROLE MISMATCH"))
+		fmt.Printf("%s\n", style.Bold.Render("[!]  ROLE MISMATCH"))
 		fmt.Printf("  GT_ROLE=%s (authoritative)\n", info.EnvRole)
 		fmt.Printf("  cwd suggests: %s\n", info.CwdRole)
 		fmt.Println()
@@ -409,7 +409,7 @@ func runRoleDetect(cmd *cobra.Command, args []string) error {
 		parsedRole, _, _ := parseRoleString(envRole)
 		if parsedRole != ctx.Role {
 			fmt.Println()
-			fmt.Printf("%s\n", style.Bold.Render("⚠️  Mismatch with $GT_ROLE"))
+			fmt.Printf("%s\n", style.Bold.Render("[!]  Mismatch with $GT_ROLE"))
 			fmt.Printf("  $GT_ROLE=%s\n", envRole)
 			fmt.Println("  The env var takes precedence in normal operation.")
 		}

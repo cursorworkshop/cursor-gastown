@@ -172,7 +172,7 @@ func runSynthesisStart(cmd *cobra.Command, args []string) error {
 
 	if !allComplete && !synthesisForce {
 		fmt.Printf("\n%s Not all legs complete. Use --force to proceed anyway.\n",
-			style.Warning.Render("⚠"))
+			style.Warning.Render("[!]"))
 		fmt.Printf("\nIncomplete legs:\n")
 		for _, leg := range legOutputs {
 			if leg.Status != "closed" {
@@ -275,11 +275,11 @@ func runSynthesisStatus(cmd *cobra.Command, args []string) error {
 	for _, leg := range legOutputs {
 		status := "○"
 		if leg.Status == "closed" {
-			status = "✓"
+			status = "[OK]"
 		}
 		fileStatus := ""
 		if leg.HasFile {
-			fileStatus = style.Dim.Render(" (output: ✓)")
+			fileStatus = style.Dim.Render(" (output: [OK])")
 		}
 		fmt.Printf("    %s %s: %s [%s]%s\n", status, leg.LegID, leg.Title, leg.Status, fileStatus)
 	}
@@ -287,7 +287,7 @@ func runSynthesisStatus(cmd *cobra.Command, args []string) error {
 	// Synthesis readiness
 	fmt.Printf("\n  %s\n", style.Bold.Render("Synthesis:"))
 	if allComplete {
-		fmt.Printf("    %s Ready - all legs complete\n", style.Success.Render("✓"))
+		fmt.Printf("    %s Ready - all legs complete\n", style.Success.Render("[OK]"))
 		fmt.Printf("    Run: gt synthesis start %s\n", convoyID)
 	} else {
 		completedCount := 0

@@ -412,7 +412,7 @@ func runRigAdd(cmd *cobra.Command, args []string) error {
 		defaultBranch = rigCfg.DefaultBranch
 	}
 
-	fmt.Printf("\n%s Rig created in %.1fs\n", style.Success.Render("✓"), elapsed.Seconds())
+	fmt.Printf("\n%s Rig created in %.1fs\n", style.Success.Render("[OK]"), elapsed.Seconds())
 	fmt.Printf("\nStructure:\n")
 	fmt.Printf("  %s/\n", name)
 	fmt.Printf("  ├── config.json\n")
@@ -518,7 +518,7 @@ func runRigRemove(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("saving rigs config: %w", err)
 	}
 
-	fmt.Printf("%s Rig %s removed from registry\n", style.Success.Render("✓"), name)
+	fmt.Printf("%s Rig %s removed from registry\n", style.Success.Render("[OK]"), name)
 	fmt.Printf("\nNote: Files at %s were NOT deleted.\n", filepath.Join(townRoot, name))
 	fmt.Printf("To delete: %s\n", style.Dim.Render(fmt.Sprintf("rm -rf %s", filepath.Join(townRoot, name))))
 
@@ -564,7 +564,7 @@ func runRigReset(cmd *cobra.Command, args []string) error {
 		if err := townBd.ClearHandoffContent(roleKey); err != nil {
 			return fmt.Errorf("clearing handoff content: %w", err)
 		}
-		fmt.Printf("%s Cleared handoff content for %s\n", style.Success.Render("✓"), roleKey)
+		fmt.Printf("%s Cleared handoff content for %s\n", style.Success.Render("[OK]"), roleKey)
 	}
 
 	// Clear stale mail messages
@@ -575,9 +575,9 @@ func runRigReset(cmd *cobra.Command, args []string) error {
 		}
 		if result.Closed > 0 || result.Cleared > 0 {
 			fmt.Printf("%s Cleared mail: %d closed, %d pinned cleared\n",
-				style.Success.Render("✓"), result.Closed, result.Cleared)
+				style.Success.Render("[OK]"), result.Closed, result.Cleared)
 		} else {
-			fmt.Printf("%s No mail to clear\n", style.Success.Render("✓"))
+			fmt.Printf("%s No mail to clear\n", style.Success.Render("[OK]"))
 		}
 	}
 
@@ -605,7 +605,7 @@ func runResetStale(bd *beads.Beads, dryRun bool) error {
 	}
 
 	if len(issues) == 0 {
-		fmt.Printf("%s No in_progress issues found\n", style.Success.Render("✓"))
+		fmt.Printf("%s No in_progress issues found\n", style.Success.Render("[OK]"))
 		return nil
 	}
 
@@ -660,7 +660,7 @@ func runResetStale(bd *beads.Beads, dryRun bool) error {
 				Assignee: &emptyAssignee,
 			}); err != nil {
 				fmt.Printf("  %s Failed to reset %s: %v\n",
-					style.Warning.Render("⚠"),
+					style.Warning.Render("[!]"),
 					issue.ID, err)
 				continue
 			}
@@ -675,15 +675,15 @@ func runResetStale(bd *beads.Beads, dryRun bool) error {
 				style.Dim.Render("(dry-run)"),
 				resetCount, skippedCount)
 		} else {
-			fmt.Printf("%s No stale issues found\n", style.Success.Render("✓"))
+			fmt.Printf("%s No stale issues found\n", style.Success.Render("[OK]"))
 		}
 	} else {
 		if resetCount > 0 {
 			fmt.Printf("%s Reset %d stale issues: %v\n",
-				style.Success.Render("✓"),
+				style.Success.Render("[OK]"),
 				resetCount, resetIssues)
 		} else {
-			fmt.Printf("%s No stale issues to reset\n", style.Success.Render("✓"))
+			fmt.Printf("%s No stale issues to reset\n", style.Success.Render("[OK]"))
 		}
 		if skippedCount > 0 {
 			fmt.Printf("  Skipped %d persistent (crew) issues\n", skippedCount)
@@ -787,7 +787,7 @@ func runRigBoot(cmd *cobra.Command, args []string) error {
 
 	// Report results
 	if len(started) > 0 {
-		fmt.Printf("%s Started: %s\n", style.Success.Render("✓"), strings.Join(started, ", "))
+		fmt.Printf("%s Started: %s\n", style.Success.Render("[OK]"), strings.Join(started, ", "))
 	}
 	if len(skipped) > 0 {
 		fmt.Printf("%s Skipped: %s\n", style.Dim.Render("•"), strings.Join(skipped, ", "))
@@ -820,7 +820,7 @@ func runRigStart(cmd *cobra.Command, args []string) error {
 	for _, rigName := range args {
 		r, err := rigMgr.GetRig(rigName)
 		if err != nil {
-			fmt.Printf("%s Rig '%s' not found\n", style.Warning.Render("⚠"), rigName)
+			fmt.Printf("%s Rig '%s' not found\n", style.Warning.Render("[!]"), rigName)
 			failedRigs = append(failedRigs, rigName)
 			continue
 		}
@@ -843,7 +843,7 @@ func runRigStart(cmd *cobra.Command, args []string) error {
 				if err == witness.ErrAlreadyRunning {
 					skipped = append(skipped, "witness")
 				} else {
-					fmt.Printf("  %s Failed to start witness: %v\n", style.Warning.Render("⚠"), err)
+					fmt.Printf("  %s Failed to start witness: %v\n", style.Warning.Render("[!]"), err)
 					hasError = true
 				}
 			} else {
@@ -860,7 +860,7 @@ func runRigStart(cmd *cobra.Command, args []string) error {
 			fmt.Printf("  Starting refinery...\n")
 			refMgr := refinery.NewManager(r)
 			if err := refMgr.Start(false); err != nil {
-				fmt.Printf("  %s Failed to start refinery: %v\n", style.Warning.Render("⚠"), err)
+				fmt.Printf("  %s Failed to start refinery: %v\n", style.Warning.Render("[!]"), err)
 				hasError = true
 			} else {
 				started = append(started, "refinery")
@@ -869,7 +869,7 @@ func runRigStart(cmd *cobra.Command, args []string) error {
 
 		// Report results for this rig
 		if len(started) > 0 {
-			fmt.Printf("  %s Started: %s\n", style.Success.Render("✓"), strings.Join(started, ", "))
+			fmt.Printf("  %s Started: %s\n", style.Success.Render("[OK]"), strings.Join(started, ", "))
 		}
 		if len(skipped) > 0 {
 			fmt.Printf("  %s Skipped: %s (already running)\n", style.Dim.Render("•"), strings.Join(skipped, ", "))
@@ -885,10 +885,10 @@ func runRigStart(cmd *cobra.Command, args []string) error {
 
 	// Summary
 	if len(successRigs) > 0 {
-		fmt.Printf("%s Started rigs: %s\n", style.Success.Render("✓"), strings.Join(successRigs, ", "))
+		fmt.Printf("%s Started rigs: %s\n", style.Success.Render("[OK]"), strings.Join(successRigs, ", "))
 	}
 	if len(failedRigs) > 0 {
-		fmt.Printf("%s Failed rigs: %s\n", style.Warning.Render("⚠"), strings.Join(failedRigs, ", "))
+		fmt.Printf("%s Failed rigs: %s\n", style.Warning.Render("[!]"), strings.Join(failedRigs, ", "))
 		return fmt.Errorf("some rigs failed to start")
 	}
 
@@ -941,7 +941,7 @@ func runRigShutdown(cmd *cobra.Command, args []string) error {
 			}
 
 			if len(problemPolecats) > 0 {
-				fmt.Printf("\n%s Cannot shutdown - polecats have uncommitted work:\n\n", style.Warning.Render("⚠"))
+				fmt.Printf("\n%s Cannot shutdown - polecats have uncommitted work:\n\n", style.Warning.Render("[!]"))
 				for _, pp := range problemPolecats {
 					fmt.Printf("  %s: %s\n", style.Bold.Render(pp.name), pp.status.String())
 				}
@@ -987,14 +987,14 @@ func runRigShutdown(cmd *cobra.Command, args []string) error {
 	}
 
 	if len(errors) > 0 {
-		fmt.Printf("\n%s Some agents failed to stop:\n", style.Warning.Render("⚠"))
+		fmt.Printf("\n%s Some agents failed to stop:\n", style.Warning.Render("[!]"))
 		for _, e := range errors {
 			fmt.Printf("  - %s\n", e)
 		}
 		return fmt.Errorf("shutdown incomplete")
 	}
 
-	fmt.Printf("%s Rig %s shut down successfully\n", style.Success.Render("✓"), rigName)
+	fmt.Printf("%s Rig %s shut down successfully\n", style.Success.Render("[OK]"), rigName)
 	return nil
 }
 
@@ -1016,7 +1016,7 @@ func runRigReboot(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("boot failed: %w", err)
 	}
 
-	fmt.Printf("\n%s Rig %s rebooted successfully\n", style.Success.Render("✓"), rigName)
+	fmt.Printf("\n%s Rig %s rebooted successfully\n", style.Success.Render("[OK]"), rigName)
 	return nil
 }
 
@@ -1190,7 +1190,7 @@ func runRigStop(cmd *cobra.Command, args []string) error {
 	for _, rigName := range args {
 		r, err := rigMgr.GetRig(rigName)
 		if err != nil {
-			fmt.Printf("%s Rig '%s' not found\n", style.Warning.Render("⚠"), rigName)
+			fmt.Printf("%s Rig '%s' not found\n", style.Warning.Render("[!]"), rigName)
 			failed = append(failed, rigName)
 			continue
 		}
@@ -1218,7 +1218,7 @@ func runRigStop(cmd *cobra.Command, args []string) error {
 				}
 
 				if len(problemPolecats) > 0 {
-					fmt.Printf("\n%s Cannot stop %s - polecats have uncommitted work:\n", style.Warning.Render("⚠"), rigName)
+					fmt.Printf("\n%s Cannot stop %s - polecats have uncommitted work:\n", style.Warning.Render("[!]"), rigName)
 					for _, pp := range problemPolecats {
 						fmt.Printf("  %s: %s\n", style.Bold.Render(pp.name), pp.status.String())
 					}
@@ -1264,13 +1264,13 @@ func runRigStop(cmd *cobra.Command, args []string) error {
 		}
 
 		if len(errors) > 0 {
-			fmt.Printf("%s Some agents in %s failed to stop:\n", style.Warning.Render("⚠"), rigName)
+			fmt.Printf("%s Some agents in %s failed to stop:\n", style.Warning.Render("[!]"), rigName)
 			for _, e := range errors {
 				fmt.Printf("  - %s\n", e)
 			}
 			failed = append(failed, rigName)
 		} else {
-			fmt.Printf("%s Rig %s stopped\n", style.Success.Render("✓"), rigName)
+			fmt.Printf("%s Rig %s stopped\n", style.Success.Render("[OK]"), rigName)
 			succeeded = append(succeeded, rigName)
 		}
 	}
@@ -1279,10 +1279,10 @@ func runRigStop(cmd *cobra.Command, args []string) error {
 	if len(args) > 1 {
 		fmt.Println()
 		if len(succeeded) > 0 {
-			fmt.Printf("%s Stopped: %s\n", style.Success.Render("✓"), strings.Join(succeeded, ", "))
+			fmt.Printf("%s Stopped: %s\n", style.Success.Render("[OK]"), strings.Join(succeeded, ", "))
 		}
 		if len(failed) > 0 {
-			fmt.Printf("%s Failed: %s\n", style.Warning.Render("⚠"), strings.Join(failed, ", "))
+			fmt.Printf("%s Failed: %s\n", style.Warning.Render("[!]"), strings.Join(failed, ", "))
 			fmt.Printf("\nUse %s to force shutdown (DANGER: will lose work!)\n", style.Bold.Render("--nuclear"))
 			return fmt.Errorf("some rigs failed to stop")
 		}
@@ -1320,7 +1320,7 @@ func runRigRestart(cmd *cobra.Command, args []string) error {
 	for _, rigName := range args {
 		r, err := rigMgr.GetRig(rigName)
 		if err != nil {
-			fmt.Printf("%s Rig '%s' not found\n", style.Warning.Render("⚠"), rigName)
+			fmt.Printf("%s Rig '%s' not found\n", style.Warning.Render("[!]"), rigName)
 			failed = append(failed, rigName)
 			continue
 		}
@@ -1350,7 +1350,7 @@ func runRigRestart(cmd *cobra.Command, args []string) error {
 				}
 
 				if len(problemPolecats) > 0 {
-					fmt.Printf("\n%s Cannot restart %s - polecats have uncommitted work:\n", style.Warning.Render("⚠"), rigName)
+					fmt.Printf("\n%s Cannot restart %s - polecats have uncommitted work:\n", style.Warning.Render("[!]"), rigName)
 					for _, pp := range problemPolecats {
 						fmt.Printf("  %s: %s\n", style.Bold.Render(pp.name), pp.status.String())
 					}
@@ -1397,7 +1397,7 @@ func runRigRestart(cmd *cobra.Command, args []string) error {
 		}
 
 		if len(stopErrors) > 0 {
-			fmt.Printf("  %s Stop errors:\n", style.Warning.Render("⚠"))
+			fmt.Printf("  %s Stop errors:\n", style.Warning.Render("[!]"))
 			for _, e := range stopErrors {
 				fmt.Printf("    - %s\n", e)
 			}
@@ -1422,7 +1422,7 @@ func runRigRestart(cmd *cobra.Command, args []string) error {
 				if err == witness.ErrAlreadyRunning {
 					skipped = append(skipped, "witness")
 				} else {
-					fmt.Printf("    %s Failed to start witness: %v\n", style.Warning.Render("⚠"), err)
+					fmt.Printf("    %s Failed to start witness: %v\n", style.Warning.Render("[!]"), err)
 					startErrors = append(startErrors, fmt.Sprintf("witness: %v", err))
 				}
 			} else {
@@ -1438,7 +1438,7 @@ func runRigRestart(cmd *cobra.Command, args []string) error {
 		} else {
 			fmt.Printf("    Starting refinery...\n")
 			if err := refMgr.Start(false); err != nil {
-				fmt.Printf("    %s Failed to start refinery: %v\n", style.Warning.Render("⚠"), err)
+				fmt.Printf("    %s Failed to start refinery: %v\n", style.Warning.Render("[!]"), err)
 				startErrors = append(startErrors, fmt.Sprintf("refinery: %v", err))
 			} else {
 				started = append(started, "refinery")
@@ -1447,20 +1447,20 @@ func runRigRestart(cmd *cobra.Command, args []string) error {
 
 		// Report results for this rig
 		if len(started) > 0 {
-			fmt.Printf("  %s Started: %s\n", style.Success.Render("✓"), strings.Join(started, ", "))
+			fmt.Printf("  %s Started: %s\n", style.Success.Render("[OK]"), strings.Join(started, ", "))
 		}
 		if len(skipped) > 0 {
 			fmt.Printf("  %s Skipped: %s (already running)\n", style.Dim.Render("•"), strings.Join(skipped, ", "))
 		}
 
 		if len(startErrors) > 0 {
-			fmt.Printf("  %s Start errors:\n", style.Warning.Render("⚠"))
+			fmt.Printf("  %s Start errors:\n", style.Warning.Render("[!]"))
 			for _, e := range startErrors {
 				fmt.Printf("    - %s\n", e)
 			}
 			failed = append(failed, rigName)
 		} else {
-			fmt.Printf("%s Rig %s restarted\n", style.Success.Render("✓"), rigName)
+			fmt.Printf("%s Rig %s restarted\n", style.Success.Render("[OK]"), rigName)
 			succeeded = append(succeeded, rigName)
 		}
 		fmt.Println()
@@ -1469,10 +1469,10 @@ func runRigRestart(cmd *cobra.Command, args []string) error {
 	// Summary
 	if len(args) > 1 {
 		if len(succeeded) > 0 {
-			fmt.Printf("%s Restarted: %s\n", style.Success.Render("✓"), strings.Join(succeeded, ", "))
+			fmt.Printf("%s Restarted: %s\n", style.Success.Render("[OK]"), strings.Join(succeeded, ", "))
 		}
 		if len(failed) > 0 {
-			fmt.Printf("%s Failed: %s\n", style.Warning.Render("⚠"), strings.Join(failed, ", "))
+			fmt.Printf("%s Failed: %s\n", style.Warning.Render("[!]"), strings.Join(failed, ", "))
 			fmt.Printf("\nUse %s to force shutdown (DANGER: will lose work!)\n", style.Bold.Render("--nuclear"))
 			return fmt.Errorf("some rigs failed to restart")
 		}

@@ -251,7 +251,7 @@ git merge --ff-only temp
 git push origin main
 ```
 
-⚠️ **STOP HERE - DO NOT PROCEED UNTIL STEPS 2-3 COMPLETE**
+[!] **STOP HERE - DO NOT PROCEED UNTIL STEPS 2-3 COMPLETE**
 
 **Step 2: Send MERGED Notification (REQUIRED - DO THIS IMMEDIATELY)**
 
@@ -268,7 +268,7 @@ POLECAT WORKTREES ACCUMULATE INDEFINITELY AND THE LIFECYCLE BREAKS.
 
 **Step 3: Close MR Bead (REQUIRED - DO THIS IMMEDIATELY)**
 
-⚠️ **VERIFICATION BEFORE CLOSING**: Confirm the work is actually on main:
+[!] **VERIFICATION BEFORE CLOSING**: Confirm the work is actually on main:
 ```bash
 # Get the commit message/issue from the branch
 git log origin/main --oneline | grep "<issue-id>"

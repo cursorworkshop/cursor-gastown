@@ -150,7 +150,7 @@ func runCallbacksProcess(cmd *cobra.Command, args []string) error {
 		// Print result
 		if result.Error != nil {
 			fmt.Printf("  %s %s: %v\n",
-				style.Error.Render("✗"),
+				style.Error.Render("[X]"),
 				msg.Subject,
 				result.Error)
 		} else if result.Handled {

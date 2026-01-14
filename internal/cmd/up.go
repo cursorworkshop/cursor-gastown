@@ -189,7 +189,7 @@ func runUp(cmd *cobra.Command, args []string) error {
 		}
 		_ = events.LogFeed(events.TypeBoot, "gt", events.BootPayload("town", startedServices))
 	} else {
-		fmt.Printf("%s Some services failed to start\n", style.Bold.Render("✗"))
+		fmt.Printf("%s Some services failed to start\n", style.Bold.Render("[X]"))
 		return fmt.Errorf("not all services started")
 	}
 

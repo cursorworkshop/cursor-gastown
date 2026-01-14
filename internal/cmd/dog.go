@@ -195,7 +195,7 @@ func runDogAdd(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("adding dog %s: %w", name, err)
 	}
 
-	fmt.Printf("✓ Created dog %s in kennel\n", style.Bold.Render(name))
+	fmt.Printf("[OK] Created dog %s in kennel\n", style.Bold.Render(name))
 	fmt.Printf("  Path: %s\n", d.Path)
 	fmt.Printf("  Worktrees:\n")
 	for rigName, path := range d.Worktrees {
@@ -266,7 +266,7 @@ func runDogRemove(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("removing dog %s: %w", name, err)
 		}
 
-		fmt.Printf("✓ Removed dog %s\n", name)
+		fmt.Printf("[OK] Removed dog %s\n", name)
 
 		// Delete agent bead for the dog
 		if b != nil {
@@ -377,7 +377,7 @@ func runDogCall(cmd *cobra.Command, args []string) error {
 					continue
 				}
 				woken++
-				fmt.Printf("✓ Called %s\n", d.Name)
+				fmt.Printf("[OK] Called %s\n", d.Name)
 			}
 		}
 
@@ -406,7 +406,7 @@ func runDogCall(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("waking dog %s: %w", name, err)
 		}
 
-		fmt.Printf("✓ Called %s - ready for work\n", name)
+		fmt.Printf("[OK] Called %s - ready for work\n", name)
 		return nil
 	}
 
@@ -425,7 +425,7 @@ func runDogCall(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("waking dog %s: %w", d.Name, err)
 	}
 
-	fmt.Printf("✓ Called %s - ready for work\n", d.Name)
+	fmt.Printf("[OK] Called %s - ready for work\n", d.Name)
 	return nil
 }
 
@@ -472,9 +472,9 @@ func showDogStatus(mgr *dog.Manager, name string) error {
 		fmt.Println("\nWorktrees:")
 		for rigName, path := range d.Worktrees {
 			// Check if worktree exists
-			exists := "✓"
+			exists := "[OK]"
 			if _, err := os.Stat(path); os.IsNotExist(err) {
-				exists = "✗"
+				exists = "[X]"
 			}
 			fmt.Printf("  %s %s: %s\n", exists, rigName, path)
 		}

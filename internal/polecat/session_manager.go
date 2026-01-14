@@ -451,6 +451,6 @@ func (m *SessionManager) hookIssue(issueID, agentID, workDir string) error {
 	if err := cmd.Run(); err != nil {
 		return fmt.Errorf("bd update failed: %w", err)
 	}
-	fmt.Printf("✓ Hooked issue %s to %s\n", issueID, agentID)
+	fmt.Printf("[OK] Hooked issue %s to %s\n", issueID, agentID)
 	return nil
 }

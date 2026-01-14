@@ -286,7 +286,7 @@ func (m *Manager) AddRig(opts AddRigOptions) (*Rig, error) {
 			return nil, fmt.Errorf("creating bare repo: %w", err)
 		}
 	}
-	fmt.Printf("   ✓ Created shared bare repo\n")
+	fmt.Printf("   [OK] Created shared bare repo\n")
 	bareGit := git.NewGitWithDir(bareRepoPath, "")
 
 	// Determine default branch: use provided value or auto-detect from remote
@@ -333,7 +333,7 @@ func (m *Manager) AddRig(opts AddRigOptions) (*Rig, error) {
 	if err := mayorGit.Checkout(defaultBranch); err != nil {
 		return nil, fmt.Errorf("checking out default branch for mayor: %w", err)
 	}
-	fmt.Printf("   ✓ Created mayor clone\n")
+	fmt.Printf("   [OK] Created mayor clone\n")
 
 	// Check if source repo has .beads/ with its own prefix - if so, use that prefix.
 	// This ensures we use the project's existing beads database instead of creating a new one.
@@ -378,7 +378,7 @@ func (m *Manager) AddRig(opts AddRigOptions) (*Rig, error) {
 	if err := m.initBeads(rigPath, opts.BeadsPrefix); err != nil {
 		return nil, fmt.Errorf("initializing beads: %w", err)
 	}
-	fmt.Printf("   ✓ Initialized beads (prefix: %s)\n", opts.BeadsPrefix)
+	fmt.Printf("   [OK] Initialized beads (prefix: %s)\n", opts.BeadsPrefix)
 
 	// Create refinery as worktree from bare repo on default branch.
 	// Refinery needs to see polecat branches (shared .repo.git) and merges them.
@@ -391,7 +391,7 @@ func (m *Manager) AddRig(opts AddRigOptions) (*Rig, error) {
 	if err := bareGit.WorktreeAddExisting(refineryRigPath, defaultBranch); err != nil {
 		return nil, fmt.Errorf("creating refinery worktree: %w", err)
 	}
-	fmt.Printf("   ✓ Created refinery worktree\n")
+	fmt.Printf("   [OK] Created refinery worktree\n")
 	// Set up beads redirect for refinery (points to rig-level .beads)
 	if err := beads.SetupRedirect(m.townRoot, refineryRigPath); err != nil {
 		fmt.Printf("  Warning: Could not set up refinery beads redirect: %v\n", err)
@@ -459,14 +459,14 @@ Use crew for your own workspace. Polecats are for batch work dispatch.
 			fmt.Fprintf(os.Stderr, "  Warning: Could not create %s settings: %v\n", sr.role, err)
 		}
 	}
-	fmt.Printf("   ✓ Installed Claude settings\n")
+	fmt.Printf("   [OK] Installed Claude settings\n")
 
 	// Initialize beads at rig level
 	fmt.Printf("  Initializing beads database...\n")
 	if err := m.initBeads(rigPath, opts.BeadsPrefix); err != nil {
 		return nil, fmt.Errorf("initializing beads: %w", err)
 	}
-	fmt.Printf("   ✓ Initialized beads (prefix: %s)\n", opts.BeadsPrefix)
+	fmt.Printf("   [OK] Initialized beads (prefix: %s)\n", opts.BeadsPrefix)
 
 	// Create rig-level agent beads (witness, refinery) in rig beads.
 	// Town-level agents (mayor, deacon) are created by gt install in town beads.
@@ -606,7 +606,7 @@ func (m *Manager) initBeads(rigPath, prefix string) error {
 	townRoute := beads.Route{Prefix: "hq-", Path: ".."}
 	if err := beads.AppendRouteToDir(beadsDir, townRoute); err != nil {
 		// Non-fatal: role slot set will fail but agent beads still work
-		fmt.Printf("   ⚠ Could not add route to town beads: %v\n", err)
+		fmt.Printf("   [!] Could not add route to town beads: %v\n", err)
 	}
 
 	return nil
@@ -675,7 +675,7 @@ func (m *Manager) initAgentBeads(rigPath, rigName, prefix string) error {
 		if _, err := bd.CreateAgentBead(agent.id, agent.desc, fields); err != nil {
 			return fmt.Errorf("creating %s: %w", agent.id, err)
 		}
-		fmt.Printf("   ✓ Created agent bead: %s\n", agent.id)
+		fmt.Printf("   [OK] Created agent bead: %s\n", agent.id)
 	}
 
 	return nil

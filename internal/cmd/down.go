@@ -122,7 +122,7 @@ func runDown(cmd *cobra.Command, args []string) error {
 		}
 		_ = events.LogFeed(events.TypeHalt, "gt", events.HaltPayload(stoppedServices))
 	} else {
-		fmt.Printf("%s Some services failed to stop\n", style.Bold.Render("✗"))
+		fmt.Printf("%s Some services failed to stop\n", style.Bold.Render("[X]"))
 		return fmt.Errorf("not all services stopped")
 	}
 

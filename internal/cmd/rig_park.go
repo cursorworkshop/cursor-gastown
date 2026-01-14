@@ -110,7 +110,7 @@ func runRigPark(cmd *cobra.Command, args []string) error {
 	}
 
 	// Output
-	fmt.Printf("%s Rig %s parked (local only)\n", style.Success.Render("✓"), rigName)
+	fmt.Printf("%s Rig %s parked (local only)\n", style.Success.Render("[OK]"), rigName)
 	for _, msg := range stoppedAgents {
 		fmt.Printf("  %s\n", msg)
 	}
@@ -134,7 +134,7 @@ func runRigUnpark(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("clearing parked status: %w", err)
 	}
 
-	fmt.Printf("%s Rig %s unparked\n", style.Success.Render("✓"), rigName)
+	fmt.Printf("%s Rig %s unparked\n", style.Success.Render("[OK]"), rigName)
 	fmt.Printf("  Daemon can now auto-restart agents\n")
 	fmt.Printf("  Use '%s' to start agents immediately\n", style.Dim.Render("gt rig start "+rigName))
 

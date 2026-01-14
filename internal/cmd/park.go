@@ -184,7 +184,7 @@ func runPark(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("writing parked state: %w", err)
 	}
 
-	fmt.Printf("%s Parked work on gate %s\n", style.Bold.Render("🅿️"), gateID)
+	fmt.Printf("%s Parked work on gate %s\n", style.Bold.Render("[P]"), gateID)
 	if beadID != "" {
 		fmt.Printf("  Working on: %s\n", beadID)
 	}

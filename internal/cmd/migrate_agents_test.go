@@ -20,7 +20,7 @@ func TestMigrationResultStatus(t *testing.T) {
 				Status:  "migrated",
 				Message: "successfully migrated",
 			},
-			wantIcon: "✓",
+			wantIcon: "[OK]",
 		},
 		{
 			name: "would migrate shows checkmark",
@@ -30,7 +30,7 @@ func TestMigrationResultStatus(t *testing.T) {
 				Status:  "would migrate",
 				Message: "would copy state from gt-mayor",
 			},
-			wantIcon: "✓",
+			wantIcon: "[OK]",
 		},
 		{
 			name: "skipped shows empty circle",
@@ -50,7 +50,7 @@ func TestMigrationResultStatus(t *testing.T) {
 				Status:  "error",
 				Message: "failed to create",
 			},
-			wantIcon: "✗",
+			wantIcon: "[X]",
 		},
 	}
 
@@ -59,11 +59,11 @@ func TestMigrationResultStatus(t *testing.T) {
 			var icon string
 			switch tt.result.Status {
 			case "migrated", "would migrate":
-				icon = "✓"
+				icon = "[OK]"
 			case "skipped":
 				icon = "⊘"
 			case "error":
-				icon = "✗"
+				icon = "[X]"
 			}
 			if icon != tt.wantIcon {
 				t.Errorf("icon for status %q = %q, want %q", tt.result.Status, icon, tt.wantIcon)

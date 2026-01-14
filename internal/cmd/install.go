@@ -117,7 +117,7 @@ func runInstall(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Creating Gas Town HQ at %s\n\n",
-		style.Bold.Render("🏭"), style.Dim.Render(absPath))
+		style.Bold.Render("[HQ]"), style.Dim.Render(absPath))
 
 	// Create directory structure
 	if err := os.MkdirAll(absPath, 0755); err != nil {

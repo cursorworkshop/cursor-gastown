@@ -1416,13 +1416,13 @@ func runBatchSling(beadIDs []string, rigName string, townBeadsDir string) error 
 		info, err := getBeadInfo(beadID)
 		if err != nil {
 			results = append(results, slingResult{beadID: beadID, success: false, errMsg: err.Error()})
-			fmt.Printf("  %s Could not get bead info: %v\n", style.Dim.Render("✗"), err)
+			fmt.Printf("  %s Could not get bead info: %v\n", style.Dim.Render("[X]"), err)
 			continue
 		}
 
 		if info.Status == "pinned" && !slingForce {
 			results = append(results, slingResult{beadID: beadID, success: false, errMsg: "already pinned"})
-			fmt.Printf("  %s Already pinned (use --force to re-sling)\n", style.Dim.Render("✗"))
+			fmt.Printf("  %s Already pinned (use --force to re-sling)\n", style.Dim.Render("[X]"))
 			continue
 		}
 
@@ -1438,7 +1438,7 @@ func runBatchSling(beadIDs []string, rigName string, townBeadsDir string) error 
 		spawnInfo, err := SpawnPolecatForSling(rigName, spawnOpts)
 		if err != nil {
 			results = append(results, slingResult{beadID: beadID, success: false, errMsg: err.Error()})
-			fmt.Printf("  %s Failed to spawn polecat: %v\n", style.Dim.Render("✗"), err)
+			fmt.Printf("  %s Failed to spawn polecat: %v\n", style.Dim.Render("[X]"), err)
 			continue
 		}
 
@@ -1467,7 +1467,7 @@ func runBatchSling(beadIDs []string, rigName string, townBeadsDir string) error 
 		hookCmd.Stderr = os.Stderr
 		if err := hookCmd.Run(); err != nil {
 			results = append(results, slingResult{beadID: beadID, polecat: spawnInfo.PolecatName, success: false, errMsg: "hook failed"})
-			fmt.Printf("  %s Failed to hook bead: %v\n", style.Dim.Render("✗"), err)
+			fmt.Printf("  %s Failed to hook bead: %v\n", style.Dim.Render("[X]"), err)
 			continue
 		}
 
@@ -1514,7 +1514,7 @@ func runBatchSling(beadIDs []string, rigName string, townBeadsDir string) error 
 	if successCount < len(beadIDs) {
 		for _, r := range results {
 			if !r.success {
-				fmt.Printf("  %s %s: %s\n", style.Dim.Render("✗"), r.beadID, r.errMsg)
+				fmt.Printf("  %s %s: %s\n", style.Dim.Render("[X]"), r.beadID, r.errMsg)
 			}
 		}
 	}

@@ -401,7 +401,7 @@ func runMQReject(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("rejecting MR: %w", err)
 	}
 
-	fmt.Printf("%s Rejected: %s\n", style.Bold.Render("✗"), result.Branch)
+	fmt.Printf("%s Rejected: %s\n", style.Bold.Render("[X]"), result.Branch)
 	fmt.Printf("  Worker: %s\n", result.Worker)
 	fmt.Printf("  Reason: %s\n", mqRejectReason)
 

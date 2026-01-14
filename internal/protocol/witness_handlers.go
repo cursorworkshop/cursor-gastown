@@ -64,13 +64,13 @@ func (h *DefaultWitnessHandler) HandleMerged(payload *MergedPayload) error {
 	// This verifies cleanup_status before nuking to prevent work loss.
 	nukeResult := witness.AutoNukeIfClean(h.WorkDir, h.Rig, payload.Polecat)
 	if nukeResult.Nuked {
-		fmt.Fprintf(h.Output, "[Witness] ✓ Auto-nuked polecat %s: %s\n", payload.Polecat, nukeResult.Reason)
+		fmt.Fprintf(h.Output, "[Witness] [OK] Auto-nuked polecat %s: %s\n", payload.Polecat, nukeResult.Reason)
 	} else if nukeResult.Skipped {
-		fmt.Fprintf(h.Output, "[Witness] ⚠ Cleanup skipped for %s: %s\n", payload.Polecat, nukeResult.Reason)
+		fmt.Fprintf(h.Output, "[Witness] [!] Cleanup skipped for %s: %s\n", payload.Polecat, nukeResult.Reason)
 	} else if nukeResult.Error != nil {
-		fmt.Fprintf(h.Output, "[Witness] ✗ Cleanup failed for %s: %v\n", payload.Polecat, nukeResult.Error)
+		fmt.Fprintf(h.Output, "[Witness] [X] Cleanup failed for %s: %v\n", payload.Polecat, nukeResult.Error)
 	} else {
-		fmt.Fprintf(h.Output, "[Witness] ✓ Polecat %s work merged, cleanup can proceed\n", payload.Polecat)
+		fmt.Fprintf(h.Output, "[Witness] [OK] Polecat %s work merged, cleanup can proceed\n", payload.Polecat)
 	}
 
 	return nil
@@ -94,7 +94,7 @@ func (h *DefaultWitnessHandler) HandleMergeFailed(payload *MergeFailedPayload) e
 		// Continue - notification is best-effort
 	}
 
-	fmt.Fprintf(h.Output, "[Witness] ✗ Polecat %s merge failed, rework needed\n", payload.Polecat)
+	fmt.Fprintf(h.Output, "[Witness] [X] Polecat %s merge failed, rework needed\n", payload.Polecat)
 
 	return nil
 }
@@ -119,7 +119,7 @@ func (h *DefaultWitnessHandler) HandleReworkRequest(payload *ReworkRequestPayloa
 		// Continue - notification is best-effort
 	}
 
-	fmt.Fprintf(h.Output, "[Witness] ⚠ Polecat %s needs to rebase onto %s\n", payload.Polecat, payload.TargetBranch)
+	fmt.Fprintf(h.Output, "[Witness] [!] Polecat %s needs to rebase onto %s\n", payload.Polecat, payload.TargetBranch)
 
 	return nil
 }

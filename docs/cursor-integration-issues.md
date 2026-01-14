@@ -79,7 +79,7 @@ Ability to pre-authorize workspaces or skip the trust dialog for automated/headl
 ```
   ╭──────────────────────────────────────────────────────────────────────────╮
   │                                                                          │
-  │  ⚠ Workspace Trust Required                                              │
+  │  [!] Workspace Trust Required                                              │
   │                                                                          │
   │  Cursor Agent can execute code and access files in your workspace. You   │
   │  will also trust the MCP servers this workspace has enabled.             │

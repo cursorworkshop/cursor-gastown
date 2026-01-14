@@ -399,9 +399,9 @@
                     </td>
                     <td>
                         {{if eq .CIStatus "pass"}}
-                        <span class="ci-status ci-pass">✓ Pass</span>
+                        <span class="ci-status ci-pass">[OK] Pass</span>
                         {{else if eq .CIStatus "fail"}}
-                        <span class="ci-status ci-fail">✗ Fail</span>
+                        <span class="ci-status ci-fail">[X] Fail</span>
                         {{else}}
                         <span class="ci-status ci-pending">⏳ Pending</span>
                         {{end}}

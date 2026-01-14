@@ -83,8 +83,8 @@ func (s *BdActivitySource) Close() error {
 	return s.cmd.Wait()
 }
 
-// bd activity line pattern: [HH:MM:SS] SYMBOL BEAD_ID action · description
-var bdActivityPattern = regexp.MustCompile(`^\[(\d{2}:\d{2}:\d{2})\]\s+([+→✓✗⊘📌])\s+(\S+)?\s*(\w+)?\s*·?\s*(.*)$`)
+// bd activity line pattern: [HH:MM:SS] SYMBOL BEAD_ID action - description
+var bdActivityPattern = regexp.MustCompile(`^\[(\d{2}:\d{2}:\d{2})\]\s+([+>OK!X@#])\s+(\S+)?\s*(\w+)?\s*-?\s*(.*)$`)
 
 // parseBdActivityLine parses a line from bd activity output
 func parseBdActivityLine(line string) *Event {
@@ -114,15 +114,15 @@ func parseBdActivityLine(line string) *Event {
 	switch symbol {
 	case "+":
 		eventType = "create"
-	case "→":
+	case ">":
 		eventType = "update"
-	case "✓":
+	case "OK":
 		eventType = "complete"
-	case "✗":
+	case "X", "!":
 		eventType = "fail"
-	case "⊘":
+	case "@":
 		eventType = "delete"
-	case "📌":
+	case "#":
 		eventType = "pin"
 	}
 

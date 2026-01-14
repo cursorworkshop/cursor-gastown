@@ -445,7 +445,7 @@ func (e *Engineer) handleSuccess(mr *beads.Issue, result ProcessResult) {
 	}
 
 	// 5. Log success
-	_, _ = fmt.Fprintf(e.output, "[Engineer] ✓ Merged: %s (commit: %s)\n", mr.ID, result.MergeCommit)
+	_, _ = fmt.Fprintf(e.output, "[Engineer] [OK] Merged: %s (commit: %s)\n", mr.ID, result.MergeCommit)
 }
 
 // handleFailure handles a failed merge request.
@@ -458,7 +458,7 @@ func (e *Engineer) handleFailure(mr *beads.Issue, result ProcessResult) {
 	}
 
 	// Log the failure
-	_, _ = fmt.Fprintf(e.output, "[Engineer] ✗ Failed: %s - %s\n", mr.ID, result.Error)
+	_, _ = fmt.Fprintf(e.output, "[Engineer] [X] Failed: %s - %s\n", mr.ID, result.Error)
 }
 
 // ProcessMRFromQueue processes a merge request from wisp queue.
@@ -560,7 +560,7 @@ func (e *Engineer) handleSuccessFromQueue(mr *mrqueue.MR, result ProcessResult) 
 	}
 
 	// 4. Log success
-	_, _ = fmt.Fprintf(e.output, "[Engineer] ✓ Merged: %s (commit: %s)\n", mr.ID, result.MergeCommit)
+	_, _ = fmt.Fprintf(e.output, "[Engineer] [OK] Merged: %s (commit: %s)\n", mr.ID, result.MergeCommit)
 }
 
 // handleFailureFromQueue handles a failed merge from wisp queue.
@@ -605,7 +605,7 @@ func (e *Engineer) handleFailureFromQueue(mr *mrqueue.MR, result ProcessResult) 
 	}
 
 	// Log the failure - MR stays in queue but may be blocked
-	_, _ = fmt.Fprintf(e.output, "[Engineer] ✗ Failed: %s - %s\n", mr.ID, result.Error)
+	_, _ = fmt.Fprintf(e.output, "[Engineer] [X] Failed: %s - %s\n", mr.ID, result.Error)
 	if mr.BlockedBy != "" {
 		_, _ = fmt.Fprintln(e.output, "[Engineer] MR blocked pending conflict resolution - queue continues to next MR")
 	} else {

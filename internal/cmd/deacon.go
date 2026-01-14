@@ -110,7 +110,7 @@ var deaconTriggerPendingCmd = &cobra.Command{
 	Short: "Trigger pending polecat spawns (bootstrap mode)",
 	Long: `Check inbox for POLECAT_STARTED messages and trigger ready polecats.
 
-⚠️  BOOTSTRAP MODE ONLY - Uses regex detection (ZFC violation acceptable).
+[!]  BOOTSTRAP MODE ONLY - Uses regex detection (ZFC violation acceptable).
 
 This command uses WaitForClaudeReady (regex) to detect when Claude is ready.
 This is appropriate for daemon bootstrap when no AI is available.
@@ -665,7 +665,7 @@ func runDeaconHealthCheck(cmd *cobra.Command, args []string) error {
 
 	// Check if force-kill threshold reached
 	if agentState.ShouldForceKill(healthCheckFailures) {
-		fmt.Printf("%s Agent %s should be force-killed\n", style.Bold.Render("✗"), agent)
+		fmt.Printf("%s Agent %s should be force-killed\n", style.Bold.Render("[X]"), agent)
 		os.Exit(2) // Exit code 2 = should force-kill
 	}
 
@@ -931,7 +931,7 @@ func runDeaconStaleHooks(cmd *cobra.Command, args []string) error {
 				status = style.Bold.Render("OK")
 				action = "unhooked (agent dead)"
 			} else if r.Error != "" {
-				status = style.Dim.Render("✗")
+				status = style.Dim.Render("[X]")
 				action = fmt.Sprintf("error: %s", r.Error)
 			}
 		}

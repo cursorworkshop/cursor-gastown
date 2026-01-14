@@ -118,7 +118,7 @@ func SpawnPolecatForSling(rigName string, opts SlingSpawnOptions) (*SpawnedPolec
 	// Handle naked mode (no-tmux)
 	if opts.Naked {
 		fmt.Println()
-		fmt.Printf("%s\n", style.Bold.Render("🔧 NO-TMUX MODE (--naked)"))
+		fmt.Printf("%s\n", style.Bold.Render("[FIX] NO-TMUX MODE (--naked)"))
 		fmt.Printf("Polecat created. Agent must be started manually.\n\n")
 		fmt.Printf("To start the agent:\n")
 		fmt.Printf("  cd %s\n", polecatObj.ClonePath)

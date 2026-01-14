@@ -36,13 +36,13 @@ var (
 		Bold(true)
 
 	// SuccessPrefix is the checkmark prefix for success messages
-	SuccessPrefix = Success.Render("✓")
+	SuccessPrefix = Success.Render("[OK]")
 
 	// WarningPrefix is the warning prefix
-	WarningPrefix = Warning.Render("⚠")
+	WarningPrefix = Warning.Render("[!]")
 
 	// ErrorPrefix is the error prefix
-	ErrorPrefix = Error.Render("✗")
+	ErrorPrefix = Error.Render("[X]")
 
 	// ArrowPrefix for action indicators
 	ArrowPrefix = Info.Render("→")
@@ -52,5 +52,5 @@ var (
 // The format and args work like fmt.Printf.
 func PrintWarning(format string, args ...interface{}) {
 	msg := fmt.Sprintf(format, args...)
-	fmt.Printf("%s %s\n", Warning.Render("⚠ Warning:"), msg)
+	fmt.Printf("%s %s\n", Warning.Render("[!] Warning:"), msg)
 }

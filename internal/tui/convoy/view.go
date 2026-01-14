@@ -100,7 +100,7 @@ func (m Model) renderView() string {
 				issueIcon := "○"
 				style := issueOpenStyle
 				if issue.Status == "closed" {
-					issueIcon = "✓"
+					issueIcon = "[OK]"
 					style = issueClosedStyle
 				}
 
@@ -137,13 +137,13 @@ func (m Model) renderView() string {
 func statusToIcon(status string) string {
 	switch status {
 	case "open":
-		return "🚚"
+		return "[>]"
 	case "closed":
-		return "✓"
+		return "[OK]"
 	case "in_progress":
-		return "→"
+		return "[..]"
 	default:
-		return "●"
+		return "[?]"
 	}
 }
 

@@ -65,8 +65,8 @@ The `--continue` flag:
 $ bd mol current
 You're working on molecule gt-abc (Implement user auth)
 
-  ✓ gt-abc.1: Design schema
-  ✓ gt-abc.2: Create models
+  [OK] gt-abc.1: Design schema
+  [OK] gt-abc.2: Create models
   → gt-abc.3: Add endpoints [in_progress] <- YOU ARE HERE
   ○ gt-abc.4: Write tests
   ○ gt-abc.5: Update docs
@@ -76,7 +76,7 @@ Progress: 2/5 steps complete
 $ # ... implement the endpoints ...
 
 $ bd close gt-abc.3 --continue
-✓ Closed gt-abc.3: Add endpoints
+[OK] Closed gt-abc.3: Add endpoints
 
 Next ready in molecule:
   gt-abc.4: Write tests
@@ -86,9 +86,9 @@ Next ready in molecule:
 $ bd mol current
 You're working on molecule gt-abc (Implement user auth)
 
-  ✓ gt-abc.1: Design schema
-  ✓ gt-abc.2: Create models
-  ✓ gt-abc.3: Add endpoints
+  [OK] gt-abc.1: Design schema
+  [OK] gt-abc.2: Create models
+  [OK] gt-abc.3: Add endpoints
   → gt-abc.4: Write tests [in_progress] <- YOU ARE HERE
   ○ gt-abc.5: Update docs
 
@@ -101,7 +101,7 @@ When closing the last step:
 
 ```bash
 $ bd close gt-abc.5 --continue
-✓ Closed gt-abc.5: Update docs
+[OK] Closed gt-abc.5: Update docs
 
 Molecule gt-abc complete! All steps closed.
 Consider: bd mol squash gt-abc --summary '...'

@@ -40,7 +40,7 @@ type TownSettings struct {
 	// DefaultAgent is the name of the agent preset to use by default.
 	// Can be a built-in preset ("claude", "gemini", "codex", "cursor", "auggie", "amp")
 	// or a custom agent name defined in settings/agents.json.
-	// Default: "claude"
+	// Default: "cursor"
 	DefaultAgent string `json:"default_agent,omitempty"`
 
 	// Agents defines custom agent configurations or overrides.
@@ -55,7 +55,7 @@ func NewTownSettings() *TownSettings {
 	return &TownSettings{
 		Type:         "town-settings",
 		Version:      CurrentTownSettingsVersion,
-		DefaultAgent: "claude",
+		DefaultAgent: "cursor",
 		Agents:       make(map[string]*RuntimeConfig),
 	}
 }
@@ -190,9 +190,9 @@ type RigSettings struct {
 	Runtime    *RuntimeConfig    `json:"runtime,omitempty"`     // LLM runtime settings (deprecated: use Agent)
 
 	// Agent selects which agent preset to use for this rig.
-	// Can be a built-in preset ("claude", "gemini", "codex", "cursor", "auggie", "amp")
+	// Can be a built-in preset ("cursor", "claude", "gemini", "codex", "auggie", "amp")
 	// or a custom agent defined in settings/agents.json.
-	// If empty, uses the town's default_agent setting.
+	// If empty, uses the town's default_agent setting (cursor).
 	// Takes precedence over Runtime if both are set.
 	Agent string `json:"agent,omitempty"`
 }
@@ -212,19 +212,19 @@ type CrewConfig struct {
 }
 
 // RuntimeConfig represents LLM runtime configuration for agent sessions.
-// This allows switching between different LLM backends (claude, aider, etc.)
+// This allows switching between different LLM backends (cursor, claude, aider, etc.)
 // without modifying startup code.
 type RuntimeConfig struct {
-	// Command is the CLI command to invoke (e.g., "claude", "aider").
-	// Default: "claude"
+	// Command is the CLI command to invoke (e.g., "cursor-agent", "claude", "aider").
+	// Default: "cursor-agent"
 	Command string `json:"command,omitempty"`
 
 	// Args are additional command-line arguments.
-	// Default: ["--dangerously-skip-permissions"]
+	// Default: ["-f"] (force/YOLO mode for cursor-agent)
 	Args []string `json:"args,omitempty"`
 
 	// InitialPrompt is an optional first message to send after startup.
-	// For claude, this is passed as the prompt argument.
+	// For cursor-agent, this is passed with -p flag.
 	// Empty by default (hooks handle context).
 	InitialPrompt string `json:"initial_prompt,omitempty"`
 }
@@ -232,8 +232,8 @@ type RuntimeConfig struct {
 // DefaultRuntimeConfig returns a RuntimeConfig with sensible defaults.
 func DefaultRuntimeConfig() *RuntimeConfig {
 	return &RuntimeConfig{
-		Command: "claude",
-		Args:    []string{"--dangerously-skip-permissions"},
+		Command: "cursor-agent",
+		Args:    []string{"-f"},
 	}
 }
 
@@ -246,13 +246,13 @@ func (rc *RuntimeConfig) BuildCommand() string {
 
 	cmd := rc.Command
 	if cmd == "" {
-		cmd = "claude"
+		cmd = "cursor-agent"
 	}
 
 	// Build args
 	args := rc.Args
 	if args == nil {
-		args = []string{"--dangerously-skip-permissions"}
+		args = []string{"-f"}
 	}
 
 	// Combine command and args

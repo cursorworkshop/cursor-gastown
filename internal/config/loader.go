@@ -729,10 +729,10 @@ func LoadRuntimeConfig(rigPath string) *RuntimeConfig {
 	// Fill in defaults for empty fields
 	rc := settings.Runtime
 	if rc.Command == "" {
-		rc.Command = "claude"
+		rc.Command = "cursor-agent"
 	}
 	if rc.Args == nil {
-		rc.Args = []string{"--dangerously-skip-permissions"}
+		rc.Args = []string{"-f"}
 	}
 	return rc
 }
@@ -831,7 +831,7 @@ func ResolveAgentConfig(townRoot, rigPath string) *RuntimeConfig {
 	} else if townSettings.DefaultAgent != "" {
 		agentName = townSettings.DefaultAgent
 	} else {
-		agentName = "claude" // ultimate fallback
+		agentName = "cursor" // ultimate fallback
 	}
 
 	// Look up the agent configuration
@@ -873,7 +873,7 @@ func ResolveAgentConfigWithOverride(townRoot, rigPath, agentOverride string) (*R
 	} else if townSettings.DefaultAgent != "" {
 		agentName = townSettings.DefaultAgent
 	} else {
-		agentName = "claude" // ultimate fallback
+		agentName = "cursor" // ultimate fallback
 	}
 
 	// If an override is requested, validate it exists.
@@ -924,10 +924,10 @@ func fillRuntimeDefaults(rc *RuntimeConfig) *RuntimeConfig {
 		InitialPrompt: rc.InitialPrompt,
 	}
 	if result.Command == "" {
-		result.Command = "claude"
+		result.Command = "cursor-agent"
 	}
 	if result.Args == nil {
-		result.Args = []string{"--dangerously-skip-permissions"}
+		result.Args = []string{"-f"}
 	}
 	return result
 }

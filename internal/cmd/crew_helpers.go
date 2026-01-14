@@ -230,7 +230,7 @@ func ensureDefaultBranch(dir, roleName, rigPath string) bool { //nolint:unparam 
 
 	// Warn about wrong branch
 	fmt.Printf("\n%s %s is on branch '%s', not %s\n",
-		style.Warning.Render("⚠"),
+		style.Warning.Render("[!]"),
 		roleName,
 		branch,
 		defaultBranch)
@@ -240,16 +240,16 @@ func ensureDefaultBranch(dir, roleName, rigPath string) bool { //nolint:unparam 
 	// Auto-switch to default branch
 	fmt.Printf("  Switching to %s...\n", defaultBranch)
 	if err := g.Checkout(defaultBranch); err != nil {
-		fmt.Printf("  %s Could not switch to %s: %v\n", style.Error.Render("✗"), defaultBranch, err)
+		fmt.Printf("  %s Could not switch to %s: %v\n", style.Error.Render("[X]"), defaultBranch, err)
 		fmt.Printf("  Please manually run: git checkout %s && git pull\n", defaultBranch)
 		return false
 	}
 
 	// Pull latest
 	if err := g.Pull("origin", defaultBranch); err != nil {
-		fmt.Printf("  %s Pull failed (continuing anyway): %v\n", style.Warning.Render("⚠"), err)
+		fmt.Printf("  %s Pull failed (continuing anyway): %v\n", style.Warning.Render("[!]"), err)
 	} else {
-		fmt.Printf("  %s Switched to %s and pulled latest\n", style.Success.Render("✓"), defaultBranch)
+		fmt.Printf("  %s Switched to %s and pulled latest\n", style.Success.Render("[OK]"), defaultBranch)
 	}
 
 	return true

@@ -209,9 +209,9 @@ bd activity --follow
 
 [14:32:08] + patrol-x7k.arm-ace bonded (5 steps)
 [14:32:09] → patrol-x7k.arm-ace.capture in_progress
-[14:32:10] ✓ patrol-x7k.arm-ace.capture completed
-[14:32:14] ✓ patrol-x7k.arm-ace.decide completed
-[14:32:17] ✓ patrol-x7k.arm-ace COMPLETE
+[14:32:10] [OK] patrol-x7k.arm-ace.capture completed
+[14:32:14] [OK] patrol-x7k.arm-ace.decide completed
+[14:32:17] [OK] patrol-x7k.arm-ace COMPLETE
 ```
 
 **Why it matters:**

@@ -312,7 +312,7 @@ func runMqIntegrationLand(cmd *cobra.Command, args []string) error {
 			fmt.Printf("Running tests: %s\n", testCmd)
 			if err := runTestCommand(r.Path, testCmd); err != nil {
 				// Tests failed - reset main
-				fmt.Printf("  %s Tests failed, resetting main...\n", style.Bold.Render("✗"))
+				fmt.Printf("  %s Tests failed, resetting main...\n", style.Bold.Render("[X]"))
 				_ = g.Checkout("main") // best-effort: need to be on main to reset
 				resetErr := resetHard(g, "HEAD~1")
 				if resetErr != nil {

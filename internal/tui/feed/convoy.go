@@ -307,7 +307,7 @@ func (m *Model) renderConvoys() string {
 
 // renderConvoyLine renders a single convoy status line
 func renderConvoyLine(c Convoy, landed bool) string {
-	// Format: "  hq-xyz  Title       2/4 ●●○○" or "  hq-xyz  Title       ✓ 2h ago"
+	// Format: "  hq-xyz  Title       2/4 ●●○○" or "  hq-xyz  Title       [OK] 2h ago"
 	id := ConvoyIDStyle.Render(c.ID)
 
 	// Truncate title if too long
@@ -320,7 +320,7 @@ func renderConvoyLine(c Convoy, landed bool) string {
 	if landed {
 		// Show checkmark and time since landing
 		age := formatAge(time.Since(c.ClosedAt))
-		status := ConvoyLandedStyle.Render("✓") + " " + ConvoyAgeStyle.Render(age+" ago")
+		status := ConvoyLandedStyle.Render("[OK]") + " " + ConvoyAgeStyle.Render(age+" ago")
 		return fmt.Sprintf("  %s  %-20s  %s", id, title, status)
 	}
 

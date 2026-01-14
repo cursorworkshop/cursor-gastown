@@ -81,7 +81,7 @@ func (h *DefaultRefineryHandler) HandleMergeReady(payload *MergeReadyPayload) er
 		return fmt.Errorf("failed to add merge request to queue: %w", err)
 	}
 
-	_, _ = fmt.Fprintf(h.Output, "[Refinery] ✓ Added to merge queue: %s\n", mr.ID)
+	_, _ = fmt.Fprintf(h.Output, "[Refinery] [OK] Added to merge queue: %s\n", mr.ID)
 	_, _ = fmt.Fprintf(h.Output, "  Queue length: %d\n", h.Queue.Count())
 
 	return nil

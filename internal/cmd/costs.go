@@ -616,7 +616,7 @@ func runCostsRecord(cmd *cobra.Command, args []string) error {
 
 	// Output confirmation (silent if cost is zero and no work item)
 	if cost > 0 || recordWorkItem != "" {
-		fmt.Printf("%s Recorded $%.2f for %s (event: %s)", style.Success.Render("✓"), cost, session, eventID)
+		fmt.Printf("%s Recorded $%.2f for %s (event: %s)", style.Success.Render("[OK]"), cost, session, eventID)
 		if recordWorkItem != "" {
 			fmt.Printf(" (work: %s)", recordWorkItem)
 		}

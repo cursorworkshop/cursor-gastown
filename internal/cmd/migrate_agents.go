@@ -134,7 +134,7 @@ func runMigrateAgents(cmd *cobra.Command, args []string) error {
 		fmt.Println("   Use --execute to apply changes")
 		fmt.Println()
 	} else {
-		fmt.Println("🚀 Migrating agent beads to two-level architecture")
+		fmt.Println("[>>] Migrating agent beads to two-level architecture")
 		fmt.Println()
 	}
 
@@ -288,11 +288,11 @@ func printMigrationResult(r migrationResult) {
 	var icon string
 	switch r.Status {
 	case "migrated", "would migrate":
-		icon = "  ✓"
+		icon = "  [OK]"
 	case "skipped":
 		icon = "  ⊘"
 	case "error":
-		icon = "  ✗"
+		icon = "  [X]"
 	}
 	fmt.Printf("%s %s → %s: %s\n", icon, r.OldID, r.NewID, r.Message)
 }

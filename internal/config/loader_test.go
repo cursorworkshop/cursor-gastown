@@ -778,11 +778,11 @@ func TestMessagingConfigPath(t *testing.T) {
 
 func TestRuntimeConfigDefaults(t *testing.T) {
 	rc := DefaultRuntimeConfig()
-	if rc.Command != "claude" {
-		t.Errorf("Command = %q, want %q", rc.Command, "claude")
+	if rc.Command != "cursor-agent" {
+		t.Errorf("Command = %q, want %q", rc.Command, "cursor-agent")
 	}
-	if len(rc.Args) != 1 || rc.Args[0] != "--dangerously-skip-permissions" {
-		t.Errorf("Args = %v, want [--dangerously-skip-permissions]", rc.Args)
+	if len(rc.Args) != 1 || rc.Args[0] != "-f" {
+		t.Errorf("Args = %v, want [-f]", rc.Args)
 	}
 }
 
@@ -795,12 +795,12 @@ func TestRuntimeConfigBuildCommand(t *testing.T) {
 		{
 			name: "nil config uses defaults",
 			rc:   nil,
-			want: "claude --dangerously-skip-permissions",
+			want: "cursor-agent -f",
 		},
 		{
 			name: "default config",
 			rc:   DefaultRuntimeConfig(),
-			want: "claude --dangerously-skip-permissions",
+			want: "cursor-agent -f",
 		},
 		{
 			name: "custom command",
@@ -815,7 +815,7 @@ func TestRuntimeConfigBuildCommand(t *testing.T) {
 		{
 			name: "empty command uses default",
 			rc:   &RuntimeConfig{Command: "", Args: nil},
-			want: "claude --dangerously-skip-permissions",
+			want: "cursor-agent -f",
 		},
 	}
 
@@ -840,19 +840,19 @@ func TestRuntimeConfigBuildCommandWithPrompt(t *testing.T) {
 			name:   "no prompt",
 			rc:     DefaultRuntimeConfig(),
 			prompt: "",
-			want:   "claude --dangerously-skip-permissions",
+			want:   "cursor-agent -f",
 		},
 		{
 			name:   "with prompt",
 			rc:     DefaultRuntimeConfig(),
 			prompt: "gt prime",
-			want:   `claude --dangerously-skip-permissions "gt prime"`,
+			want:   `cursor-agent -f "gt prime"`,
 		},
 		{
 			name:   "prompt with quotes",
 			rc:     DefaultRuntimeConfig(),
 			prompt: `Hello "world"`,
-			want:   `claude --dangerously-skip-permissions "Hello \"world\""`,
+			want:   `cursor-agent -f "Hello \"world\""`,
 		},
 		{
 			name:   "config initial prompt used if no override",
@@ -882,7 +882,7 @@ func TestBuildAgentStartupCommand(t *testing.T) {
 	// Test without rig config (uses defaults)
 	cmd := BuildAgentStartupCommand("witness", "gastown/witness", "", "")
 
-	// Should contain environment exports and claude command
+	// Should contain environment exports and cursor-agent command
 	if !strings.Contains(cmd, "export") {
 		t.Error("expected export in command")
 	}
@@ -892,8 +892,8 @@ func TestBuildAgentStartupCommand(t *testing.T) {
 	if !strings.Contains(cmd, "BD_ACTOR=gastown/witness") {
 		t.Error("expected BD_ACTOR in command")
 	}
-	if !strings.Contains(cmd, "claude --dangerously-skip-permissions") {
-		t.Error("expected claude command in output")
+	if !strings.Contains(cmd, "cursor-agent -f") {
+		t.Error("expected cursor-agent command in output")
 	}
 }
 
@@ -1216,8 +1216,8 @@ func TestLoadRuntimeConfigFromSettings(t *testing.T) {
 func TestLoadRuntimeConfigFallsBackToDefaults(t *testing.T) {
 	// Non-existent path should use defaults
 	rc := LoadRuntimeConfig("/nonexistent/path")
-	if rc.Command != "claude" {
-		t.Errorf("Command = %q, want %q (default)", rc.Command, "claude")
+	if rc.Command != "cursor-agent" {
+		t.Errorf("Command = %q, want %q (default)", rc.Command, "cursor-agent")
 	}
 }
 

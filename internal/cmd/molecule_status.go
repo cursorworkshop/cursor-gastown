@@ -257,7 +257,7 @@ func runMoleculeProgress(cmd *cobra.Command, args []string) error {
 	fmt.Printf("  Blocked:     %d\n", len(progress.BlockedSteps))
 
 	if progress.Complete {
-		fmt.Printf("\n  %s\n", style.Bold.Render("✓ Molecule complete!"))
+		fmt.Printf("\n  %s\n", style.Bold.Render("[OK] Molecule complete!"))
 	}
 
 	return nil
@@ -599,7 +599,7 @@ func outputMoleculeStatus(status MoleculeStatusInfo) error {
 	}
 
 	// AUTONOMOUS MODE banner - hooked work triggers autonomous execution
-	fmt.Println(style.Bold.Render("🚀 AUTONOMOUS MODE - Work on hook triggers immediate execution"))
+	fmt.Println(style.Bold.Render("[>>] AUTONOMOUS MODE - Work on hook triggers immediate execution"))
 	fmt.Println()
 
 	// Check if this is a mail bead - display mail-specific format
@@ -655,7 +655,7 @@ func outputMoleculeStatus(status MoleculeStatusInfo) error {
 		fmt.Printf("  Blocked:     %d\n", len(status.Progress.BlockedSteps))
 
 		if status.Progress.Complete {
-			fmt.Printf("\n%s\n", style.Bold.Render("✓ Molecule complete!"))
+			fmt.Printf("\n%s\n", style.Bold.Render("[OK] Molecule complete!"))
 		}
 	}
 

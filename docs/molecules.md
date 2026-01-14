@@ -66,9 +66,9 @@ Output:
 ```
 You're working on molecule gt-abc (Feature X)
 
-  ✓ gt-abc.1: Design
-  ✓ gt-abc.2: Scaffold
-  ✓ gt-abc.3: Implement
+  [OK] gt-abc.1: Design
+  [OK] gt-abc.2: Scaffold
+  [OK] gt-abc.3: Implement
   → gt-abc.4: Write tests [in_progress] <- YOU ARE HERE
   ○ gt-abc.5: Documentation
   ○ gt-abc.6: Exit decision
@@ -100,7 +100,7 @@ bd close gt-abc.3 --continue
 ### Transition Output
 
 ```
-✓ Closed gt-abc.3: Implement feature
+[OK] Closed gt-abc.3: Implement feature
 
 Next ready in molecule:
   gt-abc.4: Write tests
@@ -111,7 +111,7 @@ Next ready in molecule:
 ### When Molecule Completes
 
 ```
-✓ Closed gt-abc.6: Exit decision
+[OK] Closed gt-abc.6: Exit decision
 
 Molecule gt-abc complete! All steps closed.
 Consider: bd mol squash gt-abc --summary '...'

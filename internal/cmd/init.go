@@ -52,7 +52,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 	}
 
 	fmt.Printf("%s Initializing Gas Town rig in %s\n\n",
-		style.Bold.Render("⚙️"), style.Dim.Render(cwd))
+		style.Bold.Render("[CFG]"), style.Dim.Render(cwd))
 
 	// Create agent directories
 	created := 0

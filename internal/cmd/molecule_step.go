@@ -333,7 +333,7 @@ func handleStepContinue(cwd, townRoot, _ string, nextStep *beads.Issue, dryRun b
 
 // handleMoleculeComplete handles when a molecule is complete.
 func handleMoleculeComplete(cwd, townRoot, moleculeID string, dryRun bool) error {
-	fmt.Printf("\n%s Molecule complete!\n", style.Bold.Render("🎉"))
+	fmt.Printf("\n%s Molecule complete!\n", style.Bold.Render("[DONE]"))
 
 	// Detect agent identity
 	roleInfo, err := GetRoleWithContext(cwd, townRoot)

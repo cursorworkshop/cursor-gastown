@@ -433,7 +433,7 @@ This single command:
 **2. Verify submission:**
 You should see output like:
 ```
-✓ Work submitted to merge queue
+[OK] Work submitted to merge queue
   MR ID: gt-xxxxx
   Source: polecat/<name>
   Target: main

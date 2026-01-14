@@ -210,10 +210,10 @@ func DAGProgress(steps map[string]string, phases []string) string {
 	var sb strings.Builder
 
 	icons := map[string]string{
-		"done":        "✓",
-		"in_progress": "⧖",
-		"ready":       "○",
-		"blocked":     "◌",
+		"done":        "[OK]",
+		"in_progress": "[..]",
+		"ready":       "[ ]",
+		"blocked":     "[-]",
 	}
 
 	colors := map[string]lipgloss.Style{

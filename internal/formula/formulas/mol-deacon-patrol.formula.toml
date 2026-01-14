@@ -193,7 +193,7 @@ When an issue in one rig closes, any dependencies in other rigs should be notifi
 
 **Step 1: Check recent closures from feed**
 ```bash
-gt feed --since 10m --plain | grep "✓"
+gt feed --since 10m --plain | grep "[OK]"
 # Look for recently closed issues
 ```
 

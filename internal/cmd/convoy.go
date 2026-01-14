@@ -469,7 +469,7 @@ func runConvoyStranded(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	fmt.Printf("%s Found %d stranded convoy(s):\n\n", style.Warning.Render("⚠"), len(stranded))
+	fmt.Printf("%s Found %d stranded convoy(s):\n\n", style.Warning.Render("[!]"), len(stranded))
 	for _, s := range stranded {
 		fmt.Printf("  🚚 %s: %s\n", s.ID, s.Title)
 		fmt.Printf("     Ready issues: %d\n", s.ReadyCount)
@@ -811,11 +811,11 @@ func runConvoyStatus(cmd *cobra.Command, args []string) error {
 	if len(tracked) > 0 {
 		fmt.Printf("\n  %s\n", style.Bold.Render("Tracked Issues:"))
 		for _, t := range tracked {
-			// Status symbol: ✓ closed, ▶ in_progress/hooked, ○ other
+			// Status symbol: [OK] closed, ▶ in_progress/hooked, ○ other
 			status := "○"
 			switch t.Status {
 			case "closed":
-				status = "✓"
+				status = "[OK]"
 			case "in_progress", "hooked":
 				status = "▶"
 			}
@@ -983,11 +983,11 @@ func printConvoyTree(townBeads string, convoys []struct {
 				connector = "└──"
 			}
 
-			// Status symbol: ✓ closed, ▶ in_progress/hooked, ○ other
+			// Status symbol: [OK] closed, ▶ in_progress/hooked, ○ other
 			status := "○"
 			switch t.Status {
 			case "closed":
-				status = "✓"
+				status = "[OK]"
 			case "in_progress", "hooked":
 				status = "▶"
 			}
@@ -1007,7 +1007,7 @@ func formatConvoyStatus(status string) string {
 	case "open":
 		return style.Warning.Render("●")
 	case "closed":
-		return style.Success.Render("✓")
+		return style.Success.Render("[OK]")
 	case "in_progress":
 		return style.Info.Render("→")
 	default:

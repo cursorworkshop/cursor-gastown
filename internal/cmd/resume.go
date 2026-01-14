@@ -132,7 +132,7 @@ func runResume(cmd *cobra.Command, args []string) error {
 	// If gate not closed yet, show status and exit
 	if !status.GateClosed {
 		fmt.Printf("%s Work parked on gate %s (still open)\n",
-			style.Bold.Render("🅿️"), parked.GateID)
+			style.Bold.Render("[P]"), parked.GateID)
 		if parked.BeadID != "" {
 			fmt.Printf("  Working on: %s\n", parked.BeadID)
 		}
@@ -144,7 +144,7 @@ func runResume(cmd *cobra.Command, args []string) error {
 
 	// Gate closed - resume work!
 	if gateNotFound {
-		fmt.Printf("%s Gate %s no longer exists\n", style.Bold.Render("⚠️"), parked.GateID)
+		fmt.Printf("%s Gate %s no longer exists\n", style.Bold.Render("[!]"), parked.GateID)
 		fmt.Printf("  The gate may have been cleaned up. Restoring parked work anyway.\n")
 	} else {
 		fmt.Printf("%s Gate %s has cleared!\n", style.Bold.Render("🚦"), parked.GateID)
@@ -200,10 +200,10 @@ func displayResumeStatus(status ResumeStatus, parked *ParkedWork) error {
 	gateIcon := "⏳"
 	if status.GateClosed {
 		gateStatus = "closed"
-		gateIcon = "✓"
+		gateIcon = "[OK]"
 	}
 
-	fmt.Printf("%s Parked work status:\n", style.Bold.Render("🅿️"))
+	fmt.Printf("%s Parked work status:\n", style.Bold.Render("[P]"))
 	fmt.Printf("  Gate: %s %s (%s)\n", gateIcon, parked.GateID, gateStatus)
 	if parked.BeadID != "" {
 		fmt.Printf("  Bead: %s\n", parked.BeadID)
@@ -316,7 +316,7 @@ func checkHandoffMessages() error {
 	} else {
 		fmt.Printf("%s Read messages: gt mail read <id>\n", style.Bold.Render("→"))
 	}
-	fmt.Printf("%s Clear after reading: gt mail close <id>\n", style.Dim.Render("💡"))
+	fmt.Printf("%s Clear after reading: gt mail close <id>\n", style.Dim.Render("[TIP]"))
 
 	return nil
 }

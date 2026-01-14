@@ -665,7 +665,7 @@ func runSessionCheck(cmd *cobra.Command, args []string) error {
 				totalHealthy++
 			} else {
 				// Check if polecat has work on hook (would need restart)
-				fmt.Printf("  %s %s/%s: %s\n", style.Bold.Render("✗"), r.Name, polecatName, style.Dim.Render("session not running"))
+				fmt.Printf("  %s %s/%s: %s\n", style.Bold.Render("[X]"), r.Name, polecatName, style.Dim.Render("session not running"))
 				totalCrashed++
 			}
 		}

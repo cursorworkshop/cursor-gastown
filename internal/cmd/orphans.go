@@ -101,7 +101,7 @@ func runOrphans(cmd *cobra.Command, args []string) error {
 	}
 
 	// Display results
-	fmt.Printf("%s Found %d orphaned commit(s):\n\n", style.Warning.Render("⚠"), len(filtered))
+	fmt.Printf("%s Found %d orphaned commit(s):\n\n", style.Warning.Render("[!]"), len(filtered))
 
 	for _, o := range filtered {
 		age := formatAge(o.Date)
