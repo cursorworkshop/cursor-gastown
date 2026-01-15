@@ -232,12 +232,72 @@ Examples:
 	RunE: runCouncilPattern,
 }
 
+var councilProfilesCmd = &cobra.Command{
+	Use:   "profiles",
+	Short: "List available configuration profiles",
+	Long: `Show predefined configuration profiles.
+
+Profiles are pre-built configurations optimized for different use cases:
+- cost-optimized: Minimize API costs
+- quality-focused: Maximize output quality
+- balanced: Good default for most teams
+- anthropic-only: Single-provider (Anthropic)
+- openai-only: Single-provider (OpenAI)
+- google-only: Single-provider (Google)
+
+Examples:
+  gt council profiles
+  gt council profiles --json`,
+	RunE: runCouncilProfiles,
+}
+
+var councilUseCmd = &cobra.Command{
+	Use:   "use <profile>",
+	Short: "Apply a configuration profile",
+	Long: `Apply a predefined profile to your council configuration.
+
+This will overwrite your current council.toml with the profile settings.
+
+Examples:
+  gt council use balanced
+  gt council use cost-optimized`,
+	Args: cobra.ExactArgs(1),
+	RunE: runCouncilUse,
+}
+
+var councilExportCmd = &cobra.Command{
+	Use:   "export <file>",
+	Short: "Export current configuration as a profile",
+	Long: `Export the current council configuration as a shareable profile.
+
+Examples:
+  gt council export my-team-config.json
+  gt council export my-team-config.json --name "My Team" --author "Jane Doe"`,
+	Args: cobra.ExactArgs(1),
+	RunE: runCouncilExport,
+}
+
+var councilImportCmd = &cobra.Command{
+	Use:   "import <file>",
+	Short: "Import a profile from a file",
+	Long: `Import a council configuration profile from a JSON file.
+
+Examples:
+  gt council import shared-config.json
+  gt council import https://example.com/profile.json`,
+	Args: cobra.ExactArgs(1),
+	RunE: runCouncilImport,
+}
+
 // Flags
 var (
 	councilShowJSON     bool
 	councilRouteComplex string
 	councilInitForce    bool
 	councilStatsJSON    bool
+	councilExportName   string
+	councilExportAuthor string
+	councilExportDesc   string
 )
 
 func runCouncilShow(cmd *cobra.Command, args []string) error {
@@ -843,6 +903,140 @@ func runCouncilPattern(cmd *cobra.Command, args []string) error {
 	return fmt.Errorf("pattern %q not found (try 'gt council chains' or 'gt council ensembles')", name)
 }
 
+func runCouncilProfiles(cmd *cobra.Command, args []string) error {
+	if councilShowJSON {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(council.PredefinedProfiles)
+	}
+
+	fmt.Printf("%s\n\n", style.Bold.Render("Available Configuration Profiles"))
+
+	for name, profile := range council.PredefinedProfiles {
+		fmt.Printf("  %s\n", style.Bold.Render(name))
+		fmt.Printf("    %s\n", profile.Description)
+		fmt.Printf("    Tags: %s\n", strings.Join(profile.Tags, ", "))
+		fmt.Printf("    Use case: %s\n", style.Dim.Render(profile.UseCase))
+		fmt.Println()
+	}
+
+	fmt.Printf("%s\n", style.Dim.Render("Apply a profile with: gt council use <profile>"))
+
+	return nil
+}
+
+func runCouncilUse(cmd *cobra.Command, args []string) error {
+	profileName := args[0]
+
+	profile, ok := council.GetProfile(profileName)
+	if !ok {
+		return fmt.Errorf("profile %q not found (run 'gt council profiles' to see available)", profileName)
+	}
+
+	townRoot, err := workspace.FindFromCwd()
+	if err != nil {
+		return fmt.Errorf("finding town root: %w", err)
+	}
+
+	// Validate profile
+	if issues := council.ValidateProfile(profile); len(issues) > 0 {
+		return fmt.Errorf("invalid profile: %s", strings.Join(issues, "; "))
+	}
+
+	// Apply the profile
+	if err := council.ApplyProfile(profile, townRoot); err != nil {
+		return fmt.Errorf("applying profile: %w", err)
+	}
+
+	fmt.Printf("%s Applied profile %s\n", style.Success.Render("✓"), style.Bold.Render(profileName))
+	fmt.Printf("\n%s\n", profile.Description)
+
+	// Show key settings
+	fmt.Printf("\n%s\n", style.Bold.Render("Key Settings:"))
+	for role, cfg := range profile.Config.Roles {
+		fmt.Printf("  %s: %s\n", role, cfg.Model)
+	}
+
+	return nil
+}
+
+func runCouncilExport(cmd *cobra.Command, args []string) error {
+	outputPath := args[0]
+
+	townRoot, err := workspace.FindFromCwd()
+	if err != nil {
+		return fmt.Errorf("finding town root: %w", err)
+	}
+
+	cfg, err := council.LoadConfig(townRoot)
+	if err != nil {
+		return fmt.Errorf("loading config: %w", err)
+	}
+
+	name := councilExportName
+	if name == "" {
+		name = "custom-profile"
+	}
+
+	author := councilExportAuthor
+	if author == "" {
+		author = "Gas Town User"
+	}
+
+	description := councilExportDesc
+	if description == "" {
+		description = "Custom Gas Town Council configuration"
+	}
+
+	profile := council.ExportProfile(cfg, name, description, author)
+
+	if err := council.ExportProfileToFile(profile, outputPath); err != nil {
+		return fmt.Errorf("exporting profile: %w", err)
+	}
+
+	fmt.Printf("%s Exported profile to %s\n", style.Success.Render("✓"), outputPath)
+
+	return nil
+}
+
+func runCouncilImport(cmd *cobra.Command, args []string) error {
+	inputPath := args[0]
+
+	townRoot, err := workspace.FindFromCwd()
+	if err != nil {
+		return fmt.Errorf("finding town root: %w", err)
+	}
+
+	profile, err := council.ImportProfileFromFile(inputPath)
+	if err != nil {
+		return fmt.Errorf("importing profile: %w", err)
+	}
+
+	// Validate
+	if issues := council.ValidateProfile(profile); len(issues) > 0 {
+		fmt.Printf("%s Profile has issues:\n", style.Warning.Render("Warning:"))
+		for _, issue := range issues {
+			fmt.Printf("  - %s\n", issue)
+		}
+		fmt.Println()
+	}
+
+	// Apply
+	if err := council.ApplyProfile(profile, townRoot); err != nil {
+		return fmt.Errorf("applying profile: %w", err)
+	}
+
+	fmt.Printf("%s Imported profile %s\n", style.Success.Render("✓"), style.Bold.Render(profile.Name))
+	if profile.Author != "" {
+		fmt.Printf("  Author: %s\n", profile.Author)
+	}
+	if profile.Description != "" {
+		fmt.Printf("  %s\n", profile.Description)
+	}
+
+	return nil
+}
+
 func init() {
 	// Add flags
 	councilShowCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
@@ -852,6 +1046,10 @@ func init() {
 	councilStatsCmd.Flags().BoolVar(&councilStatsJSON, "json", false, "Output as JSON")
 	councilChainsCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
 	councilEnsemblesCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
+	councilProfilesCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
+	councilExportCmd.Flags().StringVar(&councilExportName, "name", "", "Profile name")
+	councilExportCmd.Flags().StringVar(&councilExportAuthor, "author", "", "Profile author")
+	councilExportCmd.Flags().StringVar(&councilExportDesc, "description", "", "Profile description")
 
 	// Add subcommands
 	councilCmd.AddCommand(councilShowCmd)
@@ -867,6 +1065,10 @@ func init() {
 	councilCmd.AddCommand(councilChainsCmd)
 	councilCmd.AddCommand(councilEnsemblesCmd)
 	councilCmd.AddCommand(councilPatternCmd)
+	councilCmd.AddCommand(councilProfilesCmd)
+	councilCmd.AddCommand(councilUseCmd)
+	councilCmd.AddCommand(councilExportCmd)
+	councilCmd.AddCommand(councilImportCmd)
 
 	// Register with root
 	rootCmd.AddCommand(councilCmd)

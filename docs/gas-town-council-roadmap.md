@@ -125,14 +125,23 @@ When one provider hits rate limits or has an outage, work continues on other pro
 - Strategies: majority, consensus, weighted, best
 - Predefined ensembles: `critical-decision`, `fast-consensus`, `quality`
 
-### Phase 6: Community & Ecosystem (Planned)
+### Phase 6: Community & Ecosystem ✅
 
-**Goal**: Make adoption easy.
+**Status**: Complete
 
-Deliverables:
-- Config sharing (`gt council config export/import`)
-- Community profile repository
-- Tutorial content
+- `internal/council/profiles.go` - Profile management
+- `gt council profiles` - List available profiles
+- `gt council use <profile>` - Apply a profile
+- `gt council export <file>` - Export config as profile
+- `gt council import <file>` - Import profile from file
+
+**Built-in Profiles**:
+- `balanced` - Recommended default
+- `cost-optimized` - Minimize API costs
+- `quality-focused` - Maximize output quality
+- `anthropic-only` - Single-provider (Claude)
+- `openai-only` - Single-provider (GPT)
+- `google-only` - Single-provider (Gemini)
 
 ## Configuration
 
