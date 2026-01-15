@@ -123,24 +123,25 @@ const (
 
 // Role icons - centralized for easy customization.
 // These match the Gas Town visual identity (see ~/Desktop/Gas Town/ prompts).
+// Using Unicode symbols for clean status bar display.
 const (
 	// IconMayor is the mayor icon (fox conductor).
-	IconMayor = "[mayor]"
+	IconMayor = "🦊"
 
 	// IconDeacon is the deacon icon (wolf in the engine room).
-	IconDeacon = "[deacon]"
+	IconDeacon = "🐺"
 
 	// IconWitness is the witness icon (watchful owl).
-	IconWitness = "[witness]"
+	IconWitness = "🦉"
 
 	// IconRefinery is the refinery icon (industrial).
-	IconRefinery = "[refinery]"
+	IconRefinery = "⚙️"
 
 	// IconCrew is the crew icon (established worker).
-	IconCrew = "[crew]"
+	IconCrew = "👷"
 
 	// IconPolecat is the polecat icon (transient worker).
-	IconPolecat = "[polecat]"
+	IconPolecat = "🐾"
 )
 
 // RoleIcon returns the icon for a given role name.

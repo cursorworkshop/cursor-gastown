@@ -718,10 +718,10 @@ func (t *Tmux) SetStatusFormat(session, rig, worker, role string) error {
 	// Get icon for role (empty string if not found)
 	icon := roleIcons[role]
 
-	// Compact format - icon already identifies role
-	// Mayor: [mayor] Mayor
-	// Crew:  [crew] gastown/crew/max (full path)
-	// Polecat: [polecat] gastown/Toast
+	// Compact format - emoji icon identifies role
+	// Mayor: 🦊 Mayor
+	// Crew:  👷 gastown/crew/max (full path)
+	// Polecat: 🐾 gastown/Toast
 	var left string
 	if rig == "" {
 		// Town-level agent (Mayor, Deacon)
