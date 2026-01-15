@@ -191,6 +191,47 @@ Examples:
 	RunE: runCouncilCompare,
 }
 
+var councilChainsCmd = &cobra.Command{
+	Use:   "chains",
+	Short: "List available chain patterns",
+	Long: `Show predefined chain-of-models patterns.
+
+Chains pass output through a sequence of models, where each model
+refines or transforms the previous output. This is useful for
+complex tasks that benefit from multiple perspectives.
+
+Examples:
+  gt council chains
+  gt council chains --json`,
+	RunE: runCouncilChains,
+}
+
+var councilEnsemblesCmd = &cobra.Command{
+	Use:   "ensembles",
+	Short: "List available ensemble patterns",
+	Long: `Show predefined ensemble voting patterns.
+
+Ensembles run multiple models in parallel and combine their outputs
+through voting. This provides higher confidence for critical decisions.
+
+Examples:
+  gt council ensembles
+  gt council ensembles --json`,
+	RunE: runCouncilEnsembles,
+}
+
+var councilPatternCmd = &cobra.Command{
+	Use:   "pattern <name>",
+	Short: "Show details of a specific pattern",
+	Long: `Show detailed configuration for a chain or ensemble pattern.
+
+Examples:
+  gt council pattern code-review
+  gt council pattern critical-decision`,
+	Args: cobra.ExactArgs(1),
+	RunE: runCouncilPattern,
+}
+
 // Flags
 var (
 	councilShowJSON     bool
@@ -669,6 +710,139 @@ func runCouncilCompare(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func runCouncilChains(cmd *cobra.Command, args []string) error {
+	if councilShowJSON {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(council.PredefinedChains)
+	}
+
+	fmt.Printf("%s\n\n", style.Bold.Render("Predefined Chain Patterns"))
+	fmt.Printf("%s\n\n", style.Dim.Render("Chains pass output through a sequence of models"))
+
+	for name, chain := range council.PredefinedChains {
+		fmt.Printf("  %s\n", style.Bold.Render(name))
+		fmt.Printf("    Steps: %d\n", len(chain.Steps))
+
+		// Show step models
+		var models []string
+		for _, step := range chain.Steps {
+			models = append(models, step.Model)
+		}
+		fmt.Printf("    Flow:  %s\n", strings.Join(models, " -> "))
+
+		// Show options
+		var opts []string
+		if chain.PassContext {
+			opts = append(opts, "pass-context")
+		}
+		if chain.StopOnError {
+			opts = append(opts, "stop-on-error")
+		}
+		if len(opts) > 0 {
+			fmt.Printf("    Opts:  %s\n", strings.Join(opts, ", "))
+		}
+		fmt.Println()
+	}
+
+	fmt.Printf("%s\n", style.Dim.Render("Use 'gt council pattern <name>' for full details"))
+
+	return nil
+}
+
+func runCouncilEnsembles(cmd *cobra.Command, args []string) error {
+	if councilShowJSON {
+		enc := json.NewEncoder(os.Stdout)
+		enc.SetIndent("", "  ")
+		return enc.Encode(council.PredefinedEnsembles)
+	}
+
+	fmt.Printf("%s\n\n", style.Bold.Render("Predefined Ensemble Patterns"))
+	fmt.Printf("%s\n\n", style.Dim.Render("Ensembles run models in parallel and vote on output"))
+
+	for name, ensemble := range council.PredefinedEnsembles {
+		fmt.Printf("  %s\n", style.Bold.Render(name))
+		fmt.Printf("    Models:   %s\n", strings.Join(ensemble.Models, ", "))
+		fmt.Printf("    Strategy: %s\n", ensemble.VotingStrategy)
+		if ensemble.Threshold > 0 {
+			fmt.Printf("    Threshold: %.0f%%\n", ensemble.Threshold*100)
+		}
+		fmt.Printf("    Timeout:  %s\n", ensemble.Timeout)
+		fmt.Println()
+	}
+
+	fmt.Printf("%s\n", style.Dim.Render("Use 'gt council pattern <name>' for full details"))
+
+	return nil
+}
+
+func runCouncilPattern(cmd *cobra.Command, args []string) error {
+	name := args[0]
+
+	// Check chains first
+	if chain, ok := council.PredefinedChains[name]; ok {
+		fmt.Printf("%s %s\n\n", style.Bold.Render("Chain:"), name)
+		fmt.Printf("Type: Chain-of-Models\n")
+		fmt.Printf("Pass Context: %v\n", chain.PassContext)
+		fmt.Printf("Stop on Error: %v\n\n", chain.StopOnError)
+
+		fmt.Printf("%s\n", style.Bold.Render("Steps:"))
+		for i, step := range chain.Steps {
+			fmt.Printf("\n  %d. %s\n", i+1, style.Bold.Render(step.Name))
+			fmt.Printf("     Model: %s\n", step.Model)
+			if step.Role != "" {
+				fmt.Printf("     Role:  %s\n", step.Role)
+			}
+			if step.TransformOutput != "" {
+				fmt.Printf("     Transform: %s\n", step.TransformOutput)
+			}
+			if step.Prompt != "" {
+				// Truncate long prompts
+				prompt := step.Prompt
+				if len(prompt) > 60 {
+					prompt = prompt[:57] + "..."
+				}
+				fmt.Printf("     Prompt: %s\n", style.Dim.Render(prompt))
+			}
+		}
+		return nil
+	}
+
+	// Check ensembles
+	if ensemble, ok := council.PredefinedEnsembles[name]; ok {
+		fmt.Printf("%s %s\n\n", style.Bold.Render("Ensemble:"), name)
+		fmt.Printf("Type: Ensemble Voting\n")
+		fmt.Printf("Strategy: %s\n", ensemble.VotingStrategy)
+		fmt.Printf("Timeout: %s\n", ensemble.Timeout)
+		if ensemble.Threshold > 0 {
+			fmt.Printf("Threshold: %.0f%%\n", ensemble.Threshold*100)
+		}
+		fmt.Printf("Min Responses: %d\n\n", ensemble.MinResponses)
+
+		fmt.Printf("%s\n", style.Bold.Render("Models:"))
+		for _, model := range ensemble.Models {
+			fmt.Printf("  - %s\n", model)
+		}
+
+		// Explain voting strategy
+		fmt.Printf("\n%s\n", style.Bold.Render("Voting Strategy:"))
+		switch ensemble.VotingStrategy {
+		case council.VoteMajority:
+			fmt.Printf("  Selects the most common response among models.\n")
+		case council.VoteConsensus:
+			fmt.Printf("  Requires all models to agree. Falls back to majority if not.\n")
+		case council.VoteWeighted:
+			fmt.Printf("  Weights votes by model confidence scores.\n")
+		case council.VoteBest:
+			fmt.Printf("  Selects the highest quality response based on metrics.\n")
+		}
+
+		return nil
+	}
+
+	return fmt.Errorf("pattern %q not found (try 'gt council chains' or 'gt council ensembles')", name)
+}
+
 func init() {
 	// Add flags
 	councilShowCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
@@ -676,6 +850,8 @@ func init() {
 	councilRouteCmd.Flags().StringVar(&councilRouteComplex, "complexity", "", "Task complexity (low, medium, high)")
 	councilInitCmd.Flags().BoolVar(&councilInitForce, "force", false, "Overwrite existing config")
 	councilStatsCmd.Flags().BoolVar(&councilStatsJSON, "json", false, "Output as JSON")
+	councilChainsCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
+	councilEnsemblesCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
 
 	// Add subcommands
 	councilCmd.AddCommand(councilShowCmd)
@@ -688,6 +864,9 @@ func init() {
 	councilCmd.AddCommand(councilTemplatesCmd)
 	councilCmd.AddCommand(councilStatsCmd)
 	councilCmd.AddCommand(councilCompareCmd)
+	councilCmd.AddCommand(councilChainsCmd)
+	councilCmd.AddCommand(councilEnsemblesCmd)
+	councilCmd.AddCommand(councilPatternCmd)
 
 	// Register with root
 	rootCmd.AddCommand(councilCmd)
