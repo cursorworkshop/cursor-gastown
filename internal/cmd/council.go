@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/steveyegge/gastown/internal/council"
 	"github.com/steveyegge/gastown/internal/style"
+	"github.com/steveyegge/gastown/internal/templates"
 	"github.com/steveyegge/gastown/internal/workspace"
 )
 
@@ -144,6 +145,20 @@ Examples:
   gt council init
   gt council init --force  # Overwrite existing config`,
 	RunE: runCouncilInit,
+}
+
+var councilTemplatesCmd = &cobra.Command{
+	Use:   "templates",
+	Short: "Show available role templates",
+	Long: `Show available role templates for each provider.
+
+Different model providers respond better to different prompt styles.
+This command shows which provider-optimized templates are available
+for each Gas Town role.
+
+Examples:
+  gt council templates`,
+	RunE: runCouncilTemplates,
 }
 
 // Flags
@@ -460,6 +475,34 @@ func getKnownRoles(config *council.Config) []string {
 	return roles
 }
 
+func runCouncilTemplates(cmd *cobra.Command, args []string) error {
+	tmpl, err := templates.New()
+	if err != nil {
+		return fmt.Errorf("loading templates: %w", err)
+	}
+
+	fmt.Printf("%s\n\n", style.Bold.Render("Provider-Optimized Role Templates"))
+
+	// Get provider templates
+	providerTemplates := tmpl.ProviderTemplateNames()
+
+	// Show all roles and their available templates
+	roles := tmpl.RoleNames()
+	for _, role := range roles {
+		providers := providerTemplates[role]
+		if len(providers) > 0 {
+			fmt.Printf("  %s: default, %s\n", style.Bold.Render(role), strings.Join(providers, ", "))
+		} else {
+			fmt.Printf("  %s: default only\n", style.Bold.Render(role))
+		}
+	}
+
+	fmt.Printf("\n%s\n", style.Dim.Render("Provider templates are auto-selected based on council configuration."))
+	fmt.Printf("%s\n", style.Dim.Render("OpenAI templates use structured formats; Google templates use explicit grounding."))
+
+	return nil
+}
+
 func init() {
 	// Add flags
 	councilShowCmd.Flags().BoolVar(&councilShowJSON, "json", false, "Output as JSON")
@@ -475,6 +518,7 @@ func init() {
 	councilCmd.AddCommand(councilProvidersCmd)
 	councilCmd.AddCommand(councilRouteCmd)
 	councilCmd.AddCommand(councilInitCmd)
+	councilCmd.AddCommand(councilTemplatesCmd)
 
 	// Register with root
 	rootCmd.AddCommand(councilCmd)

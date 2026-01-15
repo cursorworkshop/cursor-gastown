@@ -36,6 +36,8 @@ type RoleData struct {
 	IssuePrefix    string   // beads issue prefix
 	MayorSession   string   // e.g., "gt-ai-mayor" - dynamic mayor session name
 	DeaconSession  string   // e.g., "gt-ai-deacon" - dynamic deacon session name
+	Provider       string   // model provider: "anthropic", "openai", "google" (for template selection)
+	Model          string   // specific model being used
 }
 
 // SpawnData contains information for spawn assignment messages.
@@ -103,8 +105,17 @@ func New() (*Templates, error) {
 }
 
 // RenderRole renders a role context template.
+// If data.Provider is set and a provider-specific template exists, it uses that.
+// Otherwise, it falls back to the default template.
 func (t *Templates) RenderRole(role string, data RoleData) (string, error) {
+	// Try provider-specific template first
 	templateName := role + ".md.tmpl"
+	if data.Provider != "" {
+		providerTemplate := role + "-" + data.Provider + ".md.tmpl"
+		if t.hasTemplate(providerTemplate) {
+			templateName = providerTemplate
+		}
+	}
 
 	var buf bytes.Buffer
 	if err := t.roleTemplates.ExecuteTemplate(&buf, templateName, data); err != nil {
@@ -112,6 +123,36 @@ func (t *Templates) RenderRole(role string, data RoleData) (string, error) {
 	}
 
 	return buf.String(), nil
+}
+
+// RenderRoleForProvider renders a role template optimized for a specific provider.
+// Falls back to default template if no provider-specific template exists.
+func (t *Templates) RenderRoleForProvider(role, provider string, data RoleData) (string, error) {
+	data.Provider = provider
+	return t.RenderRole(role, data)
+}
+
+// hasTemplate checks if a template exists.
+func (t *Templates) hasTemplate(name string) bool {
+	return t.roleTemplates.Lookup(name) != nil
+}
+
+// ProviderTemplateNames returns the list of provider-specific role templates.
+func (t *Templates) ProviderTemplateNames() map[string][]string {
+	result := make(map[string][]string)
+	providers := []string{"openai", "google", "anthropic"}
+	roles := t.RoleNames()
+
+	for _, role := range roles {
+		for _, provider := range providers {
+			templateName := role + "-" + provider + ".md.tmpl"
+			if t.hasTemplate(templateName) {
+				result[role] = append(result[role], provider)
+			}
+		}
+	}
+
+	return result
 }
 
 // RenderMessage renders a message template.
