@@ -106,13 +106,24 @@ When one provider hits rate limits or has an outage, work continues on other pro
 - Rate limit hits per provider
 - Cost savings vs single-model baseline
 
-### Phase 5: Advanced Patterns (Planned)
+### Phase 5: Advanced Patterns ✅
 
-**Patterns**:
-- **Chain-of-Models**: Sequential models for complex tasks
-- **Ensemble Voting**: Multiple models vote on critical decisions
-- **File-Type Routing**: Different models for different file types
-- **Hierarchical Orchestration**: Sonnet orchestrates Haiku swarm
+**Status**: Complete
+
+- `internal/council/patterns.go` - Pattern implementations
+- `gt council chains` - List chain patterns
+- `gt council ensembles` - List ensemble patterns  
+- `gt council pattern <name>` - Show pattern details
+
+**Chain-of-Models**:
+- Sequential model execution with output transformation
+- Predefined chains: `code-review`, `architecture`, `bug-fix`
+- Support for context passing and error handling
+
+**Ensemble Voting**:
+- Parallel model execution with voting
+- Strategies: majority, consensus, weighted, best
+- Predefined ensembles: `critical-decision`, `fast-consensus`, `quality`
 
 ### Phase 6: Community & Ecosystem (Planned)
 
