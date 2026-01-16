@@ -73,21 +73,36 @@ func (c *AgentBeadsCheck) Run(ctx *CheckContext) *CheckResult {
 
 	// Check global agents (Mayor, Deacon) in town beads
 	// These use hq- prefix and are stored in ~/gt/.beads/
+	// In single-repo setups where town root == rig root, the beads database
+	// may use a different prefix (e.g., "gt"). Skip hq- checks in that case.
 	townBeadsPath := beads.GetTownBeadsPath(ctx.TownRoot)
 	townBd := beads.New(townBeadsPath)
 
-	deaconID := beads.DeaconBeadIDTown()
-	mayorID := beads.MayorBeadIDTown()
-
-	if _, err := townBd.Show(deaconID); err != nil {
-		missing = append(missing, deaconID)
+	// Check if the town beads database supports hq- prefix
+	// by checking if any route has "hq" prefix or if the db has hq- issues
+	hasHqSupport := false
+	for _, r := range routes {
+		if strings.TrimSuffix(r.Prefix, "-") == "hq" {
+			hasHqSupport = true
+			break
+		}
 	}
-	checked++
 
-	if _, err := townBd.Show(mayorID); err != nil {
-		missing = append(missing, mayorID)
+	// Only check hq- beads if the database supports that prefix
+	if hasHqSupport {
+		deaconID := beads.DeaconBeadIDTown()
+		mayorID := beads.MayorBeadIDTown()
+
+		if _, err := townBd.Show(deaconID); err != nil {
+			missing = append(missing, deaconID)
+		}
+		checked++
+
+		if _, err := townBd.Show(mayorID); err != nil {
+			missing = append(missing, mayorID)
+		}
+		checked++
 	}
-	checked++
 
 	if len(prefixToRig) == 0 {
 		// No rigs to check, but we still checked global agents
@@ -158,44 +173,55 @@ func (c *AgentBeadsCheck) Run(ctx *CheckContext) *CheckResult {
 
 // Fix creates missing agent beads.
 func (c *AgentBeadsCheck) Fix(ctx *CheckContext) error {
-	// Create global agents (Mayor, Deacon) in town beads
-	// These use hq- prefix and are stored in ~/gt/.beads/
-	townBeadsPath := beads.GetTownBeadsPath(ctx.TownRoot)
-	townBd := beads.New(townBeadsPath)
-
-	deaconID := beads.DeaconBeadIDTown()
-	if _, err := townBd.Show(deaconID); err != nil {
-		fields := &beads.AgentFields{
-			RoleType:   "deacon",
-			Rig:        "",
-			AgentState: "idle",
-			RoleBead:   beads.DeaconRoleBeadIDTown(),
-		}
-		desc := "Deacon (daemon beacon) - receives mechanical heartbeats, runs town plugins and monitoring."
-		if _, err := townBd.CreateAgentBead(deaconID, desc, fields); err != nil {
-			return fmt.Errorf("creating %s: %w", deaconID, err)
-		}
-	}
-
-	mayorID := beads.MayorBeadIDTown()
-	if _, err := townBd.Show(mayorID); err != nil {
-		fields := &beads.AgentFields{
-			RoleType:   "mayor",
-			Rig:        "",
-			AgentState: "idle",
-			RoleBead:   beads.MayorRoleBeadIDTown(),
-		}
-		desc := "Mayor - global coordinator, handles cross-rig communication and escalations."
-		if _, err := townBd.CreateAgentBead(mayorID, desc, fields); err != nil {
-			return fmt.Errorf("creating %s: %w", mayorID, err)
-		}
-	}
-
 	// Load routes to get prefixes for rig-level agents
 	beadsDir := filepath.Join(ctx.TownRoot, ".beads")
 	routes, err := beads.LoadRoutes(beadsDir)
 	if err != nil {
 		return fmt.Errorf("loading routes.jsonl: %w", err)
+	}
+
+	// Check if the town beads database supports hq- prefix
+	hasHqSupport := false
+	for _, r := range routes {
+		if strings.TrimSuffix(r.Prefix, "-") == "hq" {
+			hasHqSupport = true
+			break
+		}
+	}
+
+	// Create global agents (Mayor, Deacon) in town beads only if hq- prefix is supported
+	// These use hq- prefix and are stored in ~/gt/.beads/
+	if hasHqSupport {
+		townBeadsPath := beads.GetTownBeadsPath(ctx.TownRoot)
+		townBd := beads.New(townBeadsPath)
+
+		deaconID := beads.DeaconBeadIDTown()
+		if _, err := townBd.Show(deaconID); err != nil {
+			fields := &beads.AgentFields{
+				RoleType:   "deacon",
+				Rig:        "",
+				AgentState: "idle",
+				RoleBead:   beads.DeaconRoleBeadIDTown(),
+			}
+			desc := "Deacon (daemon beacon) - receives mechanical heartbeats, runs town plugins and monitoring."
+			if _, err := townBd.CreateAgentBead(deaconID, desc, fields); err != nil {
+				return fmt.Errorf("creating %s: %w", deaconID, err)
+			}
+		}
+
+		mayorID := beads.MayorBeadIDTown()
+		if _, err := townBd.Show(mayorID); err != nil {
+			fields := &beads.AgentFields{
+				RoleType:   "mayor",
+				Rig:        "",
+				AgentState: "idle",
+				RoleBead:   beads.MayorRoleBeadIDTown(),
+			}
+			desc := "Mayor - global coordinator, handles cross-rig communication and escalations."
+			if _, err := townBd.CreateAgentBead(mayorID, desc, fields); err != nil {
+				return fmt.Errorf("creating %s: %w", mayorID, err)
+			}
+		}
 	}
 
 	// Build prefix -> rigInfo map from routes

@@ -12,10 +12,13 @@ LDFLAGS := -X github.com/steveyegge/gastown/internal/cmd.Version=$(VERSION) \
            -X github.com/steveyegge/gastown/internal/cmd.Commit=$(COMMIT) \
            -X github.com/steveyegge/gastown/internal/cmd.BuildTime=$(BUILD_TIME)
 
-# Disable CGO on macOS to avoid dyld hangs with Security.framework
+# macOS: Disable CGO and avoid Security.framework hangs
+# The x509usefallbackroots=1 tells Go to use embedded cert roots instead of
+# calling Security.framework, which can hang on some macOS systems.
 # See: https://github.com/golang/go/issues/19734
 ifeq ($(shell uname),Darwin)
     export CGO_ENABLED=0
+    export GODEBUG=x509usefallbackroots=1
 endif
 
 generate:
@@ -33,8 +36,20 @@ ifeq ($(shell uname),Darwin)
 endif
 
 install: build
+ifeq ($(shell uname),Darwin)
+	@# On macOS, install binary as gt.bin and create wrapper script
+	@# The wrapper sets GODEBUG=x509usefallbackroots=1 to avoid Security.framework hangs
+	cp $(BUILD_DIR)/$(BINARY) ~/.local/bin/$(BINARY).bin
+	@echo '#!/bin/bash' > ~/.local/bin/$(BINARY)
+	@echo '# Wrapper to avoid macOS Security.framework hangs' >> ~/.local/bin/$(BINARY)
+	@echo 'export GODEBUG=x509usefallbackroots=1' >> ~/.local/bin/$(BINARY)
+	@echo 'exec ~/.local/bin/$(BINARY).bin "$$@"' >> ~/.local/bin/$(BINARY)
+	@chmod +x ~/.local/bin/$(BINARY) ~/.local/bin/$(BINARY).bin
+	@echo "Installed to ~/.local/bin/$(BINARY) (with wrapper for macOS)"
+else
 	cp $(BUILD_DIR)/$(BINARY) ~/.local/bin/$(BINARY)
 	@echo "Installed to ~/.local/bin/$(BINARY)"
+endif
 
 clean:
 	rm -f $(BUILD_DIR)/$(BINARY)
