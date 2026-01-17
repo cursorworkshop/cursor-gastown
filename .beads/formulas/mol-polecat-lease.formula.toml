@@ -35,7 +35,7 @@ tmux capture-pane -t gt-{{rig}}-{{polecat}} -p | tail -20
 ```
 
 Look for:
-- Claude prompt visible ("> " at start of line)
+- Cursor prompt visible ("> " at start of line)
 - `gt prime` output
 - Signs of reading the assigned issue
 

@@ -196,7 +196,7 @@ func TriggerPendingSpawns(townRoot string, timeout time.Duration) ([]TriggerResu
 		}
 
 		// Check if Claude is ready (non-blocking poll)
-		err = t.WaitForClaudeReady(ps.Session, timeout)
+		err = t.WaitForCursorReady(ps.Session, timeout)
 		if err != nil {
 			// Not ready yet - keep in pending
 			remaining = append(remaining, ps)

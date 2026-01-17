@@ -93,7 +93,7 @@ var startCrewCmd = &cobra.Command{
 	Long: `Start a crew workspace, creating it if it doesn't exist.
 
 This is a convenience command that combines 'gt crew add' and 'gt crew at --detached'.
-The crew session starts in the background with Claude running and ready.
+The crew session starts in the background with the agent running and ready.
 
 The name can include the rig in slash format (e.g., greenplace/joe).
 If not specified, the rig is inferred from the current directory.
@@ -275,16 +275,16 @@ func startConfiguredCrew(t *tmux.Tmux, townRoot string) {
 		for _, crewName := range crewToStart {
 			sessionID := crewSessionName(r.Name, crewName)
 			if running, _ := t.HasSession(sessionID); running {
-				// Session exists - check if Claude is still running
+				// Session exists - check if agent is still running
 				agentCfg := config.ResolveAgentConfig(townRoot, r.Path)
 				if !t.IsAgentRunning(sessionID, config.ExpectedPaneCommands(agentCfg)...) {
-					// Claude has exited, restart it
-					fmt.Printf("  %s %s/%s session exists, restarting Claude...\n", style.Dim.Render("○"), r.Name, crewName)
+					// Agent has exited, restart it
+					fmt.Printf("  %s %s/%s session exists, restarting agent...\n", style.Dim.Render("○"), r.Name, crewName)
 					claudeCmd := config.BuildCrewStartupCommand(r.Name, crewName, r.Path, "gt prime")
 					if err := t.SendKeys(sessionID, claudeCmd); err != nil {
 						fmt.Printf("  %s %s/%s restart failed: %v\n", style.Dim.Render("○"), r.Name, crewName, err)
 					} else {
-						fmt.Printf("  %s %s/%s Claude restarted\n", style.Bold.Render("OK"), r.Name, crewName)
+						fmt.Printf("  %s %s/%s agent restarted\n", style.Bold.Render("OK"), r.Name, crewName)
 						startedAny = true
 					}
 				} else {
@@ -371,14 +371,14 @@ func ensureRefinerySession(rigName string, r *rig.Rig) (bool, error) {
 	theme := tmux.AssignTheme(rigName)
 	_ = t.ConfigureGasTownSession(sessionName, theme, rigName, "refinery", "refinery")
 
-	// Launch Claude directly (no respawn loop - daemon handles restart)
+	// Launch Cursor directly (no respawn loop - daemon handles restart)
 	// Export GT_ROLE and BD_ACTOR in the command since tmux SetEnvironment only affects new panes
 	if err := t.SendKeys(sessionName, config.BuildAgentStartupCommand("refinery", bdActor, r.Path, "")); err != nil {
 		return false, fmt.Errorf("sending command: %w", err)
 	}
 
-	// Wait for Claude to start (non-fatal)
-	if err := t.WaitForCommand(sessionName, constants.SupportedShells, constants.ClaudeStartTimeout); err != nil {
+	// Wait for Cursor to start (non-fatal)
+	if err := t.WaitForCommand(sessionName, constants.SupportedShells, constants.CursorStartTimeout); err != nil {
 		// Non-fatal
 	}
 	time.Sleep(constants.ShutdownNotifyDelay)
@@ -763,7 +763,7 @@ func runStartCrew(cmd *cobra.Command, args []string) error {
 	crewGit := git.NewGit(r.Path)
 	crewMgr := crew.NewManager(r, crewGit)
 
-	// Resolve account for Claude config
+	// Resolve account for Cursor config
 	accountsPath := constants.MayorAccountsPath(townRoot)
 	cursorConfigDir, accountHandle, err := config.ResolveAccountConfigDir(accountsPath, startCrewAccount)
 	if err != nil {

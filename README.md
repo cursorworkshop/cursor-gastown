@@ -2,7 +2,7 @@
 
 Multi-agent orchestration for Cursor CLI with persistent work tracking.
 
-> This is a fork of [Gas Town](https://github.com/steveyegge/gastown), originally built for Claude Code. This repo converts it to work with Cursor CLI.
+> This is a fork of [Gas Town](https://github.com/steveyegge/gastown), converted to work with Cursor CLI.
 
 ## Overview
 
@@ -293,7 +293,7 @@ gt doctor --verbose  # Detailed diagnostics
 
 ## Origins
 
-Gas Town was created by Steve Yegge for orchestrating Claude Code agents. This fork adapts it for Cursor CLI, maintaining the same architecture while targeting the Cursor ecosystem.
+Gas Town was created by Steve Yegge for orchestrating AI coding agents. This fork adapts it for Cursor CLI, maintaining the same architecture while targeting the Cursor ecosystem.
 
 ## License
 

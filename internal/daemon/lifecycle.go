@@ -97,7 +97,7 @@ func (d *Daemon) ProcessLifecycleRequests() {
 }
 
 // LifecycleBody is the structured body format for lifecycle requests.
-// Claude should send mail with JSON body: {"action": "cycle"} or {"action": "shutdown"}
+// Agent should send mail with JSON body: {"action": "cycle"} or {"action": "shutdown"}
 type LifecycleBody struct {
 	Action string `json:"action"`
 }
@@ -364,7 +364,7 @@ func (d *Daemon) restartSession(sessionName, identity string) error {
 	}
 
 	// Create session
-	// Use EnsureSessionFresh to handle zombie sessions that exist but have dead Claude
+	// Use EnsureSessionFresh to handle zombie sessions that exist but have dead agent
 	if err := d.tmux.EnsureSessionFresh(sessionName, workDir); err != nil {
 		return fmt.Errorf("creating session: %w", err)
 	}
@@ -383,7 +383,7 @@ func (d *Daemon) restartSession(sessionName, identity string) error {
 
 	// Wait for Claude to start, then accept bypass permissions warning if it appears.
 	// This ensures automated role starts aren't blocked by the warning dialog.
-	if err := d.tmux.WaitForCommand(sessionName, constants.SupportedShells, constants.ClaudeStartTimeout); err != nil {
+	if err := d.tmux.WaitForCommand(sessionName, constants.SupportedShells, constants.CursorStartTimeout); err != nil {
 		// Non-fatal - Claude might still start
 	}
 	_ = d.tmux.AcceptBypassPermissionsWarning(sessionName)
@@ -765,7 +765,7 @@ func (d *Daemon) checkRigGUPPViolations(rigName string) {
 		sessionName := fmt.Sprintf("gt-%s-%s", rigName, polecatName)
 
 		// Check if tmux session exists and Claude is running
-		if d.tmux.IsClaudeRunning(sessionName) {
+		if d.tmux.IsCursorRunning(sessionName) {
 			// Session is alive - check if it's been stuck too long
 			updatedAt, err := time.Parse(time.RFC3339, agent.UpdatedAt)
 			if err != nil {
@@ -853,7 +853,7 @@ func (d *Daemon) checkRigOrphanedWork(rigName string) {
 		sessionName := fmt.Sprintf("gt-%s-%s", rigName, polecatName)
 
 		// Session running = not orphaned (work is being processed)
-		if d.tmux.IsClaudeRunning(sessionName) {
+		if d.tmux.IsCursorRunning(sessionName) {
 			continue
 		}
 

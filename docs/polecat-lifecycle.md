@@ -12,13 +12,13 @@ recycling occurs.
 
 | Layer | Component | Lifecycle | Persistence |
 |-------|-----------|-----------|-------------|
-| **Session** | Claude (tmux pane) | Ephemeral | Cycles per step/handoff |
+| **Session** | Cursor (tmux pane) | Ephemeral | Cycles per step/handoff |
 | **Sandbox** | Git worktree | Persistent | Until nuke |
 | **Slot** | Name from pool | Persistent | Until nuke |
 
 ### Session Layer
 
-The Claude session is **ephemeral**. It cycles frequently:
+The Cursor session is **ephemeral**. It cycles frequently:
 
 - After each molecule step (via `gt handoff`)
 - On context compaction
@@ -26,7 +26,7 @@ The Claude session is **ephemeral**. It cycles frequently:
 - After extended work periods
 
 **Key insight:** Session cycling is **normal operation**, not failure. The polecat
-continues working—only the Claude context refreshes.
+continues working—only the Cursor context refreshes.
 
 ```
 Session 1: Steps 1-2 → handoff
@@ -74,7 +74,7 @@ The slot:
 │                        gt sling                             │
 │  → Allocate slot from pool (Toast)                         │
 │  → Create sandbox (worktree on new branch)                 │
-│  → Start session (Claude in tmux)                          │
+│  → Start session (Cursor in tmux)                          │
 │  → Hook molecule to polecat                                │
 └─────────────────────────────────────────────────────────────┘
                               │
@@ -110,7 +110,7 @@ The slot:
 
 ## What "Recycle" Means
 
-**Session cycling**: Normal. Claude restarts, sandbox stays, slot stays.
+**Session cycling**: Normal. Cursor restarts, sandbox stays, slot stays.
 
 ```bash
 gt handoff  # Session cycles, polecat continues

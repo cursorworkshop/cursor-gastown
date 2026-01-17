@@ -27,7 +27,7 @@
 | **P2** | `internal/tui/convoy` | 601 | MEDIUM | TUI component. Harder to test but user-facing. |
 | **P2** | `internal/constants` | 221 | LOW | Mostly configuration constants. Low behavioral risk. |
 | **P3** | `internal/style` | 331 | LOW | Output formatting. Visual only. |
-| **P3** | `internal/claude` | 80 | LOW | Claude settings parsing. |
+| **P3** | `internal/cursor` | 80 | LOW | Cursor settings and hooks. |
 | **P3** | `internal/wisp` | 52 | LOW | Ephemeral molecule I/O. Small surface. |
 | **P4** | `cmd/gt` | 12 | TRIVIAL | Main entry point. Minimal code. |
 

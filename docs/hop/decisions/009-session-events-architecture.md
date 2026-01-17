@@ -12,11 +12,11 @@ on beads mutations (issue close, MR merge).
 
 ## Context
 
-The seance feature needs to discover and resume Claude Code sessions. This requires:
-1. **Pointer** to session (session_id) - for `claude --resume`
+The seance feature needs to discover and resume Cursor sessions. This requires:
+1. **Pointer** to session (session_id) - for `cursor-agent --resume`
 2. **Attribution** (which work happened in this session) - for entity CV
 
-Claude Code already stores full session transcripts indefinitely. Gas Town doesn't
+Cursor already stores full session transcripts indefinitely. Gas Town doesn't
 need to duplicate them - just point at them.
 
 ## The Separation
@@ -26,19 +26,19 @@ need to duplicate them - just point at them.
 | **Orchestration** | `~/.events.jsonl` | session_start, nudges, mail routing | Ephemeral (auto-prune) |
 | **Work** | Beads (rig-level) | Issues, MRs, convoys | Permanent (ledger) |
 | **Entity activity** | Beads (entity chain) | Session digests | Permanent (CV) |
-| **Transcript** | Claude Code | Full session content | Claude Code's retention |
+| **Transcript** | Cursor | Full session content | Cursor's retention |
 
 ## Why Not Beads for Events?
 
 1. **Volume**: Orchestration events are high volume, would overwhelm work signal
 2. **Ephemerality**: Most orchestration events don't need CV/ledger permanence
 3. **Different audiences**: Work items are cross-agent; orchestration is internal
-4. **Claude Code has it**: Transcripts already live there; we just need pointers
+4. **Cursor has it**: Transcripts already live there; we just need pointers
 
 ## Implementation
 
 ### Phase 1: Attribution (Now)
-- `gt done` captures `CLAUDE_SESSION_ID` in issue close
+- `gt done` captures `CURSOR_SESSION_ID` in issue close
 - Beads supports `closed_by_session` field on issue mutations
 - Events.jsonl continues to capture `session_start` for seance
 
@@ -51,7 +51,7 @@ need to duplicate them - just point at them.
 ### Phase 3: Pruning (Future)
 - Events.jsonl auto-prunes after N days
 - Session digests provide permanent summary
-- Full transcripts remain in Claude Code
+- Full transcripts remain in Cursor
 
 ## Consequences
 

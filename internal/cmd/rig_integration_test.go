@@ -255,7 +255,7 @@ func TestRigAddCreatesCorrectStructure(t *testing.T) {
 		t.Errorf("refinery/rig/.git should be a file (worktree), not a directory")
 	}
 
-	// Verify Claude settings are created in correct locations (outside git repos).
+	// Verify Cursor settings are created in correct locations (outside git repos).
 	// Settings in parent directories are inherited by agents via directory traversal,
 	// without polluting the source repos.
 	expectedSettings := []struct {

@@ -454,7 +454,7 @@ func (m *Manager) Start(name string, opts StartOptions) error {
 			}
 		} else {
 			// Normal start - session exists, check if Claude is actually running
-			if t.IsClaudeRunning(sessionID) {
+			if t.IsCursorRunning(sessionID) {
 				return fmt.Errorf("%w: %s", ErrSessionRunning, sessionID)
 			}
 			// Zombie session - kill and recreate
@@ -526,7 +526,7 @@ func (m *Manager) Start(name string, opts StartOptions) error {
 	}
 
 	// Wait for Claude to start (non-fatal: session continues even if this times out)
-	_ = t.WaitForCommand(sessionID, constants.SupportedShells, constants.ClaudeStartTimeout)
+	_ = t.WaitForCommand(sessionID, constants.SupportedShells, constants.CursorStartTimeout)
 
 	return nil
 }

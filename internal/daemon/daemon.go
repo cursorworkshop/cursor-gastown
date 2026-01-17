@@ -184,7 +184,7 @@ func (d *Daemon) heartbeat(state *State) {
 
 	// 3. Trigger pending polecat spawns (bootstrap mode - ZFC violation acceptable)
 	// This ensures polecats get nudged even when Deacon isn't in a patrol cycle.
-	// Uses regex-based WaitForClaudeReady, which is acceptable for daemon bootstrap.
+	// Uses regex-based WaitForCursorReady, which is acceptable for daemon bootstrap.
 	d.triggerPendingSpawns()
 
 	// 4. Process lifecycle requests
@@ -295,15 +295,15 @@ func (d *Daemon) runDegradedBootTriage(b *boot.Boot) {
 func (d *Daemon) ensureDeaconRunning() {
 	deaconSession := d.getDeaconSessionName()
 
-	// Check if tmux session exists and Claude is running (observable reality)
+	// Check if tmux session exists and Cursor is running (observable reality)
 	hasSession, sessionErr := d.tmux.HasSession(deaconSession)
 	if sessionErr == nil && hasSession {
-		if d.tmux.IsClaudeRunning(deaconSession) {
+		if d.tmux.IsCursorRunning(deaconSession) {
 			// Deacon is running - nothing to do
 			return
 		}
-		// Session exists but Claude not running - zombie session, kill it
-		d.logger.Println("Deacon session exists but Claude not running, killing zombie session...")
+		// Session exists but Cursor not running - zombie session, kill it
+		d.logger.Println("Deacon session exists but Cursor not running, killing zombie session...")
 		if err := d.tmux.KillSession(deaconSession); err != nil {
 			d.logger.Printf("Warning: failed to kill zombie Deacon session: %v", err)
 		}
@@ -314,7 +314,7 @@ func (d *Daemon) ensureDeaconRunning() {
 	d.logger.Println("Deacon not running, starting...")
 
 	// Create session in deacon directory (ensures correct CLAUDE.md is loaded)
-	// Use EnsureSessionFresh to handle zombie sessions that exist but have dead Claude
+	// Use EnsureSessionFresh to handle zombie sessions that exist but have dead agent
 	deaconDir := filepath.Join(d.config.TownRoot, "deacon")
 	sessionName := d.getDeaconSessionName()
 	if err := d.tmux.EnsureSessionFresh(sessionName, deaconDir); err != nil {
@@ -326,11 +326,11 @@ func (d *Daemon) ensureDeaconRunning() {
 	_ = d.tmux.SetEnvironment(sessionName, "GT_ROLE", "deacon")
 	_ = d.tmux.SetEnvironment(sessionName, "BD_ACTOR", "deacon")
 
-	// Launch Claude directly (no shell respawn loop)
-	// The daemon will detect if Claude exits and restart it on next heartbeat
-	// Export GT_ROLE and BD_ACTOR so Claude inherits them (tmux SetEnvironment doesn't export to processes)
+	// Launch Cursor directly (no shell respawn loop)
+	// The daemon will detect if Cursor exits and restart it on next heartbeat
+	// Export GT_ROLE and BD_ACTOR so Cursor inherits them (tmux SetEnvironment doesn't export to processes)
 	if err := d.tmux.SendKeys(sessionName, config.BuildAgentStartupCommand("deacon", "deacon", "", "")); err != nil {
-		d.logger.Printf("Error launching Claude in Deacon session: %v", err)
+		d.logger.Printf("Error launching Cursor in Deacon session: %v", err)
 		return
 	}
 
@@ -407,8 +407,8 @@ func (d *Daemon) ensureWitnessRunning(rigName string) {
 	}
 
 	// Manager.Start() handles: zombie detection, session creation, env vars, theming,
-	// WaitForClaudeReady, and crucially - startup/propulsion nudges (GUPP).
-	// It returns ErrAlreadyRunning if Claude is already running in tmux.
+	// WaitForCursorReady, and crucially - startup/propulsion nudges (GUPP).
+	// It returns ErrAlreadyRunning if Cursor is already running in tmux.
 	r := &rig.Rig{
 		Name: rigName,
 		Path: filepath.Join(d.config.TownRoot, rigName),
@@ -446,8 +446,8 @@ func (d *Daemon) ensureRefineryRunning(rigName string) {
 	}
 
 	// Manager.Start() handles: zombie detection, session creation, env vars, theming,
-	// WaitForClaudeReady, and crucially - startup/propulsion nudges (GUPP).
-	// It returns ErrAlreadyRunning if Claude is already running in tmux.
+	// WaitForCursorReady, and crucially - startup/propulsion nudges (GUPP).
+	// It returns ErrAlreadyRunning if Cursor is already running in tmux.
 	r := &rig.Rig{
 		Name: rigName,
 		Path: filepath.Join(d.config.TownRoot, rigName),
@@ -527,7 +527,7 @@ func (d *Daemon) isRigOperational(rigName string) (bool, string) {
 }
 
 // triggerPendingSpawns polls pending polecat spawns and triggers those that are ready.
-// This is bootstrap mode - uses regex-based WaitForClaudeReady which is acceptable
+// This is bootstrap mode - uses regex-based WaitForCursorReady which is acceptable
 // for daemon operations when no AI agent is guaranteed to be running.
 // The timeout is short (2s) to avoid blocking the heartbeat.
 func (d *Daemon) triggerPendingSpawns() {
@@ -546,7 +546,7 @@ func (d *Daemon) triggerPendingSpawns() {
 
 	d.logger.Printf("Found %d pending spawn(s), attempting to trigger...", len(pending))
 
-	// Trigger pending spawns (uses WaitForClaudeReady with short timeout)
+	// Trigger pending spawns (uses WaitForCursorReady with short timeout)
 	results, err := polecat.TriggerPendingSpawns(d.config.TownRoot, triggerTimeout)
 	if err != nil {
 		d.logger.Printf("Error triggering spawns: %v", err)
@@ -776,7 +776,7 @@ func (d *Daemon) restartPolecatSession(rigName, polecatName, sessionName string)
 	d.syncWorkspace(workDir)
 
 	// Create new tmux session
-	// Use EnsureSessionFresh to handle zombie sessions that exist but have dead Claude
+	// Use EnsureSessionFresh to handle zombie sessions that exist but have dead agent
 	if err := d.tmux.EnsureSessionFresh(sessionName, workDir); err != nil {
 		return fmt.Errorf("creating session: %w", err)
 	}
@@ -802,7 +802,7 @@ func (d *Daemon) restartPolecatSession(rigName, polecatName, sessionName string)
 	agentID := fmt.Sprintf("%s/%s", rigName, polecatName)
 	_ = d.tmux.SetPaneDiedHook(sessionName, agentID)
 
-	// Launch Claude with environment exported inline
+	// Launch Cursor with environment exported inline
 	// Pass rigPath so rig agent settings are honored (not town-level defaults)
 	rigPath := filepath.Join(d.config.TownRoot, rigName)
 	startCmd := config.BuildPolecatStartupCommand(rigName, polecatName, rigPath, "")
@@ -810,10 +810,10 @@ func (d *Daemon) restartPolecatSession(rigName, polecatName, sessionName string)
 		return fmt.Errorf("sending startup command: %w", err)
 	}
 
-	// Wait for Claude to start, then accept bypass permissions warning if it appears.
+	// Wait for Cursor to start, then accept bypass permissions warning if it appears.
 	// This ensures automated restarts aren't blocked by the warning dialog.
-	if err := d.tmux.WaitForCommand(sessionName, constants.SupportedShells, constants.ClaudeStartTimeout); err != nil {
-		// Non-fatal - Claude might still start
+	if err := d.tmux.WaitForCommand(sessionName, constants.SupportedShells, constants.CursorStartTimeout); err != nil {
+		// Non-fatal - Cursor might still start
 	}
 	_ = d.tmux.AcceptBypassPermissionsWarning(sessionName)
 

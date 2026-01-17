@@ -248,16 +248,16 @@ func TestEnsureSessionFresh_ZombieSession(t *testing.T) {
 	// Clean up any existing session
 	_ = tm.KillSession(sessionName)
 
-	// Create a zombie session (session exists but no Claude/node running)
+	// Create a zombie session (session exists but no agent running)
 	// A normal tmux session with bash/zsh is a "zombie" for our purposes
 	if err := tm.NewSession(sessionName, ""); err != nil {
 		t.Fatalf("NewSession: %v", err)
 	}
 	defer func() { _ = tm.KillSession(sessionName) }()
 
-	// Verify it's a zombie (not running Claude/node)
-	if tm.IsClaudeRunning(sessionName) {
-		t.Skip("session unexpectedly has Claude running - can't test zombie case")
+	// Verify it's a zombie (not running agent)
+	if tm.IsCursorRunning(sessionName) {
+		t.Skip("session unexpectedly has agent running - can't test zombie case")
 	}
 
 	// Verify generic agent check also treats it as not running (shell session)
@@ -400,7 +400,7 @@ func TestIsAgentRunning_NonexistentSession(t *testing.T) {
 	}
 }
 
-func TestIsClaudeRunning(t *testing.T) {
+func TestIsCursorRunning(t *testing.T) {
 	if !hasTmux() {
 		t.Skip("tmux not installed")
 	}
@@ -411,17 +411,17 @@ func TestIsClaudeRunning(t *testing.T) {
 	// Clean up any existing session
 	_ = tm.KillSession(sessionName)
 
-	// Create session (will run default shell, not Claude)
+	// Create session (will run default shell, not Cursor)
 	if err := tm.NewSession(sessionName, ""); err != nil {
 		t.Fatalf("NewSession: %v", err)
 	}
 	defer func() { _ = tm.KillSession(sessionName) }()
 
-	// IsClaudeRunning should be false (shell is running, not node)
+	// IsCursorRunning should be false (shell is running, not cursor-agent)
 	cmd, _ := tm.GetPaneCommand(sessionName)
 	wantRunning := cmd == "node"
 
-	if got := tm.IsClaudeRunning(sessionName); got != wantRunning {
-		t.Errorf("IsClaudeRunning() = %v, want %v (pane cmd: %q)", got, wantRunning, cmd)
+	if got := tm.IsCursorRunning(sessionName); got != wantRunning {
+		t.Errorf("IsCursorRunning() = %v, want %v (pane cmd: %q)", got, wantRunning, cmd)
 	}
 }

@@ -3,8 +3,8 @@ Clean stale sessions and garbage collect.
 
 Dogs work through molecules (poured from this formula) to clean up dead sessions, orphaned processes, and
 other system cruft. This is the garbage collector for Gas Town's runtime:
-- Dead tmux sessions (no Claude process)
-- Orphaned Claude processes (no tmux parent)
+- Dead tmux sessions (no Cursor process)
+- Orphaned Cursor processes (no tmux parent)
 - Stale wisps past retention
 - Leftover state files
 
@@ -59,7 +59,7 @@ gt hook               # Shows mode in hook_bead
 
 **Conservative targets:**
 - tmux sessions with no processes
-- Claude processes with no tmux parent
+- Cursor processes with no tmux parent
 - Wisps > 24 hours old
 
 **Aggressive additions:**
@@ -84,7 +84,7 @@ gt doctor -v
 
 **2. Parse doctor output for:**
 - orphan-sessions: Tmux sessions to kill
-- orphan-processes: Claude processes to terminate
+- orphan-processes: Cursor processes to terminate
 - wisp-gc: Wisps to delete
 
 **3. Additional scans (for aggressive mode):**
@@ -158,8 +158,8 @@ gt doctor -v
 # Tmux sessions
 tmux list-sessions 2>/dev/null
 
-# Claude processes
-pgrep -f claude
+# Cursor processes
+pgrep -f cursor-agent
 
 # Wisps
 ls .beads-wisp/ 2>/dev/null | wc -l

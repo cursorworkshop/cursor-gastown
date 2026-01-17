@@ -233,7 +233,7 @@ gt deacon health-check
 
 ### Zombie Sessions Block Restart
 
-**Symptom**: tmux session exists but Claude is dead
+**Symptom**: tmux session exists but Cursor is dead
 **Cause**: Daemon checks session existence, not process health
 **Fix**: Kill zombie sessions before recreating: `gt session kill hq-deacon`
 

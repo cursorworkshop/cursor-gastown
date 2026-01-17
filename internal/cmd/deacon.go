@@ -48,7 +48,7 @@ var deaconStartCmd = &cobra.Command{
 	Short:   "Start the Deacon session",
 	Long: `Start the Deacon tmux session.
 
-Creates a new detached tmux session for the Deacon and launches Claude.
+Creates a new detached tmux session for the Deacon and launches Cursor.
 The session runs in the workspace root directory.`,
 	RunE: runDeaconStart,
 }
@@ -112,7 +112,7 @@ var deaconTriggerPendingCmd = &cobra.Command{
 
 [!]  BOOTSTRAP MODE ONLY - Uses regex detection (ZFC violation acceptable).
 
-This command uses WaitForClaudeReady (regex) to detect when Claude is ready.
+This command uses WaitForCursorReady (regex) to detect when Cursor is ready.
 This is appropriate for daemon bootstrap when no AI is available.
 
 In steady-state, the Deacon should use AI-based observation instead:
@@ -237,7 +237,7 @@ func init() {
 
 	// Flags for trigger-pending
 	deaconTriggerPendingCmd.Flags().DurationVar(&triggerTimeout, "timeout", 2*time.Second,
-		"Timeout for checking if Claude is ready")
+		"Timeout for checking if Cursor is ready")
 
 	// Flags for health-check
 	deaconHealthCheckCmd.Flags().DurationVar(&healthCheckTimeout, "timeout", 30*time.Second,
@@ -327,7 +327,7 @@ func startDeaconSession(t *tmux.Tmux, sessionName, agentOverride string) error {
 	theme := tmux.DeaconTheme()
 	_ = t.ConfigureGasTownSession(sessionName, theme, "", "Deacon", "health-check")
 
-	// Launch Claude directly (no shell respawn loop)
+	// Launch agent directly (no shell respawn loop)
 	// Restarts are handled by daemon via ensureDeaconRunning on each heartbeat
 	// The startup hook handles context loading automatically
 	// Export GT_ROLE and BD_ACTOR in the command since tmux SetEnvironment only affects new panes
@@ -339,8 +339,8 @@ func startDeaconSession(t *tmux.Tmux, sessionName, agentOverride string) error {
 		return fmt.Errorf("sending command: %w", err)
 	}
 
-	// Wait for Claude to start (non-fatal)
-	if err := t.WaitForCommand(sessionName, constants.SupportedShells, constants.ClaudeStartTimeout); err != nil {
+	// Wait for Cursor to start (non-fatal)
+	if err := t.WaitForCommand(sessionName, constants.SupportedShells, constants.CursorStartTimeout); err != nil {
 		// Non-fatal
 	}
 	time.Sleep(constants.ShutdownNotifyDelay)
@@ -407,7 +407,7 @@ func runDeaconAttach(cmd *cobra.Command, args []string) error {
 			return err
 		}
 	}
-	// Session uses a respawn loop, so Claude restarts automatically if it exits
+	// Session uses a respawn loop, so agent restarts automatically if it exits
 
 	// Use shared attach helper (smart: links if inside tmux, attaches if outside)
 	return attachToTmuxSession(sessionName)
@@ -556,7 +556,7 @@ func runDeaconTriggerPending(cmd *cobra.Command, args []string) error {
 	// Summary
 	remaining := len(pending) - triggered
 	if remaining > 0 {
-		fmt.Printf("%s %d spawn(s) still waiting for Claude\n",
+		fmt.Printf("%s %d spawn(s) still waiting for Cursor\n",
 			style.Dim.Render("○"), remaining)
 	}
 

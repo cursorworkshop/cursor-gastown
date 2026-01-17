@@ -462,7 +462,7 @@ Next: [any notes for successor]"
 
 **Why gt handoff?**
 - Sends handoff mail to yourself with context
-- Respawns with fresh Claude instance
+- Respawns with fresh Cursor instance
 - SessionStart hook runs gt prime
 - Successor picks up from your hook
 

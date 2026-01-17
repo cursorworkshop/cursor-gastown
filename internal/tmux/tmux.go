@@ -77,12 +77,12 @@ func (t *Tmux) NewSession(name, workDir string) error {
 }
 
 // EnsureSessionFresh ensures a session is available and healthy.
-// If the session exists but is a zombie (Claude not running), it kills the session first.
+// If the session exists but is a zombie (agent not running), it kills the session first.
 // This prevents "session already exists" errors when trying to restart dead agents.
 //
 // A session is considered a zombie if:
 // - The tmux session exists
-// - But Claude (node process) is not running in it
+// - But the agent process is not running in it
 //
 // Returns nil if session was created successfully.
 func (t *Tmux) EnsureSessionFresh(name, workDir string) error {
@@ -95,13 +95,13 @@ func (t *Tmux) EnsureSessionFresh(name, workDir string) error {
 	if exists {
 		// Session exists - check if it's a zombie
 		if !t.IsAgentRunning(name) {
-			// Zombie session: tmux alive but Claude dead
+			// Zombie session: tmux alive but agent dead
 			// Kill it so we can create a fresh one
 			if err := t.KillSession(name); err != nil {
 				return fmt.Errorf("killing zombie session: %w", err)
 			}
 		} else {
-			// Session is healthy (Claude running) - nothing to do
+			// Session is healthy (agent running) - nothing to do
 			return nil
 		}
 	}
@@ -251,7 +251,7 @@ func (t *Tmux) SendKeysDelayed(session, keys string, delayMs int) error {
 
 // SendKeysDelayedDebounced sends keystrokes after a pre-delay, with a custom debounce before Enter.
 // Use this when sending input to a process that needs time to initialize AND the message
-// needs extra time between paste and Enter (e.g., Claude prompt injection).
+// needs extra time between paste and Enter (e.g., prompt injection).
 // preDelayMs: time to wait before sending text (for process readiness)
 // debounceMs: time to wait between text paste and Enter key (for paste completion)
 func (t *Tmux) SendKeysDelayedDebounced(session, keys string, preDelayMs, debounceMs int) error {
@@ -262,7 +262,7 @@ func (t *Tmux) SendKeysDelayedDebounced(session, keys string, preDelayMs, deboun
 }
 
 // NudgeSession sends a message to a Cursor session reliably.
-// This is the canonical way to send messages to Claude sessions.
+// This is the canonical way to send messages to Cursor sessions.
 // Uses: literal mode + 500ms debounce + separate Enter.
 // Verification is the Witness's job (AI), not this function.
 func (t *Tmux) NudgeSession(session, message string) error {
@@ -316,12 +316,12 @@ func (t *Tmux) NudgePane(pane, message string) error {
 }
 
 // AcceptBypassPermissionsWarning dismisses the Cursor bypass permissions warning dialog.
-// When Claude starts with --dangerously-skip-permissions, it shows a warning dialog that
+// When the agent starts with --dangerously-skip-permissions, it shows a warning dialog that
 // requires pressing Down arrow to select "Yes, I accept" and then Enter to confirm.
 // This function checks if the warning is present before sending keys to avoid interfering
 // with sessions that don't show the warning (e.g., already accepted or different config).
 //
-// Call this after starting Claude and waiting for it to initialize (WaitForCommand),
+// Call this after starting the agent and waiting for it to initialize (WaitForCommand),
 // but before sending any prompts.
 func (t *Tmux) AcceptBypassPermissionsWarning(session string) error {
 	// Wait for the dialog to potentially render
@@ -554,11 +554,11 @@ func (t *Tmux) IsAgentRunning(session string, expectedPaneCommands ...string) bo
 	return cmd != ""
 }
 
-// IsClaudeRunning checks if Claude appears to be running in the session.
+// IsCursorRunning checks if Cursor appears to be running in the session.
 // Only trusts the pane command - UI markers in scrollback cause false positives.
-func (t *Tmux) IsClaudeRunning(session string) bool {
-	// Claude runs as node
-	return t.IsAgentRunning(session, "node")
+func (t *Tmux) IsCursorRunning(session string) bool {
+	// Cursor runs as cursor-agent
+	return t.IsAgentRunning(session, "cursor-agent")
 }
 
 // WaitForCommand polls until the pane is NOT running one of the excluded commands.
@@ -609,13 +609,13 @@ func (t *Tmux) WaitForShellReady(session string, timeout time.Duration) error {
 	return fmt.Errorf("timeout waiting for shell")
 }
 
-// WaitForClaudeReady polls until Claude's prompt indicator appears in the pane.
-// Claude is ready when we see "> " at the start of a line (the input prompt).
-// This is more reliable than just checking if node is running.
+// WaitForCursorReady polls until Cursor's prompt indicator appears in the pane.
+// Cursor is ready when we see "> " at the start of a line (the input prompt).
+// This is more reliable than just checking if the agent is running.
 //
 // IMPORTANT: Bootstrap vs Steady-State Observation
 //
-// This function uses regex to detect Claude's prompt - a ZFC violation.
+// This function uses regex to detect Cursor's prompt - a ZFC violation.
 // ZFC (Zero False Commands) principle: AI should observe AI, not regex.
 //
 // Bootstrap (acceptable):
@@ -632,7 +632,7 @@ func (t *Tmux) WaitForShellReady(session string, timeout time.Duration) error {
 //
 // See: gt deacon pending (ZFC-compliant AI observation)
 // See: gt deacon trigger-pending (bootstrap mode, regex-based)
-func (t *Tmux) WaitForClaudeReady(session string, timeout time.Duration) error {
+func (t *Tmux) WaitForCursorReady(session string, timeout time.Duration) error {
 	deadline := time.Now().Add(timeout)
 	for time.Now().Before(deadline) {
 		// Capture last few lines of the pane
@@ -641,7 +641,7 @@ func (t *Tmux) WaitForClaudeReady(session string, timeout time.Duration) error {
 			time.Sleep(200 * time.Millisecond)
 			continue
 		}
-		// Look for Claude's prompt indicator "> " at start of line
+		// Look for Cursor's prompt indicator "> " at start of line
 		for _, line := range lines {
 			trimmed := strings.TrimSpace(line)
 			if strings.HasPrefix(trimmed, "> ") || trimmed == ">" {
@@ -650,7 +650,7 @@ func (t *Tmux) WaitForClaudeReady(session string, timeout time.Duration) error {
 		}
 		time.Sleep(200 * time.Millisecond)
 	}
-	return fmt.Errorf("timeout waiting for Claude prompt")
+	return fmt.Errorf("timeout waiting for Cursor prompt")
 }
 
 // GetSessionInfo returns detailed information about a session.

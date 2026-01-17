@@ -9,9 +9,9 @@ const (
 	// ShutdownNotifyDelay is the pause after sending shutdown notification.
 	ShutdownNotifyDelay = 500 * time.Millisecond
 
-	// ClaudeStartTimeout is how long to wait for Claude to start in a session.
-	// Increased to 60s because Claude can take 30s+ on slower machines.
-	ClaudeStartTimeout = 60 * time.Second
+	// CursorStartTimeout is how long to wait for Cursor to start in a session.
+	// Increased to 60s because Cursor can take 30s+ on slower machines.
+	CursorStartTimeout = 60 * time.Second
 
 	// ShellReadyTimeout is how long to wait for shell prompt after command.
 	ShellReadyTimeout = 5 * time.Second

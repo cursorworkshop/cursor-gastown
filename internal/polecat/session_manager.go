@@ -212,13 +212,13 @@ func (m *SessionManager) Start(polecat string, opts SessionStartOptions) error {
 		return fmt.Errorf("sending command: %w", err)
 	}
 
-	// Wait for Claude to start (non-fatal)
-	debugSession("WaitForCommand", m.tmux.WaitForCommand(sessionID, constants.SupportedShells, constants.ClaudeStartTimeout))
+	// Wait for Cursor to start (non-fatal)
+	debugSession("WaitForCommand", m.tmux.WaitForCommand(sessionID, constants.SupportedShells, constants.CursorStartTimeout))
 
 	// Accept bypass permissions warning dialog if it appears
 	debugSession("AcceptBypassPermissionsWarning", m.tmux.AcceptBypassPermissionsWarning(sessionID))
 
-	// Wait for Claude to be fully ready
+	// Wait for Cursor to be fully ready
 	time.Sleep(8 * time.Second)
 
 	// Inject startup nudge for predecessor discovery via /resume

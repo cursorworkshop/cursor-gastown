@@ -218,7 +218,7 @@ func (m *Manager) Start(foreground bool) error {
 
 	// Wait for Claude to start and show its prompt (non-fatal)
 	// WaitForClaudeReady waits for "> " prompt, more reliable than just checking node is running
-	if err := t.WaitForClaudeReady(sessionID, constants.ClaudeStartTimeout); err != nil {
+	if err := t.WaitForCursorReady(sessionID, constants.CursorStartTimeout); err != nil {
 		// Non-fatal - try to continue anyway
 	}
 

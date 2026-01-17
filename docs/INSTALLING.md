@@ -166,7 +166,7 @@ Run individual Cursor instances manually. Gas Town only tracks state.
 gt convoy create "Fix bugs" issue-123
 gt sling issue-123 myproject
 
-# Run Claude manually
+# Run Cursor manually
 cd ~/gt/myproject/polecats/<worker>
 claude --resume
 

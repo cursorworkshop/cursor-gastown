@@ -10,7 +10,7 @@ Technical reference for Gas Town internals. Read the README first.
 ├── mayor/                      Mayor agent home (town coordinator)
 │   ├── town.json               Town configuration
 │   ├── CLAUDE.md               Mayor context (on disk)
-│   └── .claude/settings.json   Mayor Claude settings
+│   └── .cursor/hooks.json      Mayor Cursor hooks
 ├── deacon/                     Deacon agent home (background supervisor)
 │   └── .claude/settings.json   Deacon settings (context via gt prime)
 └── <rig>/                      Project container (NOT a git clone)
@@ -220,7 +220,7 @@ gt mol step done <step>      # Complete a molecule step
 
 ## Agent Working Directories and Settings
 
-Each agent runs in a specific working directory and has its own Claude settings.
+Each agent runs in a specific working directory and has its own Cursor settings.
 Understanding this hierarchy is essential for proper configuration.
 
 ### Working Directories by Role
@@ -449,7 +449,7 @@ gt seance --talk <id> -p "Where is X?"  # One-shot question
 ```
 
 **Session Discovery**: Each session has a startup nudge that becomes searchable
-in Claude's `/resume` picker:
+in Cursor's `/resume` picker:
 
 ```
 [GAS TOWN] recipient <- sender • timestamp • topic[:mol-id]
@@ -457,8 +457,8 @@ in Claude's `/resume` picker:
 
 Example: `[GAS TOWN] gastown/crew/gus <- human • 2025-12-30T15:42 • restart`
 
-**IMPORTANT**: Always use `gt nudge` to send messages to Claude sessions.
-Never use raw `tmux send-keys` - it doesn't handle Claude's input correctly.
+**IMPORTANT**: Always use `gt nudge` to send messages to Cursor sessions.
+Never use raw `tmux send-keys` - it doesn't handle Cursor's input correctly.
 `gt nudge` uses literal mode + debounce + separate Enter for reliable delivery.
 
 ### Emergency

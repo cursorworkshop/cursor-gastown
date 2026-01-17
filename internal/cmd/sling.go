@@ -92,7 +92,7 @@ Spawning Options (when target is a rig):
   gt sling gp-abc greenplace --create               # Create polecat if missing
   gt sling gp-abc greenplace --naked                # No-tmux (manual start)
   gt sling gp-abc greenplace --force                # Ignore unread mail
-  gt sling gp-abc greenplace --account work         # Use specific Claude account
+  gt sling gp-abc greenplace --account work         # Use specific Cursor account
 
 Natural Language Args:
   gt sling gt-abc --args "patch release"
@@ -479,7 +479,7 @@ func runSling(cmd *cobra.Command, args []string) error {
 		fmt.Printf("%s No pane to nudge (agent will discover work via gt prime)\n", style.Dim.Render("○"))
 	} else {
 		// Ensure agent is ready before nudging (prevents race condition where
-		// message arrives before Claude has fully started - see issue #115)
+		// message arrives before Cursor has fully started - see issue #115)
 		sessionName := getSessionFromPane(targetPane)
 		if sessionName != "" {
 			if err := ensureAgentReady(sessionName); err != nil {
@@ -637,7 +637,7 @@ func getSessionFromPane(pane string) string {
 }
 
 // ensureAgentReady waits for an agent to be ready before nudging an existing session.
-// Uses a pragmatic approach: wait for the pane to leave a shell, then (Claude-only)
+// Uses a pragmatic approach: wait for the pane to leave a shell, then (Cursor-only)
 // accept the bypass permissions warning and give it a moment to finish initializing.
 func ensureAgentReady(sessionName string) error {
 	t := tmux.NewTmux()
@@ -648,16 +648,16 @@ func ensureAgentReady(sessionName string) error {
 	}
 
 	// Agent not running yet - wait for it to start (shell → program transition)
-	if err := t.WaitForCommand(sessionName, constants.SupportedShells, constants.ClaudeStartTimeout); err != nil {
+	if err := t.WaitForCommand(sessionName, constants.SupportedShells, constants.CursorStartTimeout); err != nil {
 		return fmt.Errorf("waiting for agent to start: %w", err)
 	}
 
-	// Claude-only: accept bypass permissions warning if present
-	if t.IsClaudeRunning(sessionName) {
+	// Cursor-only: accept bypass permissions warning if present
+	if t.IsCursorRunning(sessionName) {
 		_ = t.AcceptBypassPermissionsWarning(sessionName)
 
 		// PRAGMATIC APPROACH: fixed delay rather than prompt detection.
-		// Claude startup takes ~5-8 seconds on typical machines.
+		// Cursor startup takes ~5-8 seconds on typical machines.
 		time.Sleep(8 * time.Second)
 	} else {
 		time.Sleep(1 * time.Second)

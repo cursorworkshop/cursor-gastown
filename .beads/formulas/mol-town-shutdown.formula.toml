@@ -1,7 +1,7 @@
 description = """
 Full Gas Town shutdown and restart.
 
-This is an idempotent shutdown - it stops Claude sessions but preserves
+This is an idempotent shutdown - it stops Cursor sessions but preserves
 polecat sandboxes and hooks. Polecats can resume their work after restart.
 
 Use when you need to:
@@ -47,13 +47,13 @@ If only warnings, decide whether to proceed (work will be preserved).
 
 [[steps]]
 id = "stop-sessions"
-title = "Stop Claude sessions (preserve sandboxes)"
+title = "Stop Cursor sessions (preserve sandboxes)"
 needs = ["preflight-check"]
 description = """
-Kill Claude processes but leave polecat sandboxes intact.
+Kill Cursor processes but leave polecat sandboxes intact.
 
 ```bash
-# Stop all polecat Claude sessions
+# Stop all polecat Cursor sessions
 gt stop --all --preserve-sandbox
 
 # Verify sandboxes still exist
@@ -61,7 +61,7 @@ gt polecats --all --status
 ```
 
 What this does:
-- Kills tmux sessions running Claude
+- Kills tmux sessions running Cursor
 - Leaves git clones untouched
 - Leaves hook files (pinned molecules) intact
 - Leaves uncommitted work in place

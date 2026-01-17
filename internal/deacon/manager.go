@@ -57,11 +57,11 @@ func (m *Manager) Start() error {
 	// Check if session already exists
 	running, _ := t.HasSession(sessionID)
 	if running {
-		// Session exists - check if Claude is actually running (healthy vs zombie)
-		if t.IsClaudeRunning(sessionID) {
+		// Session exists - check if Cursor is actually running (healthy vs zombie)
+		if t.IsCursorRunning(sessionID) {
 			return ErrAlreadyRunning
 		}
-		// Zombie - tmux alive but Claude dead. Kill and recreate.
+		// Zombie - tmux alive but Cursor dead. Kill and recreate.
 		if err := t.KillSession(sessionID); err != nil {
 			return fmt.Errorf("killing zombie session: %w", err)
 		}
@@ -91,8 +91,8 @@ func (m *Manager) Start() error {
 	theme := tmux.DeaconTheme()
 	_ = t.ConfigureGasTownSession(sessionID, theme, "", "Deacon", "health-check")
 
-	// Launch Claude in a respawn loop for automatic recovery
-	// The respawn loop ensures the deacon restarts if Claude crashes
+	// Launch Cursor in a respawn loop for automatic recovery
+	// The respawn loop ensures the deacon restarts if Cursor crashes
 	runtimeCmd := config.GetRuntimeCommand("")
 	respawnCmd := fmt.Sprintf(
 		`export GT_ROLE=deacon BD_ACTOR=deacon GIT_AUTHOR_NAME=deacon && while true; do echo "⛪ Starting Deacon session..."; %s; echo ""; echo "Deacon exited. Restarting in 2s... (Ctrl-C to stop)"; sleep 2; done`,
@@ -101,12 +101,12 @@ func (m *Manager) Start() error {
 
 	if err := t.SendKeysDelayed(sessionID, respawnCmd, 200); err != nil {
 		_ = t.KillSession(sessionID) // best-effort cleanup
-		return fmt.Errorf("starting Claude agent: %w", err)
+		return fmt.Errorf("starting Cursor agent: %w", err)
 	}
 
-	// Wait for Claude to start (non-fatal)
-	// Note: Deacon respawn loop makes this tricky - Claude restarts multiple times
-	if err := t.WaitForCommand(sessionID, constants.SupportedShells, constants.ClaudeStartTimeout); err != nil {
+	// Wait for Cursor to start (non-fatal)
+	// Note: Deacon respawn loop makes this tricky - Cursor restarts multiple times
+	if err := t.WaitForCommand(sessionID, constants.SupportedShells, constants.CursorStartTimeout); err != nil {
 		// Non-fatal - try to continue anyway
 	}
 

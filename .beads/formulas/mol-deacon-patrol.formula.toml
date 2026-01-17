@@ -91,7 +91,7 @@ needs = ["inbox-check"]
 description = """
 Nudge newly spawned polecats that are ready for input.
 
-When polecats are spawned, their Claude session takes 10-20 seconds to initialize. The spawn command returns immediately without waiting. This step finds spawned polecats that are now ready and sends them a trigger to start working.
+When polecats are spawned, their Cursor session takes 10-20 seconds to initialize. The spawn command returns immediately without waiting. This step finds spawned polecats that are now ready and sends them a trigger to start working.
 
 **ZFC-Compliant Observation** (AI observes AI):
 
@@ -101,8 +101,8 @@ gt deacon pending
 ```
 
 For each pending session, analyze the captured output:
-- Look for Claude's prompt indicator "> " at the start of a line
-- If prompt is visible, Claude is ready for input
+- Look for Cursor's prompt indicator "> " at the start of a line
+- If prompt is visible, Cursor is ready for input
 - Make the judgment call yourself - you're the AI observer
 
 For each ready polecat:
@@ -277,7 +277,7 @@ If NO active work (empty result or only patrol molecules):
 If ACTIVE work exists:
 - Proceed with health check nudges below
 
-**ZFC Principle**: You (Claude) make the judgment call about what is "stuck" or "unresponsive" - there are no hardcoded thresholds in Go. Read the signals, consider context, and decide.
+**ZFC Principle**: You (Cursor) make the judgment call about what is "stuck" or "unresponsive" - there are no hardcoded thresholds in Go. Read the signals, consider context, and decide.
 
 For each rig, run:
 ```bash
@@ -500,7 +500,7 @@ Skip dispatch - system is healthy.
 
 **Cleanup types (for reference):**
 - orphan-sessions: Dead tmux sessions
-- orphan-processes: Orphaned Claude processes
+- orphan-processes: Orphaned Cursor processes
 - wisp-gc: Old wisps past retention
 
 **Exit criteria:** Session GC dispatched to dog (if needed)."""
@@ -588,7 +588,7 @@ needs = ["patrol-cleanup"]
 description = """
 Check own context limit.
 
-The Deacon runs in a Claude session with finite context. Check if approaching the limit:
+The Deacon runs in a Cursor session with finite context. Check if approaching the limit:
 
 ```bash
 gt context --usage

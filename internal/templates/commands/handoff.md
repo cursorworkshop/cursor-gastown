@@ -14,7 +14,7 @@ Execute these steps in order:
    Construct your mail address from your identity (e.g., gastown/crew/max for crew, mayor/ for mayor).
    Example: `gt mail send gastown/crew/max -s "HANDOFF: Session cycling" -m "USER_MESSAGE_HERE"`
 
-2. Run the handoff command (this will respawn your session with a fresh Claude):
+2. Run the handoff command (this will respawn your session with a fresh agent):
    `gt handoff`
 
 Note: The new session will auto-prime via the SessionStart hook and find your handoff mail.

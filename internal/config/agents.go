@@ -15,7 +15,7 @@ type AgentPreset string
 
 // Supported agent presets (built-in, E2E tested).
 const (
-	// AgentClaude is Claude Code CLI.
+	// AgentClaude is Claude CLI (legacy support).
 	AgentClaude AgentPreset = "claude"
 	// AgentGemini is Gemini CLI.
 	AgentGemini AgentPreset = "gemini"
@@ -43,7 +43,7 @@ type AgentPresetInfo struct {
 
 	// ProcessNames are the process names to look for when detecting if the agent is running.
 	// Used by tmux.IsAgentRunning to check pane_current_command.
-	// E.g., ["node"] for Claude, ["cursor-agent"] for Cursor.
+	// E.g., ["cursor-agent"] for Cursor, ["node"] for Claude CLI.
 	ProcessNames []string `json:"process_names,omitempty"`
 
 	// SessionIDEnv is the environment variable for session ID.
@@ -64,7 +64,7 @@ type AgentPresetInfo struct {
 	SupportsHooks bool `json:"supports_hooks,omitempty"`
 
 	// SupportsForkSession indicates if --fork-session is available.
-	// Claude-only feature for seance command.
+	// Feature for seance command (supported by Claude CLI).
 	SupportsForkSession bool `json:"supports_fork_session,omitempty"`
 
 	// NonInteractive contains settings for non-interactive mode.
@@ -102,13 +102,13 @@ var builtinPresets = map[AgentPreset]*AgentPresetInfo{
 		Name:                AgentClaude,
 		Command:             "claude",
 		Args:                []string{"--dangerously-skip-permissions"},
-		ProcessNames:        []string{"node"}, // Claude runs as Node.js
+		ProcessNames:        []string{"node"}, // Claude CLI runs as Node.js
 		SessionIDEnv:        "", // Claude CLI uses its own session tracking
 		ResumeFlag:          "--resume",
 		ResumeStyle:         "flag",
 		SupportsHooks:       true,
 		SupportsForkSession: true,
-		NonInteractive:      nil, // Claude is native non-interactive
+		NonInteractive:      nil, // Claude CLI is native non-interactive
 	},
 	AgentGemini: {
 		Name:                AgentGemini,
@@ -300,7 +300,7 @@ func DefaultAgentPreset() AgentPreset {
 func RuntimeConfigFromPreset(preset AgentPreset) *RuntimeConfig {
 	info := GetAgentPreset(preset)
 	if info == nil {
-		// Fall back to Claude defaults
+		// Fall back to defaults
 		return DefaultRuntimeConfig()
 	}
 
@@ -358,11 +358,11 @@ func GetSessionIDEnvVar(agentName string) string {
 
 // GetProcessNames returns the process names used to detect if an agent is running.
 // Used by tmux.IsAgentRunning to check pane_current_command.
-// Returns ["node"] for Claude (default) if agent is not found or has no ProcessNames.
+// Returns ["node"] (default) if agent is not found or has no ProcessNames.
 func GetProcessNames(agentName string) []string {
 	info := GetAgentPresetByName(agentName)
 	if info == nil || len(info.ProcessNames) == 0 {
-		// Default to Claude's process name for backwards compatibility
+		// Default process name for backwards compatibility
 		return []string{"node"}
 	}
 	return info.ProcessNames

@@ -356,7 +356,7 @@ func TestGetProcessNames(t *testing.T) {
 		{"cursor", []string{"node"}}, // cursor-agent runs as Node.js
 		{"auggie", []string{"auggie"}},
 		{"amp", []string{"amp"}},
-		{"unknown", []string{"node"}}, // Falls back to Claude's process
+		{"unknown", []string{"node"}}, // Falls back to default process
 	}
 
 	for _, tt := range tests {

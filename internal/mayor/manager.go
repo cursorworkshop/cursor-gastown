@@ -58,7 +58,7 @@ func (m *Manager) Start(agentOverride string) error {
 	running, _ := t.HasSession(sessionID)
 	if running {
 		// Session exists - check if Claude is actually running (healthy vs zombie)
-		if t.IsClaudeRunning(sessionID) {
+		if t.IsCursorRunning(sessionID) {
 			return ErrAlreadyRunning
 		}
 		// Zombie - tmux alive but Claude dead. Kill and recreate.
@@ -104,7 +104,7 @@ func (m *Manager) Start(agentOverride string) error {
 	}
 
 	// Wait for Claude to start (non-fatal)
-	if err := t.WaitForCommand(sessionID, constants.SupportedShells, constants.ClaudeStartTimeout); err != nil {
+	if err := t.WaitForCommand(sessionID, constants.SupportedShells, constants.CursorStartTimeout); err != nil {
 		// Non-fatal - try to continue anyway
 	}
 

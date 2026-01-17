@@ -9,7 +9,7 @@
 #   ./scripts/test-gce-install.sh
 #
 # This script:
-#   1. Installs all prerequisites (Go, git, tmux, beads, Claude Code)
+#   1. Installs all prerequisites (Go, git, tmux, beads, Cursor CLI)
 #   2. Installs Gas Town
 #   3. Runs verification tests
 #   4. Reports success/failure
@@ -187,15 +187,15 @@ else
 fi
 
 # ============================================
-# STEP 7: Claude Code CLI Check
+# STEP 7: Cursor CLI Check
 # ============================================
-log "Checking Claude Code CLI..."
+log "Checking Cursor CLI..."
 
-if command -v claude &> /dev/null; then
-    check "Claude Code CLI found: $(claude --version 2>/dev/null || echo 'installed')"
+if command -v cursor-agent &> /dev/null; then
+    check "Cursor CLI found: $(cursor-agent --version 2>/dev/null || echo 'installed')"
 else
-    warn "Claude Code CLI not installed"
-    echo "  Install from: https://claude.ai/code"
+    warn "Cursor CLI not installed"
+    echo "  Install from: https://cursor.com"
     echo "  Gas Town works without it, but agents won't spawn"
 fi
 
@@ -220,10 +220,10 @@ echo "  - Git: $(git --version | grep -oP '[0-9]+\.[0-9]+\.[0-9]+')"
 echo "  - tmux: $(tmux -V | grep -oP '[0-9]+\.[0-9]+')"
 echo "  - beads: $(bd --version 2>/dev/null | grep -oP '[0-9]+\.[0-9]+\.[0-9]+' || echo 'installed')"
 echo "  - gt: installed"
-if command -v claude &> /dev/null; then
-    echo "  - Claude Code: installed"
+if command -v cursor-agent &> /dev/null; then
+    echo "  - Cursor CLI: installed"
 else
-    echo "  - Claude Code: NOT INSTALLED (optional for basic usage)"
+    echo "  - Cursor CLI: NOT INSTALLED (optional for basic usage)"
 fi
 echo
 echo "Gas Town is ready to use!"
