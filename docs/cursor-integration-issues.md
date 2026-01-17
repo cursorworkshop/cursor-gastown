@@ -6,6 +6,63 @@ This fork of Gas Town uses Cursor CLI (`cursor-agent`) as the default agent back
 
 ---
 
+## Hooks: Two Pathways
+
+Gas Town supports two distinct execution pathways with different hook capabilities.
+
+### Hook Support by Pathway
+
+| Hook | CLI Pathway | IDE Pathway |
+|------|-------------|-------------|
+| `beforeShellExecution` | ✅ Primary | ✅ Available |
+| `afterShellExecution` | ✅ Primary | ✅ Available |
+| `beforeMCPExecution` | ✅ Available | ✅ Available |
+| `afterMCPExecution` | ✅ Available | ✅ Available |
+| `afterFileEdit` | ✅ Available | ✅ Available |
+| `beforeSubmitPrompt` | ❌ | ✅ Primary |
+| `stop` | ❌ | ✅ Primary |
+| `afterAgentResponse` | ❌ | ✅ Available |
+
+### CLI Pathway (`cursor-agent -p`)
+
+For headless/automated execution. Full CLI support planned for future.
+
+| Feature | Hook | Timing |
+|---------|------|--------|
+| Mail injection | `beforeShellExecution` | First command |
+| Cost recording | `afterShellExecution` | Every 10 commands |
+| Audit logging | `afterShellExecution` | Every command |
+| Bead sync | — | Manual (`bd sync`) |
+
+**Use for**: CI/CD, automated testing, batch operations, scripting.
+
+### IDE Pathway (Cursor App)
+
+For interactive development with full hook support.
+
+| Feature | Hook | Timing |
+|---------|------|--------|
+| Mail injection | `beforeSubmitPrompt` | Before each prompt |
+| Cost recording | `stop` | Session end |
+| Bead sync | `stop` | Session end |
+| Audit logging | `afterShellExecution` | Every command |
+
+**Use for**: Production work, interactive sessions, full Gas Town features.
+
+### Hook Files
+
+| File | Pathway | Purpose |
+|------|---------|---------|
+| `gastown-prompt.sh` | IDE | Mail injection before prompt |
+| `gastown-stop.sh` | IDE | Cost recording + sync on stop |
+| `gastown-shell.sh` | Both | Shell hooks (CLI primary, IDE audit) |
+
+### Future: CLI Parity
+
+Cursor CLI hook support is expected to expand. When `beforeSubmitPrompt` and `stop` become available in CLI mode, Gas Town will automatically use them. The current CLI pathway provides functional coverage until then.
+
+---
+
 ## Open Issue: Session Resume
 
 ### Description

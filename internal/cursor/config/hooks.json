@@ -11,9 +11,14 @@
         "command": ".cursor/hooks/gastown-stop.sh"
       }
     ],
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/gastown-shell.sh before"
+      }
+    ],
     "afterShellExecution": [
       {
-        "command": ".cursor/hooks/gastown-audit.sh"
+        "command": ".cursor/hooks/gastown-shell.sh after"
       }
     ]
   }

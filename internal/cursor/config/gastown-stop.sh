@@ -1,9 +1,11 @@
 #!/bin/bash
 # Gas Town stop hook for Cursor
-# Runs when the agent loop ends to record costs and sync state
 #
-# This hook is called by Cursor when the agent completes or is aborted.
-# It records session costs and syncs beads.
+# PATHWAY: IDE ONLY
+# This hook fires in Cursor IDE when the agent session ends.
+# CLI pathway uses afterShellExecution instead (see gastown-shell.sh).
+#
+# Purpose: Record session costs and sync beads on completion.
 
 set -e
 

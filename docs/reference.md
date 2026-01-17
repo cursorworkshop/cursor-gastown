@@ -326,6 +326,10 @@ Gas Town uses two settings templates based on role type:
 Autonomous agents may start without user input, so they need mail checked
 at session start. Interactive agents wait for user prompts.
 
+**Cursor Integration**: Cursor uses different hooks (`.cursor/hooks.json`). See
+[cursor-integration-issues.md](cursor-integration-issues.md) for the two-pathway
+model (CLI vs IDE).
+
 ### Troubleshooting
 
 | Problem | Solution |
@@ -359,7 +363,9 @@ gt config agent remove <name>     # Remove custom agent (built-ins protected)
 gt config default-agent [name]    # Get or set town default agent
 ```
 
-**Built-in agents**: `claude`, `gemini`, `codex`
+**Built-in agents**: `claude`, `cursor-agent`, `gemini`, `codex`
+
+**Cursor CLI**: See [cursor-integration-issues.md](cursor-integration-issues.md) for Cursor-specific hooks and CLI usage.
 
 **Custom agents**: Define per-town in `mayor/town.json`:
 ```bash

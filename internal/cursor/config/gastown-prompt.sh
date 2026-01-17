@@ -1,9 +1,11 @@
 #!/bin/bash
 # Gas Town beforeSubmitPrompt hook for Cursor
-# Runs before each user prompt to inject mail and prime context
 #
-# This hook is called by Cursor before submitting a user prompt.
-# It runs gt mail check --inject to inject any pending mail into the conversation.
+# PATHWAY: IDE ONLY
+# This hook fires in Cursor IDE before each user prompt.
+# CLI pathway uses beforeShellExecution instead (see gastown-shell.sh).
+#
+# Purpose: Inject pending mail into conversation context.
 
 set -e
 
