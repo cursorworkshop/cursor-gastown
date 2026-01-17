@@ -371,7 +371,7 @@ func TestSparseCheckoutCheck_VerifiesAllPatterns(t *testing.T) {
 
 	// Verify all required patterns are present
 	requiredPatterns := []string{
-		"!/.claude/",        // Settings, rules, agents, commands
+		"!/.cursor/",        // Settings, rules, hooks
 		"!/CLAUDE.md",       // Primary context file
 		"!/CLAUDE.local.md", // Personal context file
 		"!/.mcp.json",       // MCP server configuration
@@ -393,7 +393,7 @@ func TestSparseCheckoutCheck_LegacyPatternNotSufficient(t *testing.T) {
 	mayorRig := filepath.Join(rigDir, "mayor", "rig")
 	initGitRepo(t, mayorRig)
 
-	// Manually configure sparse checkout with only legacy .claude/ pattern (missing CLAUDE.md)
+	// Manually configure sparse checkout with only .cursor/ pattern (missing CLAUDE.md)
 	cmd := exec.Command("git", "config", "core.sparseCheckout", "true")
 	cmd.Dir = mayorRig
 	if out, err := cmd.CombinedOutput(); err != nil {
@@ -404,8 +404,8 @@ func TestSparseCheckoutCheck_LegacyPatternNotSufficient(t *testing.T) {
 	if err := os.MkdirAll(filepath.Dir(sparseFile), 0755); err != nil {
 		t.Fatal(err)
 	}
-	// Only include legacy pattern, missing CLAUDE.md
-	if err := os.WriteFile(sparseFile, []byte("/*\n!.claude/\n"), 0644); err != nil {
+	// Only include .cursor/ pattern, missing CLAUDE.md
+	if err := os.WriteFile(sparseFile, []byte("/*\n!.cursor/\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -425,7 +425,7 @@ func TestSparseCheckoutCheck_FixUpgradesLegacyPatterns(t *testing.T) {
 	rigName := "testrig"
 	rigDir := filepath.Join(tmpDir, rigName)
 
-	// Create git repo with legacy sparse checkout (only .claude/)
+	// Create git repo with incomplete sparse checkout (only .cursor/)
 	mayorRig := filepath.Join(rigDir, "mayor", "rig")
 	initGitRepo(t, mayorRig)
 
@@ -439,7 +439,7 @@ func TestSparseCheckoutCheck_FixUpgradesLegacyPatterns(t *testing.T) {
 	if err := os.MkdirAll(filepath.Dir(sparseFile), 0755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(sparseFile, []byte("/*\n!.claude/\n"), 0644); err != nil {
+	if err := os.WriteFile(sparseFile, []byte("/*\n!.cursor/\n"), 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -464,7 +464,7 @@ func TestSparseCheckoutCheck_FixUpgradesLegacyPatterns(t *testing.T) {
 	}
 
 	contentStr := string(content)
-	requiredPatterns := []string{"!/.claude/", "!/CLAUDE.md", "!/CLAUDE.local.md", "!/.mcp.json"}
+	requiredPatterns := []string{"!/.cursor/", "!/CLAUDE.md", "!/CLAUDE.local.md", "!/.mcp.json"}
 	for _, pattern := range requiredPatterns {
 		if !strings.Contains(contentStr, pattern) {
 			t.Errorf("after fix, sparse-checkout file missing pattern %q", pattern)
@@ -520,7 +520,7 @@ func TestSparseCheckoutCheck_FixFailsWithUntrackedCLAUDEMD(t *testing.T) {
 	}
 }
 
-func TestSparseCheckoutCheck_FixFailsWithUntrackedClaudeDir(t *testing.T) {
+func TestSparseCheckoutCheck_FixFailsWithUntrackedCursorDir(t *testing.T) {
 	tmpDir := t.TempDir()
 	rigName := "testrig"
 	rigDir := filepath.Join(tmpDir, rigName)
@@ -529,12 +529,12 @@ func TestSparseCheckoutCheck_FixFailsWithUntrackedClaudeDir(t *testing.T) {
 	mayorRig := filepath.Join(rigDir, "mayor", "rig")
 	initGitRepo(t, mayorRig)
 
-	// Create untracked .claude/ directory (not added to git)
-	claudeDir := filepath.Join(mayorRig, ".claude")
-	if err := os.MkdirAll(claudeDir, 0755); err != nil {
+	// Create untracked .cursor/ directory (not added to git)
+	cursorDir := filepath.Join(mayorRig, ".cursor")
+	if err := os.MkdirAll(cursorDir, 0755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(claudeDir, "settings.json"), []byte("{}"), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(cursorDir, "hooks.json"), []byte("{}"), 0644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -547,15 +547,15 @@ func TestSparseCheckoutCheck_FixFailsWithUntrackedClaudeDir(t *testing.T) {
 		t.Fatalf("expected StatusError before fix, got %v", result.Status)
 	}
 
-	// Fix should fail because .claude/ is untracked and won't be removed
+	// Fix should fail because .cursor/ is untracked and won't be removed
 	err := check.Fix(ctx)
 	if err == nil {
-		t.Fatal("expected Fix to return error for untracked .claude/, but it succeeded")
+		t.Fatal("expected Fix to return error for untracked .cursor/, but it succeeded")
 	}
 
-	// Verify error message mentions .claude
-	if !strings.Contains(err.Error(), ".claude") {
-		t.Errorf("expected error to mention .claude, got: %v", err)
+	// Verify error message mentions .cursor
+	if !strings.Contains(err.Error(), ".cursor") {
+		t.Errorf("expected error to mention .cursor, got: %v", err)
 	}
 }
 

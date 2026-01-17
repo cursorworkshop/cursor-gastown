@@ -12,7 +12,7 @@ Technical reference for Gas Town internals. Read the README first.
 │   ├── CLAUDE.md               Mayor context (on disk)
 │   └── .cursor/hooks.json      Mayor Cursor hooks
 ├── deacon/                     Deacon agent home (background supervisor)
-│   └── .claude/settings.json   Deacon settings (context via gt prime)
+│   └── .cursor/hooks.json      Deacon hooks (context via gt prime)
 └── <rig>/                      Project container (NOT a git clone)
     ├── config.json             Rig identity
     ├── .beads/ → mayor/rig/.beads
@@ -20,16 +20,16 @@ Technical reference for Gas Town internals. Read the README first.
     ├── mayor/rig/              Mayor's clone (canonical beads)
     │   └── CLAUDE.md           Per-rig mayor context (on disk)
     ├── witness/                Witness agent home (monitors only)
-    │   └── .claude/settings.json  (context via gt prime)
+    │   └── .cursor/hooks.json  (context via gt prime)
     ├── refinery/               Refinery settings parent
-    │   ├── .claude/settings.json
+    │   ├── .cursor/hooks.json
     │   └── rig/                Worktree on main
     │       └── CLAUDE.md       Refinery context (on disk)
     ├── crew/                   Crew settings parent (shared)
-    │   ├── .claude/settings.json  (context via gt prime)
+    │   ├── .cursor/hooks.json  (context via gt prime)
     │   └── <name>/rig/         Human workspaces
     └── polecats/               Polecat settings parent (shared)
-        ├── .claude/settings.json  (context via gt prime)
+        ├── .cursor/hooks.json  (context via gt prime)
         └── <name>/rig/         Worker worktrees
 ```
 
@@ -292,11 +292,10 @@ Gas Town uses git sparse checkout to exclude all context files:
 ```bash
 # Automatically configured for worktrees - excludes:
 # - .cursor/       : settings, rules, hooks
-# - .claude/       : legacy settings (for backwards compatibility)
 # - CLAUDE.md      : primary context file
 # - CLAUDE.local.md: personal context file
 # - .mcp.json      : MCP server configuration
-git sparse-checkout set --no-cone '/*' '!/.cursor/' '!/.claude/' '!/CLAUDE.md' '!/CLAUDE.local.md' '!/.mcp.json'
+git sparse-checkout set --no-cone '/*' '!/.cursor/' '!/CLAUDE.md' '!/CLAUDE.local.md' '!/.mcp.json'
 ```
 
 This ensures agents use Gas Town's context, not the source repo's instructions.
@@ -336,7 +335,7 @@ model (CLI vs IDE).
 | Problem | Solution |
 |---------|----------|
 | Agent using wrong settings | Check `gt doctor`, verify sparse checkout |
-| Settings not found | Ensure `.claude/settings.json` exists at role home |
+| Settings not found | Ensure `.cursor/hooks.json` exists at role home |
 | Source repo settings leaking | Run `gt doctor --fix` to configure sparse checkout |
 | Mayor settings affecting polecats | Mayor should run in `mayor/`, not town root |
 

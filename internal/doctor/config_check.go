@@ -295,8 +295,7 @@ func (c *SessionHookCheck) Run(ctx *CheckContext) *CheckResult {
 
 	for _, settingsPath := range settingsFiles {
 		// Skip .cursor/hooks.json files - these are handled by cursor-settings check
-		// and don't apply to Cursor CLI which uses .cursor/ directories
-		if strings.Contains(settingsPath, ".claude"+string(filepath.Separator)) {
+		if strings.Contains(settingsPath, ".cursor"+string(filepath.Separator)) {
 			continue
 		}
 
@@ -332,7 +331,7 @@ func (c *SessionHookCheck) Run(ctx *CheckContext) *CheckResult {
 		Status:  StatusWarning,
 		Message: fmt.Sprintf("%d hook issue(s) found across settings.json files", len(issues)),
 		Details: issues,
-		FixHint: "Update SessionStart/PreCompact hooks to use 'bash ~/.claude/hooks/session-start.sh' for session_id passthrough",
+		FixHint: "Update hooks in .cursor/hooks.json for proper session_id passthrough",
 	}
 }
 
@@ -413,7 +412,7 @@ func (c *SessionHookCheck) findSettingsFiles(townRoot string) []string {
 	var files []string
 
 	// Town root
-	townSettings := filepath.Join(townRoot, ".claude", "settings.json")
+	townSettings := filepath.Join(townRoot, ".cursor", "hooks.json")
 	if _, err := os.Stat(townSettings); err == nil {
 		files = append(files, townSettings)
 	}
@@ -422,37 +421,37 @@ func (c *SessionHookCheck) findSettingsFiles(townRoot string) []string {
 	rigs := findAllRigs(townRoot)
 	for _, rig := range rigs {
 		// Rig root
-		rigSettings := filepath.Join(rig, ".claude", "settings.json")
+		rigSettings := filepath.Join(rig, ".cursor", "hooks.json")
 		if _, err := os.Stat(rigSettings); err == nil {
 			files = append(files, rigSettings)
 		}
 
 		// Mayor/rig
-		mayorRigSettings := filepath.Join(rig, "mayor", "rig", ".claude", "settings.json")
+		mayorRigSettings := filepath.Join(rig, "mayor", "rig", ".cursor", "hooks.json")
 		if _, err := os.Stat(mayorRigSettings); err == nil {
 			files = append(files, mayorRigSettings)
 		}
 
 		// Witness
-		witnessSettings := filepath.Join(rig, "witness", ".claude", "settings.json")
+		witnessSettings := filepath.Join(rig, "witness", ".cursor", "hooks.json")
 		if _, err := os.Stat(witnessSettings); err == nil {
 			files = append(files, witnessSettings)
 		}
 
 		// Witness/rig
-		witnessRigSettings := filepath.Join(rig, "witness", "rig", ".claude", "settings.json")
+		witnessRigSettings := filepath.Join(rig, "witness", "rig", ".cursor", "hooks.json")
 		if _, err := os.Stat(witnessRigSettings); err == nil {
 			files = append(files, witnessRigSettings)
 		}
 
 		// Refinery
-		refinerySettings := filepath.Join(rig, "refinery", ".claude", "settings.json")
+		refinerySettings := filepath.Join(rig, "refinery", ".cursor", "hooks.json")
 		if _, err := os.Stat(refinerySettings); err == nil {
 			files = append(files, refinerySettings)
 		}
 
 		// Refinery/rig
-		refineryRigSettings := filepath.Join(rig, "refinery", "rig", ".claude", "settings.json")
+		refineryRigSettings := filepath.Join(rig, "refinery", "rig", ".cursor", "hooks.json")
 		if _, err := os.Stat(refineryRigSettings); err == nil {
 			files = append(files, refineryRigSettings)
 		}
@@ -462,7 +461,7 @@ func (c *SessionHookCheck) findSettingsFiles(townRoot string) []string {
 		if crewEntries, err := os.ReadDir(crewPath); err == nil {
 			for _, crew := range crewEntries {
 				if crew.IsDir() && !strings.HasPrefix(crew.Name(), ".") {
-					crewSettings := filepath.Join(crewPath, crew.Name(), ".claude", "settings.json")
+					crewSettings := filepath.Join(crewPath, crew.Name(), ".cursor", "hooks.json")
 					if _, err := os.Stat(crewSettings); err == nil {
 						files = append(files, crewSettings)
 					}
@@ -475,7 +474,7 @@ func (c *SessionHookCheck) findSettingsFiles(townRoot string) []string {
 		if polecatEntries, err := os.ReadDir(polecatsPath); err == nil {
 			for _, polecat := range polecatEntries {
 				if polecat.IsDir() && !strings.HasPrefix(polecat.Name(), ".") {
-					polecatSettings := filepath.Join(polecatsPath, polecat.Name(), ".claude", "settings.json")
+					polecatSettings := filepath.Join(polecatsPath, polecat.Name(), ".cursor", "hooks.json")
 					if _, err := os.Stat(polecatSettings); err == nil {
 						files = append(files, polecatSettings)
 					}

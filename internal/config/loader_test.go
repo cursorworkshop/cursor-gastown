@@ -417,12 +417,12 @@ func TestAccountsConfigRoundTrip(t *testing.T) {
 	original.Accounts["yegge"] = Account{
 		Email:       "steve.yegge@gmail.com",
 		Description: "Personal account",
-		ConfigDir:   "~/.claude-accounts/yegge",
+		ConfigDir:   "~/.cursor-accounts/yegge",
 	}
 	original.Accounts["ghosttrack"] = Account{
 		Email:       "steve@ghosttrack.com",
 		Description: "Business account",
-		ConfigDir:   "~/.claude-accounts/ghosttrack",
+		ConfigDir:   "~/.cursor-accounts/ghosttrack",
 	}
 	original.Default = "ghosttrack"
 
@@ -478,7 +478,7 @@ func TestAccountsConfigValidation(t *testing.T) {
 			config: &AccountsConfig{
 				Version: 1,
 				Accounts: map[string]Account{
-					"test": {Email: "test@example.com", ConfigDir: "~/.claude-accounts/test"},
+					"test": {Email: "test@example.com", ConfigDir: "~/.cursor-accounts/test"},
 				},
 				Default: "test",
 			},
@@ -489,7 +489,7 @@ func TestAccountsConfigValidation(t *testing.T) {
 			config: &AccountsConfig{
 				Version: 1,
 				Accounts: map[string]Account{
-					"test": {Email: "test@example.com", ConfigDir: "~/.claude-accounts/test"},
+					"test": {Email: "test@example.com", ConfigDir: "~/.cursor-accounts/test"},
 				},
 				Default: "nonexistent",
 			},

@@ -427,7 +427,7 @@ const CurrentAccountsVersion = 1
 // DefaultAccountsConfigDir returns the default base directory for account configs.
 func DefaultAccountsConfigDir() string {
 	home, _ := os.UserHomeDir()
-	return home + "/.claude-accounts"
+	return home + "/.cursor-accounts"
 }
 
 // MessagingConfig represents the messaging configuration (config/messaging.json).

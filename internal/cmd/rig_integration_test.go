@@ -279,8 +279,8 @@ func TestRigAddCreatesCorrectStructure(t *testing.T) {
 		path string
 		desc string
 	}{
-		{filepath.Join(rigPath, "witness", "rig", ".claude", "settings.json"), "witness/rig/.claude (inside source repo)"},
-		{filepath.Join(rigPath, "refinery", "rig", ".claude", "settings.json"), "refinery/rig/.claude (inside source repo)"},
+		{filepath.Join(rigPath, "witness", "rig", ".cursor", "hooks.json"), "witness/rig/.cursor (inside source repo)"},
+		{filepath.Join(rigPath, "refinery", "rig", ".cursor", "hooks.json"), "refinery/rig/.cursor (inside source repo)"},
 	}
 
 	for _, w := range wrongLocations {

@@ -18,8 +18,8 @@
 .DS_Store
 Thumbs.db
 
-# Legacy local state
-.claude/
+# Local state
+.cursor/
 
 # Test
 coverage.out

@@ -10,9 +10,9 @@ import (
 func TestParseHooksFile(t *testing.T) {
 	// Create a temp directory with a test settings file
 	tmpDir := t.TempDir()
-	claudeDir := filepath.Join(tmpDir, ".claude")
-	if err := os.MkdirAll(claudeDir, 0755); err != nil {
-		t.Fatalf("failed to create .claude dir: %v", err)
+	cursorDir := filepath.Join(tmpDir, ".cursor")
+	if err := os.MkdirAll(cursorDir, 0755); err != nil {
+		t.Fatalf("failed to create .cursor dir: %v", err)
 	}
 
 	settings := CursorSettings{
@@ -42,7 +42,7 @@ func TestParseHooksFile(t *testing.T) {
 		t.Fatalf("failed to marshal settings: %v", err)
 	}
 
-	settingsPath := filepath.Join(claudeDir, "settings.json")
+	settingsPath := filepath.Join(cursorDir, "hooks.json")
 	if err := os.WriteFile(settingsPath, data, 0644); err != nil {
 		t.Fatalf("failed to write settings: %v", err)
 	}

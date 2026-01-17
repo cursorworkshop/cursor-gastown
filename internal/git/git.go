@@ -638,7 +638,6 @@ func ConfigureSparseCheckout(repoPath string) error {
 	// Exclude all Cursor context files to prevent source repo instructions
 	// from interfering with Gas Town agent context:
 	// - .cursor/      : settings, rules, hooks
-	// - .claude/      : legacy settings (for backwards compatibility)
 	// - CLAUDE.md     : primary context file
 	// - CLAUDE.local.md : personal context file
 	// - .mcp.json     : MCP server configuration
@@ -647,7 +646,7 @@ func ConfigureSparseCheckout(repoPath string) error {
 		return fmt.Errorf("creating info dir: %w", err)
 	}
 	sparseFile := filepath.Join(infoDir, "sparse-checkout")
-	sparsePatterns := "/*\n!/.cursor/\n!/.claude/\n!/CLAUDE.md\n!/CLAUDE.local.md\n!/.mcp.json\n"
+	sparsePatterns := "/*\n!/.cursor/\n!/CLAUDE.md\n!/CLAUDE.local.md\n!/.mcp.json\n"
 	if err := os.WriteFile(sparseFile, []byte(sparsePatterns), 0644); err != nil {
 		return fmt.Errorf("writing sparse-checkout: %w", err)
 	}
@@ -672,7 +671,7 @@ func ConfigureSparseCheckout(repoPath string) error {
 
 // ExcludedContextFiles lists all context files that should be excluded by sparse checkout.
 var ExcludedContextFiles = []string{
-	".claude",
+	".cursor",
 	"CLAUDE.md",
 	"CLAUDE.local.md",
 	".mcp.json",
