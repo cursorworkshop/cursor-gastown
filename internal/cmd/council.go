@@ -968,7 +968,7 @@ func runCouncilExport(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("finding town root: %w", err)
 	}
 
-	cfg, err := council.LoadConfig(townRoot)
+	cfg, err := council.LoadOrCreate(townRoot)
 	if err != nil {
 		return fmt.Errorf("loading config: %w", err)
 	}

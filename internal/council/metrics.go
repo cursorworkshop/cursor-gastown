@@ -287,9 +287,15 @@ func (s *MetricsStore) GetMetrics() *Metrics {
 	defer s.mu.RUnlock()
 
 	// Deep copy
-	data, _ := json.Marshal(s.metrics)
+	data, err := json.Marshal(s.metrics)
+	if err != nil {
+		return s.metrics
+	}
+
 	var copy Metrics
-	json.Unmarshal(data, &copy)
+	if err := json.Unmarshal(data, &copy); err != nil {
+		return s.metrics
+	}
 	return &copy
 }
 

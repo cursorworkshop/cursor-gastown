@@ -277,7 +277,7 @@ If NO active work (empty result or only patrol molecules):
 If ACTIVE work exists:
 - Proceed with health check nudges below
 
-**ZFC Principle**: You (the AI) make the judgment call about what is "stuck" or "unresponsive" - there are no hardcoded thresholds in Go. Read the signals, consider context, and decide.
+**ZFC Principle**: You (Cursor) make the judgment call about what is "stuck" or "unresponsive" - there are no hardcoded thresholds in Go. Read the signals, consider context, and decide.
 
 For each rig, run:
 ```bash

@@ -4,6 +4,8 @@ package council
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
@@ -352,9 +354,9 @@ func ExportProfileToFile(profile *Profile, path string) error {
 
 // ImportProfileFromFile imports a profile from a JSON file.
 func ImportProfileFromFile(path string) (*Profile, error) {
-	data, err := os.ReadFile(path)
+	data, err := readProfileBytes(path)
 	if err != nil {
-		return nil, fmt.Errorf("reading profile: %w", err)
+		return nil, err
 	}
 
 	var profile Profile
@@ -363,6 +365,43 @@ func ImportProfileFromFile(path string) (*Profile, error) {
 	}
 
 	return &profile, nil
+}
+
+func readProfileBytes(path string) ([]byte, error) {
+	if isHTTPURL(path) {
+		return fetchProfileFromURL(path)
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("reading profile: %w", err)
+	}
+
+	return data, nil
+}
+
+func isHTTPURL(path string) bool {
+	return strings.HasPrefix(path, "http://") || strings.HasPrefix(path, "https://")
+}
+
+func fetchProfileFromURL(url string) ([]byte, error) {
+	client := &http.Client{Timeout: 15 * time.Second}
+	resp, err := client.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("fetching profile: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("fetching profile: %s", resp.Status)
+	}
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("reading profile response: %w", err)
+	}
+
+	return data, nil
 }
 
 // ApplyProfile applies a profile's configuration.

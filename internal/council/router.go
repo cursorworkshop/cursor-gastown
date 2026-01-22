@@ -26,9 +26,13 @@ func NewRouter(config *Config) *Router {
 		providerStatus: make(map[string]bool),
 	}
 
-	// Initialize all providers as available
-	for provider := range config.Providers {
-		r.providerStatus[provider] = true
+	// Initialize providers based on config availability
+	for provider, pc := range config.Providers {
+		available := true
+		if pc != nil {
+			available = pc.Enabled
+		}
+		r.providerStatus[provider] = available
 	}
 
 	return r
@@ -307,12 +311,24 @@ func QuickRoute(role string) (string, error) {
 func RouteWithComplexity(role string, complexity ComplexityLevel) (string, error) {
 	config := DefaultCouncilConfig()
 	router := NewRouter(config)
+	task := &TaskInfo{}
+	switch complexity {
+	case ComplexityHigh:
+		task.FilesAffected = 10
+		task.LinesChanged = 600
+		task.IsArchitectural = true
+		task.HasTests = true
+	case ComplexityLow:
+		task.FilesAffected = 1
+		task.LinesChanged = 10
+	default:
+		task.FilesAffected = 5
+		task.LinesChanged = 200
+		task.HasTests = true
+	}
 	result, err := router.Route(&RouteRequest{
 		Role: role,
-		Task: &TaskInfo{
-			FilesAffected: int(complexity) * 5,
-			LinesChanged:  int(complexity) * 200,
-		},
+		Task: task,
 	})
 	if err != nil {
 		return "", err

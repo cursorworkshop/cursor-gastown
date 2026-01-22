@@ -15,7 +15,9 @@ func init() {
 	if runtime.GOOS == "darwin" {
 		// Only set if not already set by user
 		if os.Getenv("GODEBUG") == "" {
-			os.Setenv("GODEBUG", "x509usefallbackroots=1")
+			if err := os.Setenv("GODEBUG", "x509usefallbackroots=1"); err != nil {
+				// Best-effort; continue even if environment update fails.
+			}
 		}
 	}
 }

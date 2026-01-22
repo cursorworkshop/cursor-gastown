@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 	"sync"
 	"time"
 )
@@ -113,7 +114,30 @@ func (fm *FallbackManager) CheckHealth(ctx context.Context, provider string) (*P
 		fm.recordFailure(provider)
 		return health, nil
 	}
-	defer resp.Body.Close()
+
+	if resp.StatusCode == http.StatusMethodNotAllowed {
+		if err := resp.Body.Close(); err != nil {
+			// Best-effort; we'll retry with GET regardless.
+		}
+		req, err = http.NewRequestWithContext(ctx, "GET", endpoint, nil)
+		if err != nil {
+			return nil, fmt.Errorf("creating request: %w", err)
+		}
+
+		start = time.Now()
+		resp, err = client.Do(req)
+		health.ResponseTime = time.Since(start)
+		if err != nil {
+			health.Available = false
+			fm.recordFailure(provider)
+			return health, nil
+		}
+	}
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			// Best-effort; response body is already consumed.
+		}
+	}()
 
 	// 401/403 means the endpoint is reachable (auth failed, but API is up)
 	// 429 means rate limited
@@ -312,10 +336,10 @@ func isRateLimitError(err error) bool {
 	if err == nil {
 		return false
 	}
-	errStr := err.Error()
-	return contains([]string{errStr}, "rate limit") ||
-		contains([]string{errStr}, "429") ||
-		contains([]string{errStr}, "too many requests")
+	errStr := strings.ToLower(err.Error())
+	return strings.Contains(errStr, "rate limit") ||
+		strings.Contains(errStr, "too many requests") ||
+		strings.Contains(errStr, "429")
 }
 
 // StartBackgroundRecovery starts a goroutine to periodically check for circuit recovery.
