@@ -1,5 +1,5 @@
 {
-  "name": "@gastown/gt",
+  "name": "@cursor-gastown/gt",
   "version": "0.1.0",
   "description": "Gas Town CLI - multi-agent workspace manager with native binary support",
   "main": "bin/gt.js",

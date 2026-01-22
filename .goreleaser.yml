@@ -160,7 +160,7 @@ release:
 
     **npm (Node.js):**
     ```bash
-    npm install -g @gastown/gt
+    npm install -g @cursor-gastown/gt
     ```
 
     **Manual Install:**
