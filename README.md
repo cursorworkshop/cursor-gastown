@@ -15,6 +15,17 @@ Cursor Gas Town coordinates multiple Cursor agents working on different tasks. W
 | 4-10 agents become chaotic | Scale to 20-30 agents |
 | Work state lost in memory | Stored in Beads ledger |
 
+## Default Model Selection (Role Matrix)
+
+Gas Town routes work by role using these default models:
+
+| Role | Default Model | Rationale |
+|------|---------------|-----------|
+| Mayor | opus-4.5-thinking | Strategic coordination |
+| Polecat | sonnet-4.5 | Best coding model |
+| Refinery | gpt-5.2-high | Different perspective |
+| Witness | gemini-3-flash | Fast, cheap monitoring |
+
 ## Core Concepts
 
 - **Mayor** - Your primary AI coordinator. Start here.
