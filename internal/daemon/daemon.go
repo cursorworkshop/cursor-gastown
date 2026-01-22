@@ -107,7 +107,8 @@ func (d *Daemon) Run() error {
 
 	// Handle signals
 	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM, syscall.SIGUSR1)
+	baseSignals := []os.Signal{syscall.SIGINT, syscall.SIGTERM}
+	signal.Notify(sigChan, append(baseSignals, extraSignals()...)...)
 
 	// Fixed recovery-focused heartbeat (no activity-based backoff)
 	// Normal wake is handled by feed subscription (bd activity --follow)
@@ -134,9 +135,8 @@ func (d *Daemon) Run() error {
 			return d.shutdown(state)
 
 		case sig := <-sigChan:
-			if sig == syscall.SIGUSR1 {
-				// SIGUSR1: immediate lifecycle processing (from gt handoff)
-				d.logger.Println("Received SIGUSR1, processing lifecycle requests immediately")
+			if isImmediateSignal(sig) {
+				d.logger.Println("Received immediate lifecycle signal, processing requests")
 				d.processLifecycleRequests()
 			} else {
 				d.logger.Printf("Received signal %v, shutting down", sig)
