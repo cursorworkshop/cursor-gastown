@@ -10,10 +10,10 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/steveyegge/gastown/internal/council"
-	"github.com/steveyegge/gastown/internal/style"
-	"github.com/steveyegge/gastown/internal/templates"
-	"github.com/steveyegge/gastown/internal/workspace"
+	"github.com/cursorworkshop/cursor-gastown/internal/council"
+	"github.com/cursorworkshop/cursor-gastown/internal/style"
+	"github.com/cursorworkshop/cursor-gastown/internal/templates"
+	"github.com/cursorworkshop/cursor-gastown/internal/workspace"
 )
 
 var councilCmd = &cobra.Command{

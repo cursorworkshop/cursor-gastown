@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/steveyegge/gastown/internal/config"
+	"github.com/cursorworkshop/cursor-gastown/internal/config"
 )
 
 // Adapter translates Gas Town operations to Cursor CLI commands.
@@ -259,6 +259,15 @@ func TranslateRuntimeConfig(rc *config.RuntimeConfig, workDir string) *Adapter {
 	}
 
 	return adapter
+}
+
+// CleanOrphanClaudeConfig removes any orphaned Claude-specific configuration files.
+// Returns true if any files were cleaned, false otherwise.
+// This is a no-op in the current implementation as we've moved to multi-model orchestration.
+func CleanOrphanClaudeConfig(workDir string) (bool, error) {
+	// In the future, this could check for old Claude-specific config files
+	// and remove them. For now, it's a safe no-op.
+	return false, nil
 }
 
 // EnsureWorkspaceReady ensures the workspace is ready for cursor-agent.
