@@ -6,74 +6,89 @@ This fork of Gas Town uses Cursor CLI (`cursor-agent`) as the default agent back
 
 ---
 
-## Hooks: Two Pathways
+## Hooks: Full CLI Support (v2026.01.17+)
 
-Gas Town supports two distinct execution pathways with different hook capabilities.
+As of Cursor CLI v2026.01.17, **all critical hooks are available in CLI mode**. Gas Town now
+has full parity between IDE and CLI pathways.
 
-### Hook Support by Pathway
+### Hook Support
 
-| Hook | CLI Pathway | IDE Pathway |
-|------|-------------|-------------|
-| `beforeShellExecution` | ✅ Primary | ✅ Available |
-| `afterShellExecution` | ✅ Primary | ✅ Available |
-| `beforeMCPExecution` | ✅ Available | ✅ Available |
-| `afterMCPExecution` | ✅ Available | ✅ Available |
-| `afterFileEdit` | ✅ Available | ✅ Available |
-| `beforeSubmitPrompt` | ❌ | ✅ Primary |
-| `stop` | ❌ | ✅ Primary |
-| `afterAgentResponse` | ❌ | ✅ Available |
+| Hook | CLI | IDE | Purpose |
+|------|-----|-----|---------|
+| `sessionStart` | ✅ | ✅ | Inject initial context, set env vars |
+| `beforeSubmitPrompt` | ✅ | ✅ | Gate prompt submission |
+| `preCompact` | ✅ | ✅ | Observe/prepare for context compaction |
+| `stop` | ✅ | ✅ | Cleanup, cost recording, sync |
+| `beforeShellExecution` | ✅ | ✅ | Permission gating for shell commands |
+| `afterShellExecution` | ✅ | ✅ | Audit logging |
+| `sessionEnd` | ✅ | ✅ | Fire-and-forget cleanup |
 
-### CLI Pathway (`cursor-agent -p`)
+### Gas Town Hook Implementation
 
-For headless/automated execution. Full CLI support planned for future.
+| Hook | Script | Purpose |
+|------|--------|---------|
+| `sessionStart` | `gastown-session-start.sh` | Inject mail via `additional_context`, set `GT_SESSION_ID` |
+| `beforeSubmitPrompt` | `gastown-prompt.sh` | Allow prompt (context injected at session start) |
+| `preCompact` | `gastown-precompact.sh` | Remind agent to run `gt prime` after compaction |
+| `stop` | `gastown-stop.sh` | Record costs, sync beads |
+| `beforeShellExecution` | `gastown-shell.sh` | Permission (always allow) |
+| `afterShellExecution` | `gastown-shell.sh` | Audit logging (when `GT_DEBUG` set) |
 
-| Feature | Hook | Timing |
-|---------|------|--------|
-| Mail injection | `beforeShellExecution` | First command |
-| Cost recording | `afterShellExecution` | Every 10 commands |
-| Audit logging | `afterShellExecution` | Every command |
-| Bead sync | — | Manual (`bd sync`) |
+### Hook Input/Output Schemas
 
-**Use for**: CI/CD, automated testing, batch operations, scripting.
+**sessionStart**:
+```json
+// Input
+{"session_id": "...", "is_background_agent": bool, "composer_mode": "agent"|"ask"|"edit"}
 
-### IDE Pathway (Cursor App)
+// Output
+{"continue": true, "env": {"KEY": "value"}, "additional_context": "text to inject"}
+```
 
-For interactive development with full hook support.
+**beforeSubmitPrompt**:
+```json
+// Input
+{"prompt": "...", "attachments": [...]}
 
-| Feature | Hook | Timing |
-|---------|------|--------|
-| Mail injection | `beforeSubmitPrompt` | Before each prompt |
-| Cost recording | `stop` | Session end |
-| Bead sync | `stop` | Session end |
-| Audit logging | `afterShellExecution` | Every command |
+// Output
+{"continue": true|false, "user_message": "shown when blocked"}
+```
 
-**Use for**: Production work, interactive sessions, full Gas Town features.
+**preCompact**:
+```json
+// Input
+{"trigger": "auto"|"manual", "context_usage_percent": 85, ...}
 
-### Hook Files
+// Output
+{"user_message": "shown to user/agent"}
+```
 
-| File | Pathway | Purpose |
-|------|---------|---------|
-| `gastown-prompt.sh` | IDE | Mail injection before prompt |
-| `gastown-stop.sh` | IDE | Cost recording + sync on stop |
-| `gastown-shell.sh` | Both | Shell hooks (CLI primary, IDE audit) |
+**stop**:
+```json
+// Input
+{"status": "completed"|"aborted"|"error", "loop_count": 0}
 
-### Future: CLI Parity
+// Output
+{"followup_message": "auto-submit as next prompt"} // optional
+```
 
-Cursor CLI hook support is expected to expand. When `beforeSubmitPrompt` and `stop` become available in CLI mode, Gas Town will automatically use them. The current CLI pathway provides functional coverage until then.
+**beforeShellExecution**:
+```json
+// Input
+{"command": "...", "cwd": "..."}
+
+// Output
+{"permission": "allow"|"deny"|"ask", "user_message": "...", "agent_message": "..."}
+```
 
 ---
 
-## Open Issue: Session IDs
+## Session ID Attribution
 
-### Description
-
-Gas Town needs a reliable session ID for attribution across restarts. We need to understand how to capture and use Cursor's chat ID programmatically.
-
-### Open Questions
-
-1. Where does cursor-agent output the chat ID during a session?
-2. How to use `cursor-agent ls` in non-TTY environments?
-3. Does cursor-agent expose a stable session ID in headless mode?
+The `sessionStart` hook receives a `session_id` from Cursor. Gas Town:
+1. Captures this in the hook
+2. Sets `GT_SESSION_ID` and `CURSOR_SESSION_ID` environment variables
+3. Uses it for cost attribution and session tracking
 
 ---
 
@@ -87,6 +102,10 @@ Gas Town needs a reliable session ID for attribution across restarts. We need to
 | Task execution               | YES    |
 | Multi-file tasks             | YES    |
 | Workspace trust bypass       | YES    |
+| sessionStart hook            | YES (v2026.01.17+) |
+| beforeSubmitPrompt hook      | YES (v2026.01.17+) |
+| preCompact hook              | YES (v2026.01.17+) |
+| stop hook                    | YES (v2026.01.17+) |
 
 ---
 
@@ -108,3 +127,28 @@ Gas Town needs a reliable session ID for attribution across restarts. We need to
 auto, opus-4.5-thinking, opus-4.5, sonnet-4.5, sonnet-4.5-thinking,
 gpt-5.2, gpt-5.2-high, gpt-5.1-codex-max, gemini-3-pro, gemini-3-flash, grok
 ```
+
+### Version Check
+
+```bash
+cursor-agent --version
+# Should show v2026.01.17 or later for full hook support
+```
+
+---
+
+## Hook Behavior by Mode
+
+| Hook | `-p` (headless) | `-f` (interactive) | IDE |
+|------|-----------------|-------------------|-----|
+| `sessionStart` | ✅ Fires | ✅ Fires | ✅ Fires |
+| `beforeSubmitPrompt` | ❌ No | ✅ Fires | ✅ Fires |
+| `preCompact` | ❓ Only on compaction | ❓ Only on compaction | ✅ Fires |
+| `stop` | ❌ No | ✅ Fires | ✅ Fires |
+| `sessionEnd` | ✅ Fires | ✅ Fires | ✅ Fires |
+| `beforeShellExecution` | ✅ Fires | ✅ Fires | ✅ Fires |
+| `afterShellExecution` | ✅ Fires | ✅ Fires | ✅ Fires |
+
+**Key insight**: For headless (`-p`) mode, use `sessionStart` for initial context injection
+and `sessionEnd` for cleanup. The `beforeSubmitPrompt` and `stop` hooks only fire in
+interactive modes.

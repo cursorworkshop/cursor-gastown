@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-//go:embed config/hooks.json config/gastown-prompt.sh config/gastown-stop.sh config/gastown-shell.sh
+//go:embed config/hooks.json config/gastown-session-start.sh config/gastown-prompt.sh config/gastown-precompact.sh config/gastown-stop.sh config/gastown-session-end.sh config/gastown-shell.sh
 var hooksFS embed.FS
 
 // HooksConfig represents the structure of Cursor's hooks.json
@@ -32,22 +32,23 @@ func EnsureHooks(workDir string) error {
 		return fmt.Errorf("creating hooks directory: %w", err)
 	}
 
-	// Install hooks.json if it doesn't exist
+	// Always install/update hooks.json to ensure latest hooks are configured
 	hooksJsonPath := filepath.Join(cursorDir, "hooks.json")
-	if _, err := os.Stat(hooksJsonPath); os.IsNotExist(err) {
-		content, err := hooksFS.ReadFile("config/hooks.json")
-		if err != nil {
-			return fmt.Errorf("reading hooks.json template: %w", err)
-		}
-		if err := os.WriteFile(hooksJsonPath, content, 0644); err != nil {
-			return fmt.Errorf("writing hooks.json: %w", err)
-		}
+	content, err := hooksFS.ReadFile("config/hooks.json")
+	if err != nil {
+		return fmt.Errorf("reading hooks.json template: %w", err)
+	}
+	if err := os.WriteFile(hooksJsonPath, content, 0644); err != nil {
+		return fmt.Errorf("writing hooks.json: %w", err)
 	}
 
 	// Install hook scripts
 	hookScripts := []string{
+		"gastown-session-start.sh",
 		"gastown-prompt.sh",
+		"gastown-precompact.sh",
 		"gastown-stop.sh",
+		"gastown-session-end.sh",
 		"gastown-shell.sh",
 	}
 

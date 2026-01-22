@@ -1,31 +1,34 @@
 #!/bin/bash
 # Gas Town stop hook for Cursor
 #
-# PATHWAY: IDE ONLY
-# This hook fires in Cursor IDE when the agent session ends.
-# CLI pathway uses afterShellExecution instead (see gastown-shell.sh).
+# Called when the agent loop ends.
+# Records session costs and syncs beads.
 #
-# Purpose: Record session costs and sync beads on completion.
+# Input:  {"status": "completed"|"aborted"|"error", "loop_count": N}
+# Output: {"followup_message": "..."} - optional, triggers another turn
 
-set -e
+# Read JSON input from stdin (required - must consume it)
+input=$(cat)
 
-# Read JSON input from stdin (required by Cursor hooks protocol)
-json_input=$(cat)
-
-# Export PATH to ensure gt is available
+# Export PATH to ensure gt/bd are available
 export PATH="$HOME/go/bin:$HOME/bin:$HOME/.local/bin:$PATH"
 
-# Parse the status from input
-status=$(echo "$json_input" | grep -o '"status":"[^"]*"' | cut -d'"' -f4 2>/dev/null || echo "unknown")
+# Parse status for logging
+status=$(echo "$input" | grep -o '"status":"[^"]*"' | cut -d'"' -f4 2>/dev/null || echo "unknown")
 
-# Only run if we're in a Gas Town context (GT_ROLE is set)
+# Log stop event for debugging
+if [ -n "$GT_DEBUG" ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] stop: status=$status" >> /tmp/gastown-hooks.log
+fi
+
+# Only run cost/sync if we're in a Gas Town context
 if [ -n "$GT_ROLE" ]; then
-    # Record costs
-    gt costs record 2>/dev/null || true
+    # Record session costs (suppress all output)
+    gt costs record >/dev/null 2>&1 || true
     
-    # Sync beads if bd is available
-    if command -v bd &> /dev/null; then
-        bd sync 2>/dev/null || true
+    # Sync beads if bd is available (suppress all output)
+    if command -v bd &>/dev/null; then
+        bd sync >/dev/null 2>&1 || true
     fi
 fi
 

@@ -42,12 +42,20 @@ func TestEnsureHooks(t *testing.T) {
 		t.Error("no hooks configured")
 	}
 
-	// Check specific hooks
-	if _, ok := config.Hooks["beforeSubmitPrompt"]; !ok {
-		t.Error("beforeSubmitPrompt hook not configured")
+	// Check specific hooks - all required for Gas Town CLI support
+	requiredHooks := []string{
+		"sessionStart",
+		"beforeSubmitPrompt",
+		"preCompact",
+		"stop",
+		"sessionEnd",
+		"beforeShellExecution",
+		"afterShellExecution",
 	}
-	if _, ok := config.Hooks["stop"]; !ok {
-		t.Error("stop hook not configured")
+	for _, hook := range requiredHooks {
+		if _, ok := config.Hooks[hook]; !ok {
+			t.Errorf("%s hook not configured", hook)
+		}
 	}
 }
 
@@ -61,8 +69,11 @@ func TestEnsureHooks_ScriptsCreated(t *testing.T) {
 
 	// Check hook scripts were created
 	scripts := []string{
+		"gastown-session-start.sh",
 		"gastown-prompt.sh",
+		"gastown-precompact.sh",
 		"gastown-stop.sh",
+		"gastown-session-end.sh",
 		"gastown-shell.sh",
 	}
 
