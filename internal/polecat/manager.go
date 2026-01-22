@@ -77,7 +77,7 @@ func NewManager(r *rig.Rig, g *git.Git) *Manager {
 	return &Manager{
 		rig:      r,
 		git:      g,
-		beads:    beads.New(beadsPath),
+		beads:    beads.NewWithBeadsDir(beadsPath, resolvedBeads),
 		namePool: pool,
 	}
 }

@@ -1362,7 +1362,8 @@ func createAutoConvoy(beadID, beadTitle string) (string, error) {
 	}
 
 	createCmd := exec.Command("bd", append([]string{"--no-daemon"}, createArgs...)...)
-	createCmd.Dir = townBeads
+	createCmd.Dir = townRoot
+	createCmd.Env = append(os.Environ(), "BEADS_DIR="+townBeads)
 	createCmd.Stderr = os.Stderr
 
 	if err := createCmd.Run(); err != nil {
@@ -1373,7 +1374,8 @@ func createAutoConvoy(beadID, beadTitle string) (string, error) {
 	trackBeadID := formatTrackBeadID(beadID)
 	depArgs := []string{"--no-daemon", "dep", "add", convoyID, trackBeadID, "--type=tracks"}
 	depCmd := exec.Command("bd", depArgs...)
-	depCmd.Dir = townBeads
+	depCmd.Dir = townRoot
+	depCmd.Env = append(os.Environ(), "BEADS_DIR="+townBeads)
 	depCmd.Stderr = os.Stderr
 
 	if err := depCmd.Run(); err != nil {

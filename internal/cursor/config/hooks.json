@@ -3,22 +3,22 @@
   "hooks": {
     "beforeSubmitPrompt": [
       {
-        "command": ".cursor/hooks/gastown-prompt.sh"
+        "command": "bash -lc 'dir=\"$PWD\"; while [ \"$dir\" != \"/\" ] && [ ! -x \"$dir/.cursor/hooks/gastown-prompt.sh\" ]; do dir=$(dirname \"$dir\"); done; \"$dir/.cursor/hooks/gastown-prompt.sh\"'"
       }
     ],
     "stop": [
       {
-        "command": ".cursor/hooks/gastown-stop.sh"
+        "command": "bash -lc 'dir=\"$PWD\"; while [ \"$dir\" != \"/\" ] && [ ! -x \"$dir/.cursor/hooks/gastown-stop.sh\" ]; do dir=$(dirname \"$dir\"); done; \"$dir/.cursor/hooks/gastown-stop.sh\"'"
       }
     ],
     "beforeShellExecution": [
       {
-        "command": ".cursor/hooks/gastown-shell.sh before"
+        "command": "bash -lc 'dir=\"$PWD\"; while [ \"$dir\" != \"/\" ] && [ ! -x \"$dir/.cursor/hooks/gastown-shell.sh\" ]; do dir=$(dirname \"$dir\"); done; \"$dir/.cursor/hooks/gastown-shell.sh\" before'"
       }
     ],
     "afterShellExecution": [
       {
-        "command": ".cursor/hooks/gastown-shell.sh after"
+        "command": "bash -lc 'dir=\"$PWD\"; while [ \"$dir\" != \"/\" ] && [ ! -x \"$dir/.cursor/hooks/gastown-shell.sh\" ]; do dir=$(dirname \"$dir\"); done; \"$dir/.cursor/hooks/gastown-shell.sh\" after'"
       }
     ]
   }
