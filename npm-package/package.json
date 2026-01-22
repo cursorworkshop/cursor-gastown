@@ -1,6 +1,6 @@
 {
   "name": "@cursorworkshop/cursor-gastown",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Gas Town CLI - multi-agent workspace manager with native binary support",
   "main": "bin/gt.js",
   "bin": {
