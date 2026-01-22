@@ -390,7 +390,11 @@ func fetchProfileFromURL(url string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("fetching profile: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() {
+		if err := resp.Body.Close(); err != nil {
+			// Best-effort; response body is already consumed.
+		}
+	}()
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("fetching profile: %s", resp.Status)
