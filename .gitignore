@@ -2,6 +2,8 @@
 /gt
 !cmd/gt/
 *.exe
+ /npm-package/bin/gt
+ /npm-package/bin/gt.exe
 
 # Build
 /dist/
